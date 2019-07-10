@@ -1,0 +1,34 @@
+{
+    "name": "cmkit",
+    "version": "1.0.4",
+    "description": "common web developer tool box.",
+    "main": "index.js",
+    "scripts": {
+        "install": "node install/install.js",
+        "prepublishOnly": "uglifyjs src/cmkit.js src/cocos.js -o cocos/assets/cmkit.js && uglifyjs src/module.js src/cmkit.js -o index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sutext/cmkit.git"
+    },
+    "keywords": [
+        "cmkit",
+        "cocos",
+        "cocoscreator",
+        "plugin"
+    ],
+    "files": [
+        "cocos",
+        "dist",
+        "install"
+    ],
+    "author": "supertext",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/sutext/cmkit/issues"
+    },
+    "homepage": "https://github.com/sutext/cmkit#readme",
+    "devDependencies": {
+        "uglify-js": "^3.6.0"
+    }
+}

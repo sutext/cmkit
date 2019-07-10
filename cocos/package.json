@@ -1,0 +1,16 @@
+{
+    "name": "cmkit",
+    "version": "1.0.0",
+    "description": "cocos creator common tool box.",
+    "main": "main.js",
+    "author": "supertext",
+    "runtime-resource": {
+        "path": "assets",
+        "name": "assets"
+    },
+    "reload": {
+        "ignore": [
+            "assets/**/*"
+        ]
+    }
+}
