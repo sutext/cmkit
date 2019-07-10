@@ -263,19 +263,31 @@
         });
     };
     ns.loadclip = function (dir, progress) {
-        return ns.loaddir(cc.SpriteFrame, dir, progress)
-            .then(function (value) {
-                if (Array.isArray(value.assets) && value.assets.length > 0) {
-                    value.assets.sort(function (a, b) {
-                        return a.name > b.name ? 1 : -1;
-                    });
-                    var clip = cc.AnimationClip.createWithSpriteFrames(value.assets, value.assets.length);
+        if (CC_DEV) {
+            return ns.loaddir(cc.SpriteFrame, dir, progress)
+                .then(function (value) {
+                    if (Array.isArray(value.assets) && value.assets.length > 0) {
+                        value.assets.sort(function (a, b) { return a.name > b.name ? 1 : -1; });
+                        var clip = cc.AnimationClip.createWithSpriteFrames(value.assets, value.assets.length);
+                        clip.wrapMode = cc.WrapMode.Loop;
+                        return clip;
+                    } else {
+                        throw new Error('resource not found');
+                    }
+                })
+        } else {
+            return ns.loadres(cc.SpriteAtlas, dir + '/AutoAtlas', progress).then(function (atlas) {
+                var values = atlas.getSpriteFrames();
+                if (keys.length > 0) {
+                    values.sort(function (a, b) { return a.name > b.name ? 1 : -1; });
+                    var clip = cc.AnimationClip.createWithSpriteFrames(values, values.length);
                     clip.wrapMode = cc.WrapMode.Loop;
                     return clip;
                 } else {
                     throw new Error('resource not found');
                 }
             })
+        }
     }
     ns.loadbone = function (dir, name, progress) {
         return new Promise(function (resolve, reject) {

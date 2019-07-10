@@ -1,6 +1,6 @@
 {
     "name": "cmkit",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "description": "common web developer tool box.",
     "main": "index.js",
     "scripts": {
@@ -14,13 +14,13 @@
     "keywords": [
         "cmkit",
         "cocos",
-        "cocoscreator",
+        "creator",
         "plugin"
     ],
     "files": [
         "cocos",
-        "dist",
-        "install"
+        "install",
+        "index.js"
     ],
     "author": "supertext",
     "license": "ISC",

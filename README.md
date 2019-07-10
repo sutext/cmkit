@@ -18,3 +18,4 @@ for index.tsx
 * npm i cmkit --save-dev
 * cmkit 将以插件的形式安装到pacakges目录下面
 * 扩展cocos creator的基础库 增加大量实用工具
+* cmkit 将同步安装cocos creator 的 header 文件

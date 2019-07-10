@@ -60,8 +60,15 @@ declare namespace cm {
         urls: string[];
     }>;
     /**
-     * @description 加载一个序列帧动画
-     * @param dir 相对于resources的目录名称
+     * @description 加载远程图片资源
+     * @param url 完整url地址
+     * @param progress 加载进度
+     */
+    const loadtxe: (url: string, progress?: IProgress) => Promise<cc.Texture2D>;
+    /**
+     * @description 加载指定目录下的一个序列帧动画 帧序列需以文件名按字典顺序排序
+     * @param dir 相对于resources的目录名称 
+     * @wran dir 必须配置自动图集
      * @param progress 加载进度
      */
     const loadclip: (dir: string, progress?: IProgress) => Promise<cc.AnimationClip>
@@ -73,12 +80,6 @@ declare namespace cm {
      * @param progress 加载进度
      */
     const loadbone: (dir: string, name: string, progress?: IProgress) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
-    /**
-     * @description 加载远程图片资源
-     * @param url 完整url地址
-     * @param progress 加载进度
-     */
-    const loadtxe: (url: string, progress?: IProgress) => Promise<cc.Texture2D>;
 }
 declare namespace cc {
     interface Button {
@@ -189,7 +190,6 @@ declare namespace cm {
             readonly cancel?: Action
             readonly onhide?: () => void
             readonly confirm?: Action
-
         }
     }
     namespace pop {
