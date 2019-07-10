@@ -278,7 +278,7 @@
         } else {
             return ns.loadres(cc.SpriteAtlas, dir + '/AutoAtlas', progress).then(function (atlas) {
                 var values = atlas.getSpriteFrames();
-                if (keys.length > 0) {
+                if (values.length > 0) {
                     values.sort(function (a, b) { return a.name > b.name ? 1 : -1; });
                     var clip = cc.AnimationClip.createWithSpriteFrames(values, values.length);
                     clip.wrapMode = cc.WrapMode.Loop;
