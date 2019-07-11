@@ -23,6 +23,8 @@ declare namespace cm {
      * @param debug 是否开启debug 模式 @default false
      */
     const entry: (apihost: string, debug?: boolean) => <T extends Game>(target: new () => T) => void
+    /** @description 以16进制字符串生成颜色 */
+    const color: (hex: string) => cc.Color
     /** @description 全局游戏代理实例 */
     const game: Game
     /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
