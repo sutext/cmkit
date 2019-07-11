@@ -1,16 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 (function () {
     "use strict";
     function verify(length) {
@@ -261,6 +248,19 @@ var __extends = (this && this.__extends) || (function () {
 
 //--------------------Network Socket Storage ----------------
 (function (ns) {
+    var __extends = (this && this.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        }
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
     ns.Network = (function () {
         function Network() {
             var _this = this;
@@ -631,10 +631,8 @@ var __extends = (this && this.__extends) || (function () {
                 this.timeout = null;
                 this.interval = 30;
                 this.send = function () {
-                    if (!_this.allow || _this.timeout)
-                        return;
-                    if (_this.socket.readyState !== Socket.OPEN)
-                        return;
+                    if (!_this.allow || _this.timeout) return;
+                    if (_this.socket.readyState !== Socket.OPEN) return;
                     var data = "{\"type\":\"PING\"}";
                     _this.socket.send(data);
                     ns.log('Send PING:', data);
@@ -646,19 +644,16 @@ var __extends = (this && this.__extends) || (function () {
                 };
                 this.receive = function (msg) {
                     ns.log("Received PONG", msg);
-                    if (!_this.allow || !_this.timeout)
-                        return;
+                    if (!_this.allow || !_this.timeout) return;
                     clearTimeout(_this.timeout);
                     _this.timeout = null;
                 };
                 this.start = function () {
-                    if (!_this.allow || _this.timer)
-                        return;
+                    if (!_this.allow || _this.timer) return;
                     _this.timer = setInterval(_this.send.bind(_this), _this.interval * 1000);
                 };
                 this.stop = function () {
-                    if (!_this.allow || !_this.timer)
-                        return;
+                    if (!_this.allow || !_this.timer) return;
                     clearInterval(_this.timer);
                     _this.timer = null;
                 };
@@ -804,8 +799,7 @@ var __extends = (this && this.__extends) || (function () {
             return idxkey;
         }
         function getObjkey(clskey, id) {
-            if (!clskey || !id)
-                return null;
+            if (!clskey || !id) return null;
             return clskey + "." + id;
         }
         function getItem(key) {
@@ -842,8 +836,7 @@ var __extends = (this && this.__extends) || (function () {
             };
         };
         orm.save = function (model) {
-            if (!model)
-                return;
+            if (!model) return;
             var clskey = getClskey(model.constructor);
             var idxkey = getIdxkey(model.constructor);
             var objkey = getObjkey(clskey, model[idxkey]);
