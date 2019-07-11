@@ -14,6 +14,8 @@ declare namespace cm {
         protected abstract onShow(): void
         /** @description 游戏隐藏时候调用 通常是host app 进入后台台时调用 */
         protected abstract onHide(): void
+        /** @description 退出游戏 需提供具体实现*/
+        public abstract exit(): void
     }
     /** 
      * @description Mark a Game Entry class. There can only be one game entry

@@ -206,12 +206,12 @@ var __extends = (this && this.__extends) || (function () {
     "use strict";
     ns.log = function () {
         if (ns.debug) {
-            console.log.apply(console, args)
+            console.log.apply(console, arguments)
         }
     }
     ns.warn = function () {
         if (ns.debug) {
-            console.warn.apply(console, args)
+            console.warn.apply(console, arguments)
         }
     }
     ns.call = function () {
