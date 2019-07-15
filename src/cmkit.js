@@ -1,21 +1,21 @@
 (function () {
     "use strict";
     Number.prototype.fixlen = function (len) {
-        if (typeof len !== 'number' && len < 1) { len = 2; }
+        if (typeof len !== 'number' || len < 1) { len = 2; }
         return (Array(len).join('0') + this).slice(-len);
     };
     Number.prototype.round = function (len) {
-        if (typeof len !== 'number' && len < 0) { len = 0; }
+        if (typeof len !== 'number' || len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.round(this * pow) / pow;
     };
     Number.prototype.floor = function (len) {
-        if (typeof len !== 'number' && len < 0) { len = 0; }
+        if (typeof len !== 'number' || len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.floor(this * pow) / pow;
     };
     Number.prototype.ceil = function (len) {
-        if (typeof len !== 'number' && len < 0) { len = 0; }
+        if (typeof len !== 'number' || len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.ceil(this * pow) / pow;
     };
@@ -54,7 +54,7 @@
         configurable: true
     });
     String.prototype.fixlen = function (len) {
-        if (typeof len !== 'number' && len < 1) { len = 2; }
+        if (typeof len !== 'number' || len < 1) { len = 2; }
         return (Array(len).join('0') + this).slice(-len);
     };
     String.prototype.parsed = function () {

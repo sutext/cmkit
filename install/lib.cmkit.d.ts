@@ -11,7 +11,7 @@ interface String {
     /**
      * @description fix the length of number
      * @example '1'.fixlen(2) -> '01' '12331'.fixlen(3)->'331'
-     * @param len number of length @default 2
+     * @param len must be positive nonzero number otherwise use @default 2
      */
     readonly fixlen: (len?: number) => string
 }
