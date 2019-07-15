@@ -1,28 +1,21 @@
 (function () {
     "use strict";
-    function verify(length) {
-        if (typeof length !== 'number' && length < 0) {
-            throw new Error('Precision must be positive integer!')
-        }
-    }
     Number.prototype.fixlen = function (len) {
-        if (typeof len !== 'number' && len < 1) {
-            throw new Error('Precision must be positive nonzero integer!')
-        }
+        if (typeof len !== 'number' && len < 1) { len = 2; }
         return (Array(len).join('0') + this).slice(-len);
     };
     Number.prototype.round = function (len) {
-        verify(len);
+        if (typeof len !== 'number' && len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.round(this * pow) / pow;
     };
     Number.prototype.floor = function (len) {
-        verify(len);
+        if (typeof len !== 'number' && len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.floor(this * pow) / pow;
     };
     Number.prototype.ceil = function (len) {
-        verify(len);
+        if (typeof len !== 'number' && len < 0) { len = 0; }
         var pow = Math.pow(10, len);
         return Math.ceil(this * pow) / pow;
     };
@@ -60,11 +53,8 @@
         enumerable: true,
         configurable: true
     });
-    String.prototype.fixlen = function (length) {
-        var len = 2;
-        if (typeof length === 'number' && length >= 1) {
-            len = length;
-        }
+    String.prototype.fixlen = function (len) {
+        if (typeof len !== 'number' && len < 1) { len = 2; }
         return (Array(len).join('0') + this).slice(-len);
     };
     String.prototype.parsed = function () {

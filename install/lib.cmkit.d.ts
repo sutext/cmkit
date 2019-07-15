@@ -31,17 +31,17 @@ interface Date {
 interface Number {
     /**
      * @example trun 1.3411111 to 1.35 when precision=2
-     * @param precision the permision of ceil @default 0
+     * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly ceil: (precision?: number) => number
     /**
      * @example trun 1.34567 to 1.34 when precision=2
-     * @param precision the permision of floor @default 0
+     * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly floor: (precision?: number) => number
     /**
      * @example trun 1.34567 to 1.35 when precision=2
-     * @param precision the permision of round @default 0
+     * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly round: (precision?: number) => number
     /**
@@ -52,7 +52,7 @@ interface Number {
     /**
      * @description fix the length of number
      * @example 1.fixlen(2) -> '01' 1987.fixlen(3) -> '987'
-     * @param len number of length @default 2 @warn len must be positive nonzero number
+     * @param len must be positive nonzero number otherwise use @default 2
      */
     readonly fixlen: (len?: number) => string
     /**
