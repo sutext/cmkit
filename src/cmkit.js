@@ -244,6 +244,15 @@
         ns.apihost = host
         ns.debug = debug
     }
+    ns.mapkey = function (target, field) {
+        if (!target || !target.constructor) {
+            throw new Error('The mapkeymust mark on a MetaClass property');
+        }
+        if (target.constructor.__mapkey) {
+            throw new Error('The mapkey of MetaClass must be unique');
+        }
+        target.constructor.__mapkey = field;
+    };
 })(window.cm = (window.cm || {}));
 
 //--------------------Network Socket Storage ----------------
@@ -289,13 +298,18 @@
             };
             this.objreq = function (req) {
                 if (typeof req.meta !== 'function')
-                    throw new Error('the req of objreq must be Function');
+                    throw new Error('the meta of objreq must be a Constructor');
                 return _this.objtask(req.meta, req.path, req.data, req.options);
             };
             this.aryreq = function (req) {
                 if (typeof req.meta !== 'function')
-                    throw new Error('the req of aryreq must be Function');
+                    throw new Error('the meta of aryreq must be a Constructor');
                 return _this.arytask(req.meta, req.path, req.data, req.options);
+            };
+            this.mapreq = function (req) {
+                if (typeof req.meta !== 'function')
+                    throw new Error('the meta of mapreq must be a Constructor');
+                return _this.maptask(req.meta, req.path, req.data, req.options);
             };
             this.anytask = function (path, data, opts) {
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
@@ -327,6 +341,42 @@
                         return parser(json);
                     })
                     .then(function (value) { return Array.isArray(value) ? value.map(function (ele) { return new meta(ele); }) : []; });
+                return new Network.DataTask(promiss, values[1]);
+            };
+            this.maptask = function (meta, path, data, opts) {
+                var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
+                var values = Network.http(_this.url(path), _this.params(data), options);
+                var promiss = values[0]
+                    .then(function (json) {
+                        var parser = options && options.parser || _this.resolve.bind(_this);
+                        return parser(json);
+                    })
+                    .then(function (value) {
+                        var result = {};
+                        var mapkey = meta.__mapkey || 'id';
+                        if (Array.isArray(value)) {
+                            value.forEach(function (ele) {
+                                var obj = new meta(ele);
+                                var keyvalue = obj[mapkey];
+                                if (keyvalue) {
+                                    result[keyvalue] = obj;
+                                } else {
+                                    ns.warn('the mapkey:', mapkey, 'not exist in object:', obj);
+                                }
+                            })
+                        } if (typeof value === 'object') {
+                            for (var key in value) {
+                                if (value.hasOwnProperty(key)) {
+                                    var obj = new meta(value[key]);
+                                    var keyvalue = obj[mapkey];
+                                    if (keyvalue === key) {
+                                        result[keyvalue] = obj;
+                                    }
+                                }
+                            }
+                        }
+                        return result;
+                    });
                 return new Network.DataTask(promiss, values[1]);
             };
         }
@@ -759,8 +809,7 @@
         var _stored = {};
         orm._storage = window.localStorage;
         function awake(cls, json) {
-            if (!json)
-                return undefined;
+            if (!json) return undefined;
             var obj = new cls();
             Object.assign(obj, json);
             var fields = cls[FIELD_KEY];

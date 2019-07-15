@@ -150,6 +150,8 @@ declare namespace cm {
     const config: (host: string, debug?: boolean) => void
 }
 declare namespace cm {
+    /**  @description  mark a field of IMetaClass as mapkey in Network.mapreq and Network.maptask. */
+    const mapkey: (target: Object, field: string) => void;
     interface IMetaClass<T> {
         new(json?: any): T;
     }
@@ -201,9 +203,18 @@ declare namespace cm {
         readonly anyreq: <T = any>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly objreq: <T>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly aryreq: <T>(req: Network.Request<T>) => Network.DataTask<T[]>;
+        readonly mapreq: <T>(req: Network.Request<T>) => Network.DataTask<Record<string, T>>;
         readonly anytask: <T = any>(path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly objtask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly arytask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T[]>;
+        /**
+         * @description create a map result http task.
+         * @param meta the meta class of Data @notice the cm.mapkey field must be exist in meta, otherwise 'id' used.
+         * @param path the uri of http request
+         * @param data the data of http request
+         * @param opts the options of http request
+         */
+        readonly maptask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<Record<string, T>>;
     }
     namespace Network {
         type Method = 'POST' | 'GET';
@@ -384,8 +395,9 @@ declare namespace cm {
     namespace orm {
         /**
          * @description  A class decorate use to store class.
-         * @param clsname the class name of your storage class
-         * @param primary the primary key name of your storage class
+         * @param clskey the class name of your storage class
+         * @param idxkey the primary key field name of your storage class
+         * @notice the idxkey must be exist in the metaclass
          */
         const store: (clskey: string, idxkey: string) => <T>(target: IMetaClass<T>) => void;
         /**
