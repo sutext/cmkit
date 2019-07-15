@@ -879,9 +879,6 @@
         enumerable: true,
         configurable: true
     });
-    Counter.prototype.onDestroy = function () {
-        ns.call(this._stopFunc);
-    }
     Counter.prototype.formater = function (value) {
         return value.round(2).comma();
     };
@@ -910,12 +907,7 @@
                 var dur = delta / (this._step * this._rate);
                 if (dur < 0.3) { dur = 0.3 }
                 var sid = cc.audioEngine.play(this.sound, true, 1);
-                var _this = this;
-                this._stopFunc = function () {
-                    cc.audioEngine.stop(sid);
-                    _this._stopFunc = undefined;
-                }
-                this.scheduleOnce(this._stopFunc, dur)
+                window.setTimeout(function () { cc.audioEngine.stop(sid) }, dur * 1000);
             }
         }
     };
