@@ -166,23 +166,13 @@
     }
     cc.Sprite.prototype.setAtlas = function (dir, name, progress) {
         var _this = this;
-        if (CC_DEV) {
-            return ns.loadres(cc.Texture2D, dir + '/' + name, progress).then(function (txe) {
-                if (_this.node) {
-                    _this.spriteFrame = new cc.SpriteFrame(txe);
-                    return _this;
-                }
-                return _this;
-            })
-        } else {
-            return ns.loadres(cc.SpriteAtlas, dir + '/AutoAtlas', progress).then(function (atlas) {
-                var sprite = atlas.getSpriteFrame(name);
-                if (_this.node && sprite) {
-                    _this.spriteFrame = sprite;
-                }
-                return _this;
-            })
-        }
+        return ns.loadres(cc.SpriteAtlas, dir, progress).then(function (atlas) {
+            var sprite = atlas.getSpriteFrame(name);
+            if (_this.node && sprite) {
+                _this.spriteFrame = sprite;
+            }
+            return _this;
+        })
     }
     cc.Sprite.prototype.adjust = function (width, height) {
         if (!(this.node && this.spriteFrame)) return;
@@ -262,33 +252,6 @@
             });
         });
     };
-    ns.loadclip = function (dir, progress) {
-        if (CC_DEV) {
-            return ns.loaddir(cc.SpriteFrame, dir, progress)
-                .then(function (value) {
-                    if (Array.isArray(value.assets) && value.assets.length > 0) {
-                        value.assets.sort(function (a, b) { return a.name > b.name ? 1 : -1; });
-                        var clip = cc.AnimationClip.createWithSpriteFrames(value.assets, value.assets.length);
-                        clip.wrapMode = cc.WrapMode.Loop;
-                        return clip;
-                    } else {
-                        throw new Error('resource not found');
-                    }
-                })
-        } else {
-            return ns.loadres(cc.SpriteAtlas, dir + '/AutoAtlas', progress).then(function (atlas) {
-                var values = atlas.getSpriteFrames();
-                if (values.length > 0) {
-                    values.sort(function (a, b) { return a.name > b.name ? 1 : -1; });
-                    var clip = cc.AnimationClip.createWithSpriteFrames(values, values.length);
-                    clip.wrapMode = cc.WrapMode.Loop;
-                    return clip;
-                } else {
-                    throw new Error('resource not found');
-                }
-            })
-        }
-    }
     ns.loadbone = function (dir, name, progress) {
         return new Promise(function (resolve, reject) {
             if (!(dir && name)) {

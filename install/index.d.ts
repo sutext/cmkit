@@ -70,13 +70,6 @@ declare namespace cm {
      */
     const loadtxe: (url: string, progress?: IProgress) => Promise<cc.Texture2D>;
     /**
-     * @description 加载指定目录下的一个序列帧动画 帧序列需以文件名按字典顺序排序
-     * @param dir 相对于resources的目录名称 
-     * @wran dir 必须配置自动图集
-     * @param progress 加载进度
-     */
-    const loadclip: (dir: string, progress?: IProgress) => Promise<cc.AnimationClip>
-    /**
      * @description 加载并缓存 一个dragonBones骨骼动画
      * @param dir 资源目录 相对于resources
      * @param name 骨骼动画文件名 不带后缀 骨骼动画三个文件必须一致规范命名 
@@ -144,12 +137,12 @@ declare namespace cc {
          */
         readonly setImage: (url: string, progress?: cm.IProgress) => Promise<cc.Sprite>
         /**
-         * @description 用于在自动图集模式下加载目录下的一张图片
-         * @param dir 图集相对于resourses 的目录
+         * @description 用于加载图集的一张图片
+         * @param atlas 图集url 相对于resourses 的目录
          * @param name 图集中的图片名称，不带后缀
          * @param progress 加载进度
          */
-        readonly setAtlas: (dir: string, name: string, progress?: cm.IProgress) => Promise<cc.Sprite>
+        readonly setAtlas: (atlas: string, name: string, progress?: cm.IProgress) => Promise<cc.Sprite>
     }
 }
 declare namespace dragonBones {
