@@ -994,9 +994,13 @@
             label.verticalAlign = target.verticalAlign;
             node.x = -this.offset.x;
             node.y = -this.offset.y;
-            node.color = this.node.color;
-            this.node.color = this.color;
-            this.node.addChild(node);
+            if (label.overflow === cc.Label.Overflow.SHRINK) {
+                node.width = target.node.width;
+                node.height = target.node.height;
+            }
+            node.color = target.node.color;
+            target.node.color = this.color;
+            target.node.addChild(node);
             this._label = label;
             return label;
         },
