@@ -457,8 +457,10 @@
         Network.Error = Error;
         var DataTask = /** @class */ (function() {
             function DataTask(promiss, handler) {
-                var _this = this;
+                this.promiss = promiss;
+                this.handler = handler;
                 this[Symbol.toStringTag] = 'Promise';
+                var _this = this;
                 this.then = function(onfulfilled, onrejected) {
                     return _this.promiss.then(onfulfilled, onrejected);
                 };
@@ -466,13 +468,13 @@
                     return _this.promiss.catch(onrejected);
                 };
                 this.abort = function() {
-                    _this.handler.abort();
+                    if (this.handler.readyState < 4) {
+                        _this.handler.abort();
+                    }
                 };
                 this.onProgress = function(func) {
                     _this.handler.onprogress = func;
                 };
-                this.promiss = promiss;
-                this.handler = handler;
             }
             return DataTask;
         })();
@@ -482,7 +484,7 @@
             function UploadTask() {
                 var _this = (_super !== null && _super.apply(this, arguments)) || this;
                 _this.onProgress = function(func) {
-                    _this['handler'].upload.onprogress = func;
+                    _this.handler.upload.onprogress = func;
                 };
                 return _this;
             }
