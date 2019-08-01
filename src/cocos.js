@@ -890,7 +890,7 @@
         configurable: true
     });
     Counter.prototype.formater = function(value) {
-        return value.round(2).comma();
+        return value.round().comma();
     };
     Counter.prototype.steper = function(delta) {
         if (delta < this._rate) {
