@@ -3,110 +3,110 @@ interface String {
      * @description parse the url string to formated object
      */
     readonly parsed: () => {
-        readonly query: string
-        readonly host: string
-        readonly schema: string
-        readonly [key: string]: string
-    }
+        readonly query: string;
+        readonly host: string;
+        readonly schema: string;
+        readonly [key: string]: string;
+    };
     /**
      * @description fix the length of number
      * @example '1'.fixlen(2) -> '01' '12331'.fixlen(3)->'331'
      * @param len must be positive nonzero number otherwise use @default 2
      */
-    readonly fixlen: (len?: number) => string
+    readonly fixlen: (len?: number) => string;
 }
 interface Date {
     /** @example 59:45 */
-    readonly mmss: string
+    readonly mmss: string;
     /** @example 08:00*/
-    readonly hhmm: string
+    readonly hhmm: string;
     /** @example 23:59:45*/
-    readonly hhmmss: string
+    readonly hhmmss: string;
     /**
      * @description format the Date to string
      * @param fmt @example 'yyyy-MM-dd hh:mm:ss'
      */
-    readonly format: (fmt: string) => string
+    readonly format: (fmt: string) => string;
 }
 interface Number {
     /**
      * @example trun 1.3411111 to 1.35 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
-    readonly ceil: (precision?: number) => number
+    readonly ceil: (precision?: number) => number;
     /**
      * @example trun 1.34567 to 1.34 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
-    readonly floor: (precision?: number) => number
+    readonly floor: (precision?: number) => number;
     /**
      * @example trun 1.34567 to 1.35 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
-    readonly round: (precision?: number) => number
+    readonly round: (precision?: number) => number;
     /**
      * @description insert comma symbol to the integer part
      * @example 23123.1234.comma -> '23,123.1234'
      */
-    readonly comma: () => string
+    readonly comma: () => string;
     /**
      * @description fix the length of number
      * @example 1.fixlen(2) -> '01' 1987.fixlen(3) -> '987'
      * @param len must be positive nonzero number otherwise use @default 2
      */
-    readonly fixlen: (len?: number) => string
+    readonly fixlen: (len?: number) => string;
     /**
      * @description get index symbol of int number @example 23 -> 23rd @returns 'rd'
      */
-    readonly symidx: 'st' | 'nd' | 'rd' | 'th'
+    readonly symidx: 'st' | 'nd' | 'rd' | 'th';
 }
 interface Array<T> {
     /**
      * @description get the last element from the stack
      */
-    readonly last: T | undefined
+    readonly last: T | undefined;
     /**
      * @description get the first element from the stack
      */
-    readonly first: T | undefined
+    readonly first: T | undefined;
     /**
      * @description get an random index of array return -1 when empty
      */
-    readonly ranidx: number
+    readonly ranidx: number;
     /**
      * @description get an random item from arrary,if empty return undefined
      */
-    readonly random: T | undefined
+    readonly random: T | undefined;
     /**
      * @description insert item at index
      * @param item the item to be insert
-     * @param index the index of new item 
+     * @param index the index of new item
      * @notice the max value of index is the length of befor ary
      */
-    readonly insert: (item: T, index: number) => void
+    readonly insert: (item: T, index: number) => void;
     /**
      * @description append other sequence of T
      * @param ary the sequence which will be append
      * @returns the length of self affter append.
      */
-    readonly append: (ary: T[]) => number
+    readonly append: (ary: T[]) => number;
     /**
      * @description delete an object from array
      * @returns the index that been deleted. if not found retrun -1
      * @param item the object need to be delete
      */
-    readonly delete: (item: T) => number
+    readonly delete: (item: T) => number;
     /**
      * @description delete on at index
      * @returns the object that been deleted if out of bounds retrun undefined
      * @param index the index need to be delete
      */
-    readonly remove: (index: number) => T | undefined
+    readonly remove: (index: number) => T | undefined;
     /**
      * @description judge array contains the item or not.
      * @param item the target item.
      */
-    readonly contains: (item: T) => boolean
+    readonly contains: (item: T) => boolean;
 }
 declare namespace cm {
     /**@description print info message when debug allow */
@@ -147,13 +147,13 @@ declare namespace cm {
     /** @description api server name*/
     const apihost: string;
     /** @description config global value*/
-    const config: (host: string, debug?: boolean) => void
+    const config: (host: string, debug?: boolean) => void;
 }
 declare namespace cm {
     /**  @description  mark a field of IMetaClass as mapkey in Network.mapreq and Network.maptask. */
     const mapkey: (target: Object, field: string) => void;
     interface IMetaClass<T> {
-        new(json?: any): T;
+        new (json?: any): T;
     }
     interface IObserver {
         readonly target: any;
@@ -319,9 +319,9 @@ declare namespace cm {
             readonly message: IObserver[];
         }
         /**
-        * @description A retry machine for web socket
-        * @description You can use it in any place where need retry machine
-        */
+         * @description A retry machine for web socket
+         * @description You can use it in any place where need retry machine
+         */
         class Retry {
             /**
              * @description base attempt delay time @default 100 milliscond
@@ -386,8 +386,8 @@ declare namespace cm {
             /** @description call when socket closed @param reason the close reason */
             protected onClosed(res: CloseEvent, reason: Reason): void;
             readonly isConnected: boolean;
-            readonly on: (evt: "error" | "message" | "close" | "open", target: any, callback: Function) => void;
-            readonly off: (evt: "error" | "message" | "close" | "open", target: any) => void;
+            readonly on: (evt: 'error' | 'message' | 'close' | 'open', target: any, callback: Function) => void;
+            readonly off: (evt: 'error' | 'message' | 'close' | 'open', target: any) => void;
             readonly stop: () => void;
             readonly start: () => void;
         }

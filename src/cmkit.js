@@ -262,7 +262,7 @@
     };
     ns.mapkey = function(target, field) {
         if (!target || !target.constructor) {
-            throw new Error('The mapkeymust mark on a MetaClass property');
+            throw new Error('The mapkey must mark on a MetaClass property');
         }
         if (target.constructor.__mapkey) {
             throw new Error('The mapkey of MetaClass must be unique');

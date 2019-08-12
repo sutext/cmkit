@@ -206,10 +206,10 @@ declare namespace cm {
         const wait: (msg?: string) => void;
         const idle: () => void;
     }
-    class SKPage extends cc.Component {
+    class SKPage<P = any> extends cc.Component {
         public readonly stack: Stack;
         /**push options */
-        protected options?: any;
+        protected props?: P;
         protected willShow(): void;
         protected willHide(): void;
         protected didShow(): void;
@@ -230,7 +230,7 @@ declare namespace cm {
          * @param finish the finishcall back @default undefined
          */
         public readonly pop: (deltaOrFinish?: number | (() => void), finish?: () => void) => void;
-        public readonly push: (name: string, options?: any, finish?: () => void) => void;
+        public readonly push: (name: string, props?: any, finish?: () => void) => void;
         /**
          * @description get the stack of current scene
          * @warn if Stack did't mount on root Canvan node,null will be retrun
