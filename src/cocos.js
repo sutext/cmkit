@@ -755,12 +755,13 @@
             this._root.didShow();
         }
     };
-    Stack.prototype.push = function(name, finish) {
+    Stack.prototype.push = function(name, options, finish) {
         var page = this.genPage(name);
         var top = this.top;
         var width = this.node.width;
         this.pageStack.push(page);
         this.node.addChild(page.node);
+        page.options = options;
         page.node.x = width;
         page.willShow();
         page.node.runAction(
