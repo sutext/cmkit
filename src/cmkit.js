@@ -580,21 +580,26 @@
             var _this = this;
             this._retrying = false;
             this.retryable = false;
+            this.binaryType = 'arraybuffer';
+            this.buildurl = builder;
+            this.protocols = protocols;
+            this.retry = new Socket.Retry(this.onRetryCallback.bind(this), this.onRetryFailed.bind(this));
             this.open = function() {
                 if (_this.readyState === Socket.CONNECTING || _this.readyState === Socket.OPEN || typeof _this.buildurl !== 'function') {
                     return;
                 }
                 if (_this.ws) {
-                    _this.ws.onopen = null;
-                    _this.ws.onclose = null;
-                    _this.ws.onerror = null;
-                    _this.ws.onmessage = null;
+                    _this.ws.onopen = undefined;
+                    _this.ws.onclose = undefined;
+                    _this.ws.onerror = undefined;
+                    _this.ws.onmessage = undefined;
                 }
                 _this.ws = new WebSocket(_this.buildurl(), _this.protocols);
                 _this.ws.onclose = _this.onCloseCallback.bind(_this);
                 _this.ws.onerror = _this.onErrorCallback.bind(_this);
                 _this.ws.onmessage = _this.onMessageCallback.bind(_this);
                 _this.ws.onopen = _this.onOpenCallback.bind(_this);
+                _this.ws.binaryType = _this.binaryType;
             };
             this.close = function(code, reason) {
                 if (!_this.ws) return;
@@ -604,9 +609,6 @@
             this.send = function(data) {
                 _this.ws && _this.ws.send(data);
             };
-            this.buildurl = builder;
-            this.protocols = protocols;
-            this.retry = new Socket.Retry(this.onRetryCallback.bind(this), this.onRetryFailed.bind(this));
         }
         Socket.prototype.onRetryCallback = function() {
             this.open();
@@ -702,13 +704,14 @@
             function Retry(attempt, failed) {
                 var _this = this;
                 this.delay = 100;
-                this.times = 8;
-                this.count = 0; //已经尝试次数
+                this.chance = 8;
+                this.count = 0;
+                this.allow = true;
                 this.reset = function() {
                     _this.count = 0;
                 };
                 this.attempt = function(evt) {
-                    if (_this.count < _this.times) {
+                    if (this.allow && _this.count < _this.chance) {
                         setTimeout(function() {
                             return _this.onAttempt(evt);
                         }, _this.random(_this.count++, _this.delay));
@@ -726,16 +729,15 @@
         })();
         Socket.Retry = Retry;
         var Ping = (function() {
-            function Ping(socket, allow) {
-                if (allow === void 0) {
-                    allow = true;
-                }
+            function Ping(socket) {
                 var _this = this;
+                this.allow = true;
                 this.timer = null;
                 this.timeout = null;
                 this.interval = 30;
+                this.socket = socket;
                 this.send = function() {
-                    if (!_this.allow || _this.timeout) return;
+                    if (_this.timeout) return;
                     if (_this.socket.readyState !== Socket.OPEN) return;
                     var data = '{"type":"PING"}';
                     _this.socket.send(data);
@@ -748,7 +750,7 @@
                 };
                 this.receive = function(msg) {
                     ns.log('Received PONG', msg);
-                    if (!_this.allow || !_this.timeout) return;
+                    if (!_this.timeout) return;
                     clearTimeout(_this.timeout);
                     _this.timeout = null;
                 };
@@ -757,12 +759,10 @@
                     _this.timer = setInterval(_this.send.bind(_this), _this.interval * 1000);
                 };
                 this.stop = function() {
-                    if (!_this.allow || !_this.timer) return;
+                    if (!_this.timer) return;
                     clearInterval(_this.timer);
                     _this.timer = null;
                 };
-                this.allow = allow;
-                this.socket = socket;
             }
             return Ping;
         })();
@@ -806,7 +806,7 @@
                 this.socket = new Socket(function() {
                     return _this.buildurl();
                 });
-                this.ping = new Ping(this.socket, this.allowPing);
+                this.ping = new Ping(this.socket);
                 this.socket.onopen = function(evt, isRetry) {
                     ns.log('Socket Client Opend', evt);
                     _this.onOpened(evt, isRetry);
@@ -831,16 +831,6 @@
                     _this.onClosed(evt, reason);
                 };
             }
-            Object.defineProperty(Client.prototype, 'allowPing', {
-                get: function() {
-                    return true;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Client.prototype.buildurl = function() {
-                return '';
-            };
             Client.prototype.onError = function(res) {};
             Client.prototype.onOpened = function(res, isRetry) {};
             Client.prototype.onClosed = function(res) {};

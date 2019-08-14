@@ -286,23 +286,23 @@ declare namespace cm {
          */
         const post: (url: string, data?: any, opts?: Options) => [Promise<any>, XMLHttpRequest];
     }
+    /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {
-        retryable: boolean;
         binaryType: BinaryType;
         readonly retry: Socket.Retry;
-        onopen: (evt: Event, isRetry: boolean) => void;
-        onclose: (evt: CloseEvent, reason: Socket.Reason) => void;
-        onerror: (evt: ErrorEvent) => void;
-        onmessage: (evt: MessageEvent) => void;
-        constructor(builder: () => string, protocols?: string | string[]);
+        readonly send: (data: BlobPart) => void;
         readonly open: () => void;
         readonly close: (code?: number, reason?: string) => void;
-        readonly send: (data: BlobPart) => void;
         readonly isRetrying: boolean;
         readonly protocol: string;
         readonly extensions: string;
         readonly readyState: number;
         readonly bufferedAmount: number;
+        onopen: (evt: Event, isRetry: boolean) => void;
+        onclose: (evt: CloseEvent, reason: Socket.Reason) => void;
+        onerror: (evt: ErrorEvent) => void;
+        onmessage: (evt: MessageEvent) => void;
+        constructor(builder: () => string, protocols?: string | string[]);
     }
     namespace Socket {
         const OPEN: number;
@@ -312,50 +312,43 @@ declare namespace cm {
         type Events = keyof Observers;
         type Reason = 'user' | 'ping' | 'retry' | 'server';
         type Status = 'closed' | 'closing' | 'opened' | 'opening';
-        class Observers {
+        interface Observers {
             readonly open: IObserver[];
             readonly error: IObserver[];
             readonly close: IObserver[];
             readonly message: IObserver[];
         }
-        /**
-         * @description A retry machine for web socket
-         * @description You can use it in any place where need retry machine
-         */
-        class Retry {
+        /** @description A retry machine for web socket  */
+        interface Retry {
             /**
              * @description base attempt delay time @default 100 milliscond
              * @description the real delay time use a exponential random algorithm
              */
             delay: number;
-            /**
-             * @description the max retry times when retrying @default 58
-             */
-            times: number;
-            constructor(attempt: (evt: CloseEvent) => void, failed: (evt: CloseEvent) => void);
-            /**
-             * @description reset retry times counter
-             */
-            readonly reset: () => void;
-            /**
-             * @description use this method to trigger onAttempt action or onFailed action
-             */
-            readonly attempt: (evt: CloseEvent) => void;
+            /** @description allow ping pong mechanism or not. @default true */
+            allow: boolean;
+            /** @description the max retry times when retrying @default 8 */
+            chance: number;
         }
-        class Ping {
-            constructor(socket: Socket, allow?: boolean);
+        interface Ping {
             /**
-             * @description desc the time interval of ping @default 30s
+             * @description allow ping pong mechanism or not.
+             * @default true
+             * @warn It doesn't work affter socket has been started.
+             */
+            allow: boolean;
+            /**
+             * @description the time interval of ping
+             * @default 30s
+             * @notice It doesn't work affter socket has been started.
              */
             interval: number;
-            readonly receive: (msg: any) => void;
-            readonly start: () => void;
-            readonly stop: () => void;
         }
         /**
          * @description socket client wrapped on Socket
          * @description you must inherit this class to implements your logic
          * @implements client PING heartbeat mechanis
+         * @implements client reconnect  mechanis
          */
         abstract class Client {
             /**
@@ -370,9 +363,6 @@ declare namespace cm {
              * @notice you must trigger it yourself at overwrite point
              */
             protected readonly observers: Observers;
-            constructor();
-            /** @description overwrite point set allow ping or not */
-            protected readonly allowPing: boolean;
             /** Tell me your login status if not no retry */
             protected abstract readonly isLogin: boolean;
             /** @overwrite this method to provide url for web socket */
