@@ -2,27 +2,27 @@ var fs = require('fs');
 var baseDir = process.cwd();
 if (!fs.existsSync(`${baseDir}/../../package.json`)) {
     console.log('is not in local project dir! no need install!');
-    return
+    return;
 }
 function cpdir(src, dist) {
     fs.mkdirSync(dist);
     var files = fs.readdirSync(src);
-    files.forEach(function (file) {
+    files.forEach(function(file) {
         var srcFile = src + '/' + file;
-        var distFile = dist + '/' + file
+        var distFile = dist + '/' + file;
         if (fs.statSync(srcFile).isDirectory()) {
             cpdir(srcFile, distFile);
         } else {
             fs.copyFileSync(srcFile, distFile);
         }
-    })
+    });
 }
-var rmdir = function (dir) {
+var rmdir = function(dir) {
     var files = [];
     if (fs.existsSync(dir)) {
         files = fs.readdirSync(dir);
-        files.forEach(function (file) {
-            var path = dir + "/" + file;
+        files.forEach(function(file) {
+            var path = dir + '/' + file;
             if (fs.statSync(path).isDirectory()) {
                 rmdir(path);
             } else {
@@ -43,7 +43,7 @@ if (!fs.existsSync(typesTarget)) {
 }
 if (fs.existsSync(`${baseDir}/../../project.json`) && fs.existsSync(`${baseDir}/../../assets`)) {
     var packagesDir = `${baseDir}/../../packages`;
-    var packageTarget = packagesDir + '/cmkit'
+    var packageTarget = packagesDir + '/cmkit';
     if (!fs.existsSync(packagesDir)) {
         fs.mkdirSync(packagesDir);
     }
@@ -51,9 +51,12 @@ if (fs.existsSync(`${baseDir}/../../project.json`) && fs.existsSync(`${baseDir}/
         rmdir(packageTarget);
     }
     cpdir(baseDir + `/cocos`, packageTarget);
-    fs.copyFileSync(installDir + '/index.d.ts', typesTarget + '/index.d.ts')
-    fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/lib.cmkit.d.ts')
-    fs.copyFileSync(installDir + '/lib.cocos.d.ts', typesTarget + '/lib.cocos.d.ts')
+    fs.copyFileSync(installDir + '/index.d.ts', typesTarget + '/index.d.ts');
+    fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/lib.cmkit.d.ts');
+    fs.copyFileSync(installDir + '/lib.cocos.d.ts', typesTarget + '/lib.cocos.d.ts');
+    fs.rmdirSync(baseDir);
 } else {
-    fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/index.d.ts')
+    fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/index.d.ts');
+    fs.rmdirSync(baseDir + '/install');
+    fs.rmdirSync(baseDir + '/cocos');
 }

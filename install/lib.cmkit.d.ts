@@ -288,8 +288,8 @@ declare namespace cm {
     }
     /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {
-        binaryType: BinaryType;
-        readonly retry: Socket.Retry;
+        binaryType: BinaryType; /** @default 'arraybuffer' */
+        readonly retry: Socket.Retry; /** @description retry settings */
         readonly send: (data: BlobPart) => void;
         readonly open: () => void;
         readonly close: (code?: number, reason?: string) => void;
@@ -352,11 +352,13 @@ declare namespace cm {
          */
         abstract class Client {
             /**
-             * @description the ping mechanis
-             * @ping  use socket.send("{\"type\":\"PING\"}")
-             * @pong  receive message = "{\"type\":\"PONG\"}"
+             * @description the client ping mechanis
+             * @ping use socket.send("{\"type\":\"PING\"}")
+             * @pong receive message = "{\"type\":\"PONG\"}"
+             * @note the server must send the specified @pong  when recived @ping otherwhis please close the ping
              */
             protected readonly ping: Ping;
+            /** the realy websocket handler */
             protected readonly socket: Socket;
             /**
              * @notice all the observers will not be trigger
@@ -367,7 +369,7 @@ declare namespace cm {
             protected abstract readonly isLogin: boolean;
             /** @overwrite this method to provide url for web socket */
             protected abstract buildurl(): string;
-            /** call when get some message @override point */
+            /** call when get some message @override point  @node the msg has been parsed using JSON.parse.*/
             protected abstract onMessage(msg: any): void;
             /** call when some error occur @override point */
             protected onError(res: ErrorEvent): void;
@@ -375,11 +377,16 @@ declare namespace cm {
             protected onOpened(res: any, isRetry: boolean): void;
             /** @description call when socket closed @param reason the close reason */
             protected onClosed(res: CloseEvent, reason: Reason): void;
-            readonly isConnected: boolean;
+            readonly isConnected: boolean; /** the connection status */
+            /**
+             * @description add event listener
+             * @warn By default all the envents will not be triggered unless triggerde by userself.
+             */
             readonly on: (evt: 'error' | 'message' | 'close' | 'open', target: any, callback: Function) => void;
+            /** @description remove listener */
             readonly off: (evt: 'error' | 'message' | 'close' | 'open', target: any) => void;
-            readonly stop: () => void;
-            readonly start: () => void;
+            readonly stop: () => void; /** disconnect and stop ping pong retry */
+            readonly start: () => void; /** connect the server and start ping pong retry */
         }
     }
     namespace orm {
