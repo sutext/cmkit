@@ -54,9 +54,8 @@ if (fs.existsSync(`${baseDir}/../../project.json`) && fs.existsSync(`${baseDir}/
     fs.copyFileSync(installDir + '/index.d.ts', typesTarget + '/index.d.ts');
     fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/lib.cmkit.d.ts');
     fs.copyFileSync(installDir + '/lib.cocos.d.ts', typesTarget + '/lib.cocos.d.ts');
-    fs.rmdirSync(baseDir);
 } else {
     fs.copyFileSync(installDir + '/lib.cmkit.d.ts', typesTarget + '/index.d.ts');
-    fs.rmdirSync(baseDir + '/install');
-    fs.rmdirSync(baseDir + '/cocos');
 }
+rmdir(baseDir + '/install');
+rmdir(baseDir + '/cocos');
