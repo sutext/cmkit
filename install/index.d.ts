@@ -237,6 +237,22 @@ declare namespace cm {
          */
         public static readonly current: Stack;
     }
+    class ListItem<T> extends cc.Component {
+        public readonly list: ListView<T>;
+        public readonly index: number;
+        public setData(data: T): void;
+    }
+    class ListView<T> extends cc.Component {
+        public readonly items: ListItem<T>;
+        public readonly datas: T[];
+        public readonly maskHeight: number;
+        public readonly itemHeight: number;
+        public readonly cacheCount: number;
+        public readonly itemPrefeb: cc.Prefab;
+        public readonly scrollView: cc.ScrollView;
+        public readonly reloadData: (datas: T[]) => void;
+    }
+
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
     class Counter extends cc.Component {
         /**设置label的数字，会触发滚动动画，和音效 */

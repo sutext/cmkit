@@ -150,7 +150,7 @@
         return canvas.toDataURL('image/png');
     };
     cc.Sprite.prototype.setImage = function(url, progress) {
-        if (typeof url !== 'string') return;
+        if (typeof url !== 'string') return Promise.reject('typeof url must be string');
         var _this = this;
         if (url.startsWith('http')) {
             return ns.loadtxe(url, progress).then(function(txe) {
@@ -848,6 +848,119 @@
     SKPage.prototype.didShow = function() {};
     SKPage.prototype.willHide = function() {};
     SKPage.prototype.didHide = function() {};
+
+    var ListView = (ns.ListView = cc.Class({
+        extends: cc.Component,
+        name: 'cm.ListView',
+        ctor: function() {
+            this.items = [];
+            this.datas = [];
+            this.lastOffsetY = 0;
+        },
+        properties: {
+            scrollView: {
+                default: null,
+                type: cc.ScrollView,
+                tooltip: '注意请不要在ScrollView 的 content节点上增加cc.Layout组件'
+            },
+            spacing: {
+                default: 0,
+                tooltip: '列表行间距'
+            },
+            itemPrefeb: {
+                default: null,
+                type: cc.Prefab,
+                tooltip: '列表item预制文件'
+            },
+            itemHeight: {
+                default: 132,
+                tooltip: '列表item高度'
+            },
+            cacheCount: {
+                default: 3,
+                tooltip: '列表上下两侧各预加载的item个数'
+            }
+        },
+        editor: CC_EDITOR && {
+            menu: 'CMKit/ListView'
+        }
+    }));
+    ListView.prototype.onDestroy = function() {
+        this.datas = [];
+        this.items = [];
+    };
+    ListView.prototype.onLoad = function() {
+        this.scrollView.node.on('scrolling', this.onScrolling, this);
+        this.maskHeight = this.scrollView.content.parent.getContentSize().height;
+        this.maxItemCount = Math.ceil(this.maskHeight / this.itemHeight) + 1 + this.cacheCount * 2;
+        this.maxTop = this.cacheCount * this.itemHeight;
+        this.maxBottom = -(this.maxItemCount - this.cacheCount) * this.itemHeight;
+    };
+    ListView.prototype.reloadData = function(datas) {
+        this.datas = datas;
+        this.items = [];
+        this.scrollView.content.removeAllChildren();
+        this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
+        var itemCount = Math.min(datas.length, this.maxItemCount);
+        for (var index = 0; index < itemCount; index++) {
+            var node = cc.instantiate(this.itemPrefeb);
+            var item = node.getComponent(ns.ListItem);
+            this.scrollView.content.addChild(node);
+            item.init(this);
+            item.index = index;
+            this.items.push(item);
+        }
+    };
+    ListView.prototype.onScrolling = function() {
+        if (this.datas.length <= this.maxItemCount) {
+            return;
+        }
+        var offsetY = this.scrollView.getScrollOffset().y;
+        if (offsetY > this.lastOffsetY) {
+            var head = this.items.first;
+            if (offsetY + head.node.y - this.itemHeight / 2 > this.maxTop) {
+                var index = head.index + this.items.length;
+                if (index < this.datas.length) {
+                    head.index = index;
+                    this.items.push(this.items.shift());
+                }
+            }
+        } else {
+            var head = this.items.last;
+            if (offsetY + head.node.y + this.itemHeight / 2 < this.maxBottom) {
+                var index = head.index - this.items.length;
+                if (index >= 0) {
+                    head.index = index;
+                    this.items.unshift(this.items.pop());
+                }
+            }
+        }
+        this.lastOffsetY = offsetY;
+    };
+    var ListItem = (ns.ListItem = cc.Class({
+        extends: cc.Component,
+        ctor: function() {
+            this.__index = 0;
+        }
+    }));
+    Object.defineProperty(ListItem.prototype, 'index', {
+        get: function() {
+            return this.__index;
+        },
+        set: function(val) {
+            this.__index = val;
+            if (this.list) {
+                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val;
+                this.setData(this.list.datas[val]);
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ListItem.prototype.setData = function() {};
+    ListItem.prototype.init = function(list) {
+        this.list = list;
+    };
 
     var Counter = (ns.Counter = cc.Class({
         name: 'cm.Counter',
