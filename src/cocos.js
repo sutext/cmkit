@@ -149,16 +149,25 @@
         ctx.drawImage(this.getHtmlElementObj(), 0, 0);
         return canvas.toDataURL('image/png');
     };
-    cc.Sprite.prototype.setImage = function(url, progress) {
+    cc.Sprite.prototype.setImage = function(url, placeholder, progress) {
         if (typeof url !== 'string') return Promise.reject('typeof url must be string');
         var _this = this;
         if (url.startsWith('http')) {
-            return ns.loadtxe(url, progress).then(function(txe) {
-                if (_this.node) {
-                    _this.spriteFrame = new cc.SpriteFrame(txe);
-                }
-                return _this;
-            });
+            return ns
+                .loadtxe(url, progress)
+                .then(function(txe) {
+                    if (_this.node) {
+                        _this.spriteFrame = new cc.SpriteFrame(txe);
+                    }
+                    return _this;
+                })
+                .catch(function(e) {
+                    if (typeof placeholder === 'string') {
+                        return _this.setImage(placeholder);
+                    } else {
+                        throw e;
+                    }
+                });
         } else {
             return ns.loadres(cc.Texture2D, url, progress).then(function(txe) {
                 if (_this.node) {
@@ -253,7 +262,7 @@
             });
         });
     };
-    ns.loadbone = function(dir, name, progress) {
+    ns.loadbone = function(dir, name) {
         return new Promise(function(resolve, reject) {
             if (!(dir && name)) {
                 reject(new Error('dir or name can not be empty'));
@@ -853,9 +862,9 @@
         extends: cc.Component,
         name: 'cm.ListView',
         ctor: function() {
-            this.items = [];
-            this.datas = [];
             this.lastOffsetY = 0;
+            this.datas = [];
+            this.items = [];
         },
         properties: {
             scrollView: {
@@ -890,6 +899,12 @@
         this.items = [];
     };
     ListView.prototype.onLoad = function() {
+        if (!this.scrollView) {
+            this.scrollView = this.node.getComponent(cc.ScrollView);
+        }
+        if (!this.scrollView) {
+            throw new Error('cm.ListView must be mount on cc.ScrollView node or appoint scrollView property!');
+        }
         this.scrollView.node.on('scrolling', this.onScrolling, this);
         this.maskHeight = this.scrollView.content.parent.getContentSize().height;
         this.maxItemCount = Math.ceil(this.maskHeight / this.itemHeight) + 1 + this.cacheCount * 2;
@@ -897,18 +912,38 @@
         this.maxBottom = -(this.maxItemCount - this.cacheCount) * this.itemHeight;
     };
     ListView.prototype.reloadData = function(datas) {
-        this.datas = datas;
-        this.items = [];
-        this.scrollView.content.removeAllChildren();
-        this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
-        var itemCount = Math.min(datas.length, this.maxItemCount);
-        for (var index = 0; index < itemCount; index++) {
-            var node = cc.instantiate(this.itemPrefeb);
-            var item = node.getComponent(ns.ListItem);
-            this.scrollView.content.addChild(node);
-            item.init(this);
-            item.index = index;
-            this.items.push(item);
+        if (Array.isArray(datas) && datas.length > 0) {
+            this.datas = datas;
+            this.items = [];
+            this.scrollView.content.removeAllChildren();
+            this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
+            this.scrollView.scrollToTop();
+            var itemCount = Math.min(datas.length, this.maxItemCount);
+            for (var index = 0; index < itemCount; index++) {
+                var node = cc.instantiate(this.itemPrefeb);
+                var item = node.getComponent(ns.ListItem);
+                this.scrollView.content.addChild(node);
+                item.init(this);
+                item.index = index;
+                this.items.push(item);
+            }
+        }
+    };
+    ListView.prototype.pushData = function(datas) {
+        if (Array.isArray(datas) && datas.length > 0) {
+            this.datas.append(datas);
+            this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
+            if (this.items.length < this.maxItemCount) {
+                var itemCount = Math.min(datas.length, this.maxItemCount);
+                for (var index = this.items.length; index < itemCount; index++) {
+                    var node = cc.instantiate(this.itemPrefeb);
+                    var item = node.getComponent(ns.ListItem);
+                    this.scrollView.content.addChild(node);
+                    item.init(this);
+                    item.index = index;
+                    this.items.push(item);
+                }
+            }
         }
     };
     ListView.prototype.onScrolling = function() {
@@ -923,6 +958,8 @@
                 if (index < this.datas.length) {
                     head.index = index;
                     this.items.push(this.items.shift());
+                } else {
+                    ns.call(this.onbottom);
                 }
             }
         } else {

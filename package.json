@@ -1,11 +1,11 @@
 {
     "name": "cmkit",
-    "version": "1.1.10",
+    "version": "1.2.0",
     "description": "common web developer tool box.",
     "main": "index.js",
     "scripts": {
         "install": "node install/install.js",
-        "prepublishOnly": "uglifyjs src/cmkit.js src/cocos.js -o cocos/assets/cmkit.js && uglifyjs src/module.js src/cmkit.js -o index.js"
+        "prepublishOnly": "uglifyjs src/cmkit.js src/cocos.js -o cocos/assets/cmkit.js && uglifyjs src/module.js src/cmkit.js -o web/index.js"
     },
     "repository": {
         "type": "git",
@@ -20,7 +20,7 @@
     "files": [
         "cocos",
         "install",
-        "index.js"
+        "web"
     ],
     "author": "supertext",
     "license": "ISC",

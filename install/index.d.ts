@@ -80,7 +80,7 @@ declare namespace cm {
      * @example {name}_ske.json,{name}_tex.json,{name}_tex.png
      * @param progress 加载进度
      */
-    const loadbone: (dir: string, name: string, progress?: IProgress) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
+    const loadbone: (dir: string, name: string) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
 }
 declare namespace cc {
     interface Button {
@@ -138,8 +138,9 @@ declare namespace cc {
         /**
          * @description 通过远程url 或者 相对于 resources 目录的url 加载图片
          * @param url remote url or localurl
+         * @param placeholder the placeholder url just suport local url
          */
-        readonly setImage: (url: string, progress?: cm.IProgress) => Promise<cc.Sprite>;
+        readonly setImage: (url: string, placeholder?: string, progress?: cm.IProgress) => Promise<cc.Sprite>;
         /**
          * @description 用于加载图集的一张图片
          * @param atlas 图集url 相对于resourses 的目录
@@ -201,14 +202,14 @@ declare namespace cm {
         const dismiss: (name?: string, finish?: () => void) => void;
         const remind: (msg: string, title?: string, duration?: number) => void;
         const alert: (msg: string, opts?: Alert.Options) => void;
-        /**remind error.message or pop.unknownError */
+        /** remind error.message or pop.unknownError */
         const error: (error: any) => void;
         const wait: (msg?: string) => void;
         const idle: () => void;
     }
     class SKPage<P = any> extends cc.Component {
         public readonly stack: Stack;
-        /**push options */
+        /** push options */
         protected props?: P;
         protected willShow(): void;
         protected willHide(): void;
@@ -237,20 +238,45 @@ declare namespace cm {
          */
         public static readonly current: Stack;
     }
-    class ListItem<T> extends cc.Component {
+    /**
+     * @description the base class of all list item
+     * @notice user must implement the setData(data:T) to provide refresh method.
+     * @notice the template type T is the data model
+     */
+    abstract class ListItem<T = any> extends cc.Component {
+        /** the reference of the listView */
         public readonly list: ListView<T>;
+        /** the current index off this item in list's datas set */
         public readonly index: number;
-        public setData(data: T): void;
+        /** subclass must implement this method to refresh item data */
+        protected abstract setData(data: T): void;
     }
-    class ListView<T> extends cc.Component {
+    /**
+     * @description tanagement of cc.ScrollView. Just implement the item cache and reuse mechanism.
+     * @notice the reference of scrollView must be provide.
+     * @notice the template type T is the data model
+     */
+    class ListView<T = any> extends cc.Component {
+        /** all created item of the list */
         public readonly items: ListItem<T>;
+        /** the current datas of list */
         public readonly datas: T[];
+        /** the cc.Mask's node height off scrollview, also means the max visable height off list  */
         public readonly maskHeight: number;
+        /** the item height of all items */
         public readonly itemHeight: number;
+        /** preload count of top or bottom side */
         public readonly cacheCount: number;
+        /** the item prefe of the list */
         public readonly itemPrefeb: cc.Prefab;
+        /** the reference of the scrolView */
         public readonly scrollView: cc.ScrollView;
+        /** append new datas to the last of list */
+        public readonly pushData: (datas: T[]) => void;
+        /** reset the list status */
         public readonly reloadData: (datas: T[]) => void;
+        /** trigger when list will reach bottom */
+        public onbottom: () => void;
     }
 
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
