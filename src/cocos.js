@@ -858,6 +858,16 @@
     SKPage.prototype.willHide = function() {};
     SKPage.prototype.didHide = function() {};
 
+    var Padding = cc.Class({
+        name: 'cm.Padding',
+        properties: {
+            top: 0,
+            bottom: 0
+        },
+        statics: {
+            default: new Padding()
+        }
+    });
     var ListView = (ns.ListView = cc.Class({
         extends: cc.Component,
         name: 'cm.ListView',
@@ -867,14 +877,13 @@
             this.items = [];
         },
         properties: {
-            scrollView: {
-                default: null,
-                type: cc.ScrollView,
-                tooltip: '注意请不要在ScrollView 的 content节点上增加cc.Layout组件'
-            },
             spacing: {
                 default: 0,
                 tooltip: '列表行间距'
+            },
+            padding: {
+                default: Padding.default,
+                tooltip: '列表的内边距'
             },
             itemPrefeb: {
                 default: null,
@@ -888,6 +897,11 @@
             cacheCount: {
                 default: 3,
                 tooltip: '列表上下两侧各预加载的item个数'
+            },
+            scrollView: {
+                default: null,
+                type: cc.ScrollView,
+                tooltip: '注意请不要在ScrollView 的 content节点上增加cc.Layout组件'
             }
         },
         editor: CC_EDITOR && {
@@ -916,35 +930,38 @@
             this.datas = datas;
             this.items = [];
             this.scrollView.content.removeAllChildren();
-            this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
+            this.setHeight();
             this.scrollView.scrollToTop();
             var itemCount = Math.min(datas.length, this.maxItemCount);
             for (var index = 0; index < itemCount; index++) {
-                var node = cc.instantiate(this.itemPrefeb);
-                var item = node.getComponent(ns.ListItem);
-                this.scrollView.content.addChild(node);
-                item.init(this);
-                item.index = index;
-                this.items.push(item);
+                this.addItem(index);
             }
         }
     };
     ListView.prototype.pushData = function(datas) {
         if (Array.isArray(datas) && datas.length > 0) {
             this.datas.append(datas);
-            this.scrollView.content.height = Math.max((this.itemHeight + this.spacing) * datas.length - this.spacing, this.maskHeight);
+            this.setHeight();
             if (this.items.length < this.maxItemCount) {
                 var itemCount = Math.min(datas.length, this.maxItemCount);
                 for (var index = this.items.length; index < itemCount; index++) {
-                    var node = cc.instantiate(this.itemPrefeb);
-                    var item = node.getComponent(ns.ListItem);
-                    this.scrollView.content.addChild(node);
-                    item.init(this);
-                    item.index = index;
-                    this.items.push(item);
+                    this.addItem(index);
                 }
             }
         }
+    };
+    ListView.prototype.addItem = function(index) {
+        var node = cc.instantiate(this.itemPrefeb);
+        var item = node.getComponent(ns.ListItem);
+        this.scrollView.content.addChild(node);
+        item.init(this);
+        item.index = index;
+        this.items.push(item);
+    };
+    ListView.prototype.setHeight = function() {
+        var height = (this.itemHeight + this.spacing) * this.datas.length - this.spacing;
+        height = height + this.padding.top + this.padding.bottom;
+        this.scrollView.content.height = Math.max(height, this.maskHeight);
     };
     ListView.prototype.onScrolling = function() {
         if (this.datas.length <= this.maxItemCount) {
@@ -987,7 +1004,7 @@
         set: function(val) {
             this.__index = val;
             if (this.list) {
-                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val;
+                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.top;
                 this.setData(this.list.datas[val]);
             }
         },

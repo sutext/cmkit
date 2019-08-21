@@ -261,6 +261,10 @@ declare namespace cm {
         public readonly items: ListItem<T>;
         /** the current datas of list */
         public readonly datas: T[];
+        /** the item spacing of list */
+        public readonly spacing: number;
+        /** the top and bottom pading of list */
+        public readonly padding: { readonly top: number; readonly bottom: number };
         /** the cc.Mask's node height off scrollview, also means the max visable height off list  */
         public readonly maskHeight: number;
         /** the item height of all items */
