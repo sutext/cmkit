@@ -150,7 +150,13 @@
         return canvas.toDataURL('image/png');
     };
     cc.Sprite.prototype.setImage = function(url, placeholder, progress) {
-        if (typeof url !== 'string') return Promise.reject('typeof url must be string');
+        if (typeof url !== 'string') {
+            if (typeof placeholder === 'string') {
+                return this.setImage(placeholder);
+            } else {
+                return Promise.reject('the typeof url must be string');
+            }
+        }
         var _this = this;
         if (url.startsWith('http')) {
             return ns
@@ -169,12 +175,21 @@
                     }
                 });
         } else {
-            return ns.loadres(cc.Texture2D, url, progress).then(function(txe) {
-                if (_this.node) {
-                    _this.spriteFrame = new cc.SpriteFrame(txe);
-                }
-                return _this;
-            });
+            return ns
+                .loadres(cc.Texture2D, url, progress)
+                .then(function(txe) {
+                    if (_this.node) {
+                        _this.spriteFrame = new cc.SpriteFrame(txe);
+                    }
+                    return _this;
+                })
+                .catch(function(e) {
+                    if (typeof placeholder === 'string') {
+                        return _this.setImage(placeholder);
+                    } else {
+                        throw e;
+                    }
+                });
         }
     };
     cc.Sprite.prototype.setAtlas = function(dir, name, progress) {
@@ -863,9 +878,6 @@
         properties: {
             top: 0,
             bottom: 0
-        },
-        statics: {
-            default: new Padding()
         }
     });
     var ListView = (ns.ListView = cc.Class({
@@ -875,6 +887,7 @@
             this.lastOffsetY = 0;
             this.datas = [];
             this.items = [];
+            this.padding = new Padding();
         },
         properties: {
             spacing: {
@@ -882,7 +895,8 @@
                 tooltip: '列表行间距'
             },
             padding: {
-                default: Padding.default,
+                default: null,
+                type: Padding,
                 tooltip: '列表的内边距'
             },
             itemPrefeb: {
@@ -1005,7 +1019,7 @@
             this.__index = val;
             if (this.list) {
                 this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.top;
-                this.setData(this.list.datas[val]);
+                this.setData(this.list.datas[val], this.list.bind);
             }
         },
         enumerable: true,

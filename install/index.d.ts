@@ -136,9 +136,9 @@ declare namespace cc {
          */
         readonly adjust: (width: number, height: number) => void;
         /**
-         * @description 通过远程url 或者 相对于 resources 目录的url 加载图片
-         * @param url remote url or localurl
-         * @param placeholder the placeholder url just suport local url
+         * @description 通过远程url 或者 相对于 resources目录的url 加载图片
+         * @param url the image url
+         * @param placeholder the placeholder url ,you must ensure the placeholder is exist
          */
         readonly setImage: (url: string, placeholder?: string, progress?: cm.IProgress) => Promise<cc.Sprite>;
         /**
@@ -248,8 +248,11 @@ declare namespace cm {
         public readonly list: ListView<T>;
         /** the current index off this item in list's datas set */
         public readonly index: number;
-        /** subclass must implement this method to refresh item data */
-        protected abstract setData(data: T): void;
+        /**
+         * @description subclass must implement this method to refresh item data
+         * @param bind the data which has been set on the list view.
+         */
+        protected abstract setData(data: T, bind?: any): void;
     }
     /**
      * @description tanagement of cc.ScrollView. Just implement the item cache and reuse mechanism.
@@ -281,6 +284,8 @@ declare namespace cm {
         public readonly reloadData: (datas: T[]) => void;
         /** trigger when list will reach bottom */
         public onbottom: () => void;
+        /** binding data on the list view. it will be inject to every item */
+        public bind?: any;
     }
 
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
