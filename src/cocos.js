@@ -310,6 +310,56 @@
             if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
         }
     };
+    var Button = (ns.Button = cc.Class({
+        name: 'cm.Button',
+        extends: cc.Component,
+        editor: {
+            menu: 'CMKit/Button',
+            requireComponent: cc.Button
+        },
+        properties: {
+            sound: {
+                default: null,
+                type: cc.AudioClip,
+                tooltip: '点击音效，如果设置了sound则soundPath无效'
+            },
+            volume: {
+                default: 1,
+                range: [0, 1],
+                tooltip: '点击音效的音量，范围0-1'
+            },
+            soundPath: {
+                default: 'audios/btn_tap',
+                tooltip: '点击音效文件，相对于resources/目录的路径，设置了sound则soundPath无效'
+            },
+            delayTime: {
+                default: 0.2,
+                range: [0, 5],
+                tooltip: '再次触发点击事件所需要延迟的时间(单位:s)'
+            }
+        }
+    }));
+    Button.prototype.onLoad = function() {
+        var _this = this;
+        this.ccbtn = this.node.getComponent(cc.Button);
+        this.node.on('click', function() {
+            if (!_this.enabledInHierarchy) return;
+            if (typeof _this.onclick === 'function' && !_this.__suspend) {
+                _this.__suspend = true;
+                _this.scheduleOnce(function() {
+                    _this.__suspend = false;
+                }, _this.delayTime);
+                ns.call(_this.onclick);
+            }
+            if (_this.sound) {
+                cc.audioEngine.play(_this.sound, false, _this.volume);
+            } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
+                cc.loader.loadRes(_this.soundPath, cc.AudioClip, function(err, asset) {
+                    if (!err) cc.audioEngine.play(asset, false, _this.volume);
+                });
+            }
+        });
+    };
     var pop = (ns.pop = cc.Class({
         extends: cc.Component,
         name: 'cm.pop',
@@ -1288,55 +1338,5 @@
         } else {
             _updateGraphics.call(this);
         }
-    };
-    var Button = (ns.Button = cc.Class({
-        name: 'cm.Button',
-        extends: cc.Component,
-        editor: {
-            menu: 'CMKit/Button',
-            requireComponent: cc.Button
-        },
-        properties: {
-            sound: {
-                default: null,
-                type: cc.AudioClip,
-                tooltip: '点击音效，如果设置了sound则soundPath无效'
-            },
-            volume: {
-                default: 1,
-                range: [0, 1],
-                tooltip: '点击音效的音量，范围0-1'
-            },
-            soundPath: {
-                default: 'audios/btn_tap',
-                tooltip: '点击音效文件，相对于resources/目录的路径，设置了sound则soundPath无效'
-            },
-            delayTime: {
-                default: 0.2,
-                range: [0, 5],
-                tooltip: '再次触发点击事件所需要延迟的时间(单位:s)'
-            }
-        }
-    }));
-    Button.prototype.onLoad = function() {
-        var _this = this;
-        this.ccbtn = this.node.getComponent(cc.Button);
-        this.node.on('click', function() {
-            if (!_this.enabledInHierarchy) return;
-            if (typeof _this.onclick === 'function' && !_this.__suspend) {
-                _this.__suspend = true;
-                _this.scheduleOnce(function() {
-                    _this.__suspend = false;
-                }, _this.delayTime);
-                ns.call(_this.onclick);
-            }
-            if (_this.sound) {
-                cc.audioEngine.play(_this.sound, false, _this.volume);
-            } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
-                cc.loader.loadRes(_this.soundPath, cc.AudioClip, function(err, asset) {
-                    if (!err) cc.audioEngine.play(asset, false, _this.volume);
-                });
-            }
-        });
     };
 })(window.cm || (window.cm = {}));
