@@ -308,10 +308,17 @@ declare namespace cm {
         /**圆角半径 */
         public radius: number;
     }
-    /** 用于快速添加点击事件 和实现点击音效 */
+    /**
+     * @description 用于快速添加点击事件 和实现点击音效
+     * @description cm.Button会依赖创建cc.Button,外观点击效果仍由cc.Button提供
+     */
     class Button extends cc.Component {
+        /** 关联的cc.Button */
+        public readonly ccbtn: cc.Button;
         /** 点击音效，优先级高于soundPath @default null  */
         public readonly sound: cc.AudioClip;
+        /** 点击音效的音量 @default 1 */
+        public readonly volume: number;
         /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
         public readonly soundPath: string;
         /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */

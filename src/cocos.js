@@ -595,9 +595,9 @@
         blur.clickSound = '';
         modal.blur = blur;
         if (modal.blurquit) {
-            blur.onclick = function() {
+            blur.node.on('click', function() {
                 pop.dismiss(name);
-            };
+            });
         }
         modal.closeres.forEach(function(closer) {
             closer.onclick = function() {
@@ -631,7 +631,7 @@
             },
             closeres: {
                 default: [],
-                type: [cc.Button],
+                type: [ns.Button],
                 tooltip: '指定一组按钮作为关闭器，这些按钮会自动关联关闭事件'
             }
         },
@@ -659,8 +659,8 @@
             },
             title: cc.Label,
             message: cc.Label,
-            cancel: cc.Button,
-            confirm: cc.Button,
+            cancel: ns.Button,
+            confirm: ns.Button,
             cancelText: cc.Label,
             confirmText: cc.Label
         },
@@ -1302,6 +1302,11 @@
                 type: cc.AudioClip,
                 tooltip: '点击音效，如果设置了sound则soundPath无效'
             },
+            volume: {
+                default: 1,
+                range: [0, 1],
+                tooltip: '点击音效的音量，范围0-1'
+            },
             soundPath: {
                 default: 'audios/btn_tap',
                 tooltip: '点击音效文件，相对于resources/目录的路径，设置了sound则soundPath无效'
@@ -1315,6 +1320,7 @@
     }));
     Button.prototype.onLoad = function() {
         var _this = this;
+        this.ccbtn = this.node.getComponent(cc.Button);
         this.node.on('click', function() {
             if (!_this.enabledInHierarchy) return;
             if (typeof _this.onclick === 'function' && !_this.__suspend) {
@@ -1325,10 +1331,10 @@
                 ns.call(_this.onclick);
             }
             if (_this.sound) {
-                cc.audioEngine.play(_this.sound, false, 1);
+                cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
                 cc.loader.loadRes(_this.soundPath, cc.AudioClip, function(err, asset) {
-                    if (!err) cc.audioEngine.play(asset, false, 1);
+                    if (!err) cc.audioEngine.play(asset, false, _this.volume);
                 });
             }
         });
