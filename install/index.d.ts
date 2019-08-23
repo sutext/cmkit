@@ -83,18 +83,6 @@ declare namespace cm {
     const loadbone: (dir: string, name: string) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
 }
 declare namespace cc {
-    interface Button {
-        /**
-         * @description 快速添加button的点击回调事件
-         */
-        onclick: Function;
-        /**
-         * @description 按钮点击时触发的点击音效名称，如果设置为空则不触发音效,音频资源必须放在resources/audios/目录下
-         * @example resources/audios/tap.mp3存在则可通过设置clickSound.name='tap'来实现点击音效
-         * @default 'btn_tap' make sure the btn_tap.mp3 exists in resources/audios/
-         */
-        clickSound: string;
-    }
     interface Node {
         /**
          * @description set the rect of node
@@ -319,5 +307,16 @@ declare namespace cm {
     class Corner extends cc.Component {
         /**圆角半径 */
         public radius: number;
+    }
+    /** 用于快速添加点击事件 和实现点击音效 */
+    class Button extends cc.Component {
+        /** 点击音效，优先级高于soundPath @default null  */
+        public readonly sound: cc.AudioClip;
+        /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
+        public readonly soundPath: string;
+        /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */
+        public readonly delayTime: number;
+        /** 点击回调事件 */
+        public onclick: () => void;
     }
 }
