@@ -341,8 +341,7 @@
     }));
     Button.prototype.onLoad = function() {
         var _this = this;
-        this.ccbtn = this.node.getComponent(cc.Button);
-        this.node.on('click', function() {
+        this.ccbtn = this.node.on('click', function() {
             if (!_this.enabledInHierarchy) return;
             if (typeof _this.onclick === 'function' && !_this.__suspend) {
                 _this.__suspend = true;
@@ -360,6 +359,15 @@
             }
         });
     };
+    Object.defineProperty(Button.prototype, 'ccbtn', {
+        get: function() {
+            if (this._ccbtn) return this._ccbtn;
+            this._ccbtn = this.node.getComponent(cc.Button);
+            return this._ccbtn;
+        },
+        enumerable: true,
+        configurable: true
+    });
     var pop = (ns.pop = cc.Class({
         extends: cc.Component,
         name: 'cm.pop',
