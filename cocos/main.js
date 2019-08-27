@@ -1,9 +1,5 @@
-'use strict'
+'use strict';
 module.exports = {
-    load() {
-
-    },
-    unload() {
-
-    },
-}
+    load() {},
+    unload() {}
+};

@@ -976,13 +976,17 @@
             },
             cacheCount: {
                 default: 4,
-                range: [1, 8],
-                tooltip: '列表上下两侧各预加载的item个数'
+                type: cc.Integer,
+                slide: true,
+                range: [1, 8, 1],
+                tooltip: '列表上下两侧各预加载的item个数(必须为整数)'
             },
             frameCount: {
-                default: 3,
-                range: [1, 6],
-                tooltip: '列表每一帧最多加载的item个数，优化加载速度。'
+                default: 2,
+                type: cc.Integer,
+                slide: true,
+                range: [1, 6, 1],
+                tooltip: '列表每一帧最多加载的item个数(必须为整数)，优化加载速度。'
             },
             scrollView: {
                 default: null,

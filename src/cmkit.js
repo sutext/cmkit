@@ -151,7 +151,7 @@
         var idx = this.findIndex(function(ele) {
             return ele === item;
         });
-        return idx !== -1;
+        return idx >= 0;
     };
     Date.prototype.format = function(fmt) {
         var o = {
