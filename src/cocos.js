@@ -1054,7 +1054,7 @@
         }
     };
     ListView.prototype.scrollToIndex = function(index, time, attenuated) {
-        var offset = (this.itemHeight + this.spacing) * index + this.padding.top;
+        var offset = (this.itemHeight + this.spacing) * index + this.padding.tail;
         this.scrollToOffset(offset, time, attenuated);
     };
     ListView.prototype.scrollToOffset = function(offset, time, attenuated) {
@@ -1105,7 +1105,7 @@
     };
     ListView.prototype.setHeight = function() {
         var height = (this.itemHeight + this.spacing) * this.datas.length - this.spacing;
-        height = height + this.padding.top + this.padding.bottom;
+        height = height + this.padding.head + this.padding.tail;
         this.scrollView.content.height = Math.max(height, this.maskHeight);
     };
     ListView.prototype.onScrolling = function() {
@@ -1157,7 +1157,7 @@
                 this.node.y =
                     -this.node.anchorY * this.list.itemHeight -
                     (this.list.spacing + this.list.itemHeight) * val -
-                    this.list.padding.top;
+                    this.list.padding.head;
                 this.setData(this.list.datas[val], this.list.bind);
             }
         },
