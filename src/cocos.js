@@ -263,7 +263,10 @@
                 reject(new Error('dir or name can not be empty'));
                 return;
             }
-            Promise.all([ns.loadres(dragonBones.DragonBonesAsset, dir + '/' + name + '_ske'), ns.loadres(dragonBones.DragonBonesAtlasAsset, dir + '/' + name + '_tex')])
+            Promise.all([
+                ns.loadres(dragonBones.DragonBonesAsset, dir + '/' + name + '_ske'),
+                ns.loadres(dragonBones.DragonBonesAtlasAsset, dir + '/' + name + '_tex')
+            ])
                 .then(resolve)
                 .catch(reject);
         });
@@ -942,8 +945,8 @@
     var Padding = cc.Class({
         name: 'cm.Padding',
         properties: {
-            top: 0,
-            bottom: 0
+            head: 0,
+            tail: 0
         }
     });
     var ListView = (ns.ListView = cc.Class({
@@ -1036,9 +1039,37 @@
             }
         }
     };
+    ListView.prototype.scrollToHead = function(time, attenuated) {
+        if (this.scrollView.vertical) {
+            this.scrollView.scrollToTop(time, attenuated);
+        } else if (this.scrollView.horizontal) {
+            this.scrollView.scrollToLeft(time, attenuated);
+        }
+    };
+    ListView.prototype.scrollToTail = function(time, attenuated) {
+        if (this.scrollView.vertical) {
+            this.scrollView.scrollToBottom(time, attenuated);
+        } else if (this.scrollView.horizontal) {
+            this.scrollView.scrollToRight(time, attenuated);
+        }
+    };
+    ListView.prototype.scrollToIndex = function(index, time, attenuated) {
+        var offset = (this.itemHeight + this.spacing) * index + this.padding.top;
+        this.scrollToOffset(offset, time, attenuated);
+    };
+    ListView.prototype.scrollToOffset = function(offset, time, attenuated) {
+        if (this.scrollView.vertical) {
+            this.scrollView.scrollToOffset(offset, time, attenuated);
+        } else if (this.scrollView.horizontal) {
+            this.scrollView.scrollToOffset(offset, time, attenuated);
+        }
+    };
     ListView.prototype.next = function(g, size) {
         for (var index = 0; index < size; index++) {
-            if (g.next().done) return;
+            if (g.next().done) {
+                ns.call(this.onloaded);
+                return;
+            }
         }
         var _this = this;
         this.scheduleOnce(function() {
@@ -1093,7 +1124,7 @@
                     head.index = index;
                     this.items.push(this.items.shift());
                 } else {
-                    ns.call(this.onbottom);
+                    ns.call(this.ontail);
                 }
             }
         } else {
@@ -1103,6 +1134,8 @@
                 if (index >= 0) {
                     head.index = index;
                     this.items.unshift(this.items.pop());
+                } else {
+                    ns.call(this.onhead);
                 }
             }
         }
@@ -1121,7 +1154,10 @@
         set: function(val) {
             this.__index = val;
             if (this.list) {
-                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.top;
+                this.node.y =
+                    -this.node.anchorY * this.list.itemHeight -
+                    (this.list.spacing + this.list.itemHeight) * val -
+                    this.list.padding.top;
                 this.setData(this.list.datas[val], this.list.bind);
             }
         },

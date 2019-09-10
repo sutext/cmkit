@@ -80,7 +80,10 @@ declare namespace cm {
      * @example {name}_ske.json,{name}_tex.json,{name}_tex.png
      * @param progress 加载进度
      */
-    const loadbone: (dir: string, name: string) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
+    const loadbone: (
+        dir: string,
+        name: string
+    ) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
 }
 declare namespace cc {
     interface Node {
@@ -149,7 +152,10 @@ declare namespace dragonBones {
          * @param completed the callback of animation completed
          * @param target the completed call back target
          */
-        readonly runani: (name: string, options?: { scale?: number; times?: number; completed?: (evt: cc.Event) => void; target?: any }) => void;
+        readonly runani: (
+            name: string,
+            options?: { scale?: number; times?: number; completed?: (evt: cc.Event) => void; target?: any }
+        ) => void;
         /**
          * @description stop current runed  animation from runani
          */
@@ -246,6 +252,7 @@ declare namespace cm {
      * @description tanagement of cc.ScrollView. Just implement the item cache and reuse mechanism.
      * @notice the reference of scrollView must be provide.
      * @notice the template type T is the data model
+     * @notice the list view only suport one scorll direction decide by the scrollView
      */
     class ListView<T = any> extends cc.Component {
         /** all created item of the list */
@@ -270,8 +277,38 @@ declare namespace cm {
         public readonly pushData: (datas: T[]) => void;
         /** reset the list status */
         public readonly reloadData: (datas: T[]) => void;
-        /** trigger when list will reach bottom */
-        public onbottom: () => void;
+        /**
+         * @description scroll to the head of the list
+         * @param time scorll duration @default 0
+         * @param attenuated attenuated or not @default true
+         */
+        public readonly scrollToHead: (time?: number, attenuated?: boolean) => void;
+        /**
+         * @description scroll to the head of the list
+         * @param time scorll duration @default 0
+         * @param attenuated attenuated or not @default true
+         */
+        public readonly scrollToTail: (time?: number, attenuated?: boolean) => void;
+        /**
+         * @description scroll to the speacil index of the list
+         * @param index the target index.
+         * @param time scorll duration @default 0
+         * @param attenuated attenuated or not @default true
+         */
+        public readonly scrollToIndex: (index: number, time?: number, attenuated?: boolean) => void;
+        /**
+         * @description scroll to the speacil index of the list
+         * @param offset the target scroll offset.
+         * @param time scorll duration @default 0
+         * @param attenuated attenuated or not @default true
+         */
+        public readonly scrollToOffset: (offset: number, time?: number, attenuated?: boolean) => void;
+        /** trigger when list will reach head */
+        public onhead: () => void;
+        /** trigger when list will reach tail */
+        public ontail: () => void;
+        /** trigger when all items did finish load */
+        public onloaded: () => void;
         /** binding data on the list view. it will be inject to every item */
         public bind?: any;
     }
