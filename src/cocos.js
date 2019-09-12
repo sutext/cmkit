@@ -1054,14 +1054,14 @@
         }
     };
     ListView.prototype.scrollToIndex = function(index, time, attenuated) {
-        var offset = (this.itemHeight + this.spacing) * index + this.padding.tail;
+        var offset = (this.itemHeight + this.spacing) * index + this.padding.head;
         this.scrollToOffset(offset, time, attenuated);
     };
     ListView.prototype.scrollToOffset = function(offset, time, attenuated) {
         if (this.scrollView.vertical) {
-            this.scrollView.scrollToOffset(offset, time, attenuated);
+            this.scrollView.scrollToOffset(cc.v2(0, offset), time, attenuated);
         } else if (this.scrollView.horizontal) {
-            this.scrollView.scrollToOffset(offset, time, attenuated);
+            this.scrollView.scrollToOffset(cc.v2(offset, 0), time, attenuated);
         }
     };
     ListView.prototype.next = function(g, size) {
