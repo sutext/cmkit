@@ -1054,7 +1054,7 @@
         }
     };
     ListView.prototype.scrollToIndex = function(index, time, attenuated) {
-        var offset = (this.itemHeight + this.spacing) * index + this.padding.head;
+        var offset = (this.itemHeight + this.spacing) * index;
         this.scrollToOffset(offset, time, attenuated);
     };
     ListView.prototype.scrollToOffset = function(offset, time, attenuated) {
