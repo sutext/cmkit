@@ -1039,6 +1039,12 @@
             }
         }
     };
+    ListView.prototype.addNode = function(node) {
+        this.scrollView.content.addChild(node);
+    };
+    ListView.prototype.insertNode = function(node, index) {
+        this.scrollView.content.insertChild(node, index);
+    };
     ListView.prototype.scrollToHead = function(time, attenuated) {
         if (this.scrollView.vertical) {
             this.scrollView.scrollToTop(time, attenuated);

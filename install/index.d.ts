@@ -289,10 +289,14 @@ declare namespace cm {
         public readonly cacheCount: number;
         /** the item prefe of the list */
         public readonly itemPrefeb: cc.Prefab;
+        /** add static node to the scrollView.content */
+        public readonly addNode: (node: cc.Node) => void;
         /** append new datas to the last of list */
         public readonly pushData: (datas: T[]) => void;
         /** reset the list status */
         public readonly reloadData: (datas: T[]) => void;
+        /** insert static  node to the scrollView.content at index */
+        public readonly insertdNode: (node: cc.Node, atIndex: number) => void;
         /**
          * @description scroll to the head of the list
          * @param time scorll duration @default 0
