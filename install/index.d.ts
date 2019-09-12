@@ -163,6 +163,24 @@ declare namespace dragonBones {
     }
 }
 declare namespace cm {
+    /**
+     * @description 用于快速添加点击事件 和实现点击音效
+     * @description cm.Button会依赖创建cc.Button,外观点击效果仍由cc.Button提供
+     */
+    class Button extends cc.Component {
+        /** 关联的cc.Button */
+        public readonly ccbtn: cc.Button;
+        /** 点击音效，优先级高于soundPath @default null  */
+        public readonly sound: cc.AudioClip;
+        /** 点击音效的音量 @default 1 */
+        public readonly volume: number;
+        /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
+        public readonly soundPath: string;
+        /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */
+        public readonly delayTime: number;
+        /** 点击回调事件 */
+        public onclick: () => void;
+    }
     class Modal extends cc.Component {
         /**背景按钮，若blurquit为true则onclick方法自动关联dismiss方法，否则为undefined */
         protected readonly blur: cc.Button;
@@ -249,7 +267,7 @@ declare namespace cm {
         protected abstract setData(data: T, bind?: any): void;
     }
     /**
-     * @description tanagement of cc.ScrollView. Just implement the item cache and reuse mechanism.
+     * @description Just implement the item cache and reuse mechanism of cc.ScrollView.
      * @notice the reference of scrollView must be provide.
      * @notice the template type T is the data model
      * @notice the list view only suport one scorll direction decide by the scrollView
@@ -271,8 +289,6 @@ declare namespace cm {
         public readonly cacheCount: number;
         /** the item prefe of the list */
         public readonly itemPrefeb: cc.Prefab;
-        /** the reference of the scrolView */
-        public readonly scrollView: cc.ScrollView;
         /** append new datas to the last of list */
         public readonly pushData: (datas: T[]) => void;
         /** reset the list status */
@@ -346,21 +362,18 @@ declare namespace cm {
         public radius: number;
     }
     /**
-     * @description 用于快速添加点击事件 和实现点击音效
-     * @description cm.Button会依赖创建cc.Button,外观点击效果仍由cc.Button提供
+     * @description 包装cc.Label 或 cc.Sprite,以简化代码
      */
-    class Button extends cc.Component {
-        /** 关联的cc.Button */
-        public readonly ccbtn: cc.Button;
-        /** 点击音效，优先级高于soundPath @default null  */
-        public readonly sound: cc.AudioClip;
-        /** 点击音效的音量 @default 1 */
-        public readonly volume: number;
-        /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
-        public readonly soundPath: string;
-        /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */
-        public readonly delayTime: number;
-        /** 点击回调事件 */
-        public onclick: () => void;
+    class Wrapper extends cc.Component {
+        /** proxy of cc.Label.string */
+        public text?: string;
+        /** proxy of cc.Sprite.spriteFrame */
+        public image?: cc.SpriteFrame;
+        /**
+         * @description 通过远程url 或者 相对于 resources目录的url 加载图片
+         * @param url the image url
+         * @param placeholder the placeholder url ,you must ensure the placeholder is exist
+         */
+        readonly setImage: (url: string, placeholder?: string, progress?: cm.IProgress) => Promise<cc.Sprite>;
     }
 }

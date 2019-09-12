@@ -1387,4 +1387,41 @@
             _updateGraphics.call(this);
         }
     };
+
+    var Wrapper = (ns.Wrapper = cc.Class({
+        name: 'cm.Wrapper',
+        extends: cc.Component,
+        editor: {
+            menu: 'CMKit/Wrapper'
+        },
+        properties: {
+            label: cc.Label,
+            sprite: cc.Sprite
+        }
+    }));
+    Object.defineProperty(Wrapper.prototype, 'text', {
+        get: function() {
+            return this.label && this.label.string;
+        },
+        set: function(val) {
+            this.label && (this.label.string = val);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Wrapper.prototype, 'image', {
+        get: function() {
+            return this.sprite && this.sprite.spriteFrame;
+        },
+        set: function(val) {
+            this.sprite && (this.sprite.spriteFrame = val);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Wrapper.prototype.setImage = function(url, placeholder, progress) {
+        if (this.sprite) {
+            this.sprite.setImage(url, placeholder, progress);
+        }
+    };
 })(window.cm || (window.cm = {}));
