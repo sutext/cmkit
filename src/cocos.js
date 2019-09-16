@@ -928,9 +928,7 @@
     };
     Stack.prototype.remove = function(page) {
         if (this.pageStack.delete(page) >= 0) {
-            page.node.destroy;
-        } else {
-            ns.warn('(Error in Stack.remove):  The page:', page.name, ' not found in the stack!');
+            page.node.destroy();
         }
     };
     Stack.prototype.genPage = function(name) {

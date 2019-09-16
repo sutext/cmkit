@@ -144,7 +144,7 @@
             return ele === item;
         });
         if (idx >= 0) {
-            this.splice(index, 1);
+            this.splice(idx, 1);
         }
         return idx;
     };
