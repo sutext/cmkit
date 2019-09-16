@@ -143,7 +143,9 @@
         var idx = this.findIndex(function(ele) {
             return ele === item;
         });
-        this.remove(idx);
+        if (idx >= 0) {
+            this.splice(index, 1);
+        }
         return idx;
     };
     Array.prototype.contains = function(item) {
@@ -162,7 +164,9 @@
             's+': this.getSeconds() //秒
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
-        for (var k in o) if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length));
+        for (var k in o)
+            if (new RegExp('(' + k + ')').test(fmt))
+                fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length));
         return fmt;
     };
     Object.defineProperty(Date.prototype, 'hhmmss', {
@@ -585,7 +589,11 @@
             this.protocols = protocols;
             this.retry = new Socket.Retry(this.onRetryCallback.bind(this), this.onRetryFailed.bind(this));
             this.open = function() {
-                if (_this.readyState === Socket.CONNECTING || _this.readyState === Socket.OPEN || typeof _this.buildurl !== 'function') {
+                if (
+                    _this.readyState === Socket.CONNECTING ||
+                    _this.readyState === Socket.OPEN ||
+                    typeof _this.buildurl !== 'function'
+                ) {
                     return;
                 }
                 if (_this.ws) {
@@ -795,7 +803,12 @@
                     _this.ping.stop();
                 };
                 this.start = function() {
-                    if (!_this.isLogin || _this.socket.isRetrying || _this.socket.readyState === Socket.OPEN || _this.socket.readyState === Socket.CONNECTING) {
+                    if (
+                        !_this.isLogin ||
+                        _this.socket.isRetrying ||
+                        _this.socket.readyState === Socket.OPEN ||
+                        _this.socket.readyState === Socket.CONNECTING
+                    ) {
                         return;
                     }
                     _this.socket.retry.reset();
@@ -914,7 +927,9 @@
                 throw new Error('The privkey:' + idxkey + ' invalid!');
             }
             if (_stored[clskey]) {
-                throw new Error('The clskey:' + clskey + " already exist!!You can't mark different class with same name!!");
+                throw new Error(
+                    'The clskey:' + clskey + " already exist!!You can't mark different class with same name!!"
+                );
             }
             _stored[clskey] = true;
             return function(target) {

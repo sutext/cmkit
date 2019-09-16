@@ -244,6 +244,8 @@ declare namespace cm {
          */
         public readonly pop: (deltaOrFinish?: number | (() => void), finish?: () => void) => void;
         public readonly push: (name: string, props?: any, finish?: () => void) => void;
+        /** @description remove and destroy a page node from the stack */
+        public readonly remove: (page: SKPage) => void;
         /**
          * @description get the stack of current scene
          * @warn if Stack did't mount on root Canvan node,null will be retrun
