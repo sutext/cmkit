@@ -328,7 +328,8 @@
             },
             volume: {
                 default: 1,
-                range: [0, 1],
+                range: [0, 1, 0.01],
+                slide: true,
                 tooltip: '点击音效的音量，范围0-1'
             },
             soundPath: {
@@ -337,7 +338,8 @@
             },
             delayTime: {
                 default: 0.2,
-                range: [0, 5],
+                range: [0, 5, 0.1],
+                slide: true,
                 tooltip: '再次触发点击事件所需要延迟的时间(单位:s)'
             }
         }
@@ -929,6 +931,7 @@
         if (!prefeb) throw new Error('页面不存在');
         var node = cc.instantiate(prefeb);
         var page = node.getComponent(ns.SKPage);
+        node.addComponent(cc.BlockInputEvents);
         if (!page) throw new Error('页面必须是 Page的子类');
         node.setRect(0, 0, this.node.width, this.node.height);
         page.stack = this;
