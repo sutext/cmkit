@@ -219,7 +219,7 @@ declare namespace cm {
         const wait: (msg?: string) => void;
         const idle: () => void;
     }
-    class SKPage<P = any> extends cc.Component {
+    abstract class SKPage<P = any> extends cc.Component {
         public readonly stack: Stack;
         /** push options */
         protected props?: P;
