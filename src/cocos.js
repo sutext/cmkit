@@ -524,9 +524,12 @@
             if (opacity > 0) {
                 _this.genBackground(modal).runAction(cc.fadeTo(0.25, opacity));
             }
-            modal.animator.scale = 0;
+            modal.animator.opacity = 0;
             modal.animator.runAction(
                 cc.sequence([
+                    cc.delayTime(0.05),
+                    cc.scaleTo(0, 0, 0),
+                    cc.fadeIn(0),
                     cc.scaleTo(0.3, 1, 1).easing(cc.easeElasticInOut(0.6)),
                     cc.callFunc(function() {
                         modal.onPresent(opts);
@@ -654,13 +657,15 @@
         node.setRect(0, 0, this.node.width, this.node.height);
         node.zIndex = modal.priority;
         node.addComponent(cc.BlockInputEvents);
-        var blur = node.addComponent(cc.Button);
-        blur.clickSound = '';
-        modal.blur = blur;
+        node.addComponent(cc.Button);
+        var _this = this;
+        node.on('click', function() {
+            ns.call(_this.onblur);
+        });
         if (modal.blurquit) {
-            blur.node.on('click', function() {
+            _this.onblur = function() {
                 pop.dismiss(name);
-            });
+            };
         }
         modal.closeres.forEach(function(closer) {
             closer.onclick = function() {
@@ -1255,9 +1260,9 @@
                     dur = 0.3;
                 }
                 var sid = cc.audioEngine.play(this.sound, true, 1);
-                window.setTimeout(function() {
+                this.scheduleOnce(function() {
                     cc.audioEngine.stop(sid);
-                }, dur * 1000);
+                }, dur);
             }
         }
     };

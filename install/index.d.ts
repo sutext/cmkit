@@ -171,27 +171,27 @@ declare namespace cm {
         /** 关联的cc.Button */
         public readonly ccbtn: cc.Button;
         /** 点击音效，优先级高于soundPath @default null  */
-        public readonly sound: cc.AudioClip;
+        public sound: cc.AudioClip;
         /** 点击音效的音量 @default 1 */
-        public readonly volume: number;
+        public volume: number;
         /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
-        public readonly soundPath: string;
+        public soundPath: string;
         /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */
-        public readonly delayTime: number;
+        public delayTime: number;
         /** 点击回调事件 */
         public onclick: () => void;
     }
     class Modal extends cc.Component {
-        /**背景按钮，若blurquit为true则onclick方法自动关联dismiss方法，否则为undefined */
-        protected readonly blur: cc.Button;
-        /**@default this.onhide=opts&&opts.onhide */
+        /**@description insert by present opts.onhide */
+        protected onhide?: () => void;
+        /**背景半透明按钮点击回调，若blurquit为true则onblur方法自动关联dismiss方法，否则为undefined */
+        protected onblur?: () => void;
+        /**@default this.onhide=opts&&opts.onhide 如果重写此需要考虑是否调用super */
         protected onCreate(opts?: any): void;
         /**@default empty */
         protected onPresent(opts?: any): void;
-        /**@default cm.call(this.onhide) */
+        /**@default cm.call(this.onhide) 如果重写此需要考虑是否调用super */
         protected onDismiss(): void;
-        /**@description insert by present opts.onhide */
-        protected onhide?: () => void;
         protected readonly dismiss: (finish?: () => void) => void;
     }
     namespace Alert {
