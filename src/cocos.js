@@ -658,12 +658,11 @@
         node.zIndex = modal.priority;
         node.addComponent(cc.BlockInputEvents);
         node.addComponent(cc.Button);
-        var _this = this;
         node.on('click', function() {
-            ns.call(_this.onblur);
+            ns.call(modal.onblur);
         });
         if (modal.blurquit) {
-            _this.onblur = function() {
+            modal.onblur = function() {
                 pop.dismiss(name);
             };
         }
