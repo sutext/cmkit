@@ -1030,6 +1030,16 @@
         this.maxTop = this.cacheCount * this.itemHeight;
         this.maxBottom = -(this.maxItemCount - this.cacheCount) * this.itemHeight;
     };
+    ListView.prototype.appendData = function(datas) {
+        if (Array.isArray(datas) && datas.length > 0) {
+            this.datas.append(datas);
+            this.setHeight();
+            if (this.items.length < this.maxItemCount) {
+                var itemCount = Math.min(datas.length, this.maxItemCount);
+                this.next(this.genItems(this.items.length, itemCount), this.frameCount);
+            }
+        }
+    };
     ListView.prototype.reloadData = function(datas) {
         if (Array.isArray(datas) && datas.length > 0) {
             this.datas = datas;
@@ -1041,14 +1051,14 @@
             this.next(this.genItems(0, itemCount), this.frameCount);
         }
     };
-    ListView.prototype.pushData = function(datas) {
-        if (Array.isArray(datas) && datas.length > 0) {
-            this.datas.append(datas);
-            this.setHeight();
-            if (this.items.length < this.maxItemCount) {
-                var itemCount = Math.min(datas.length, this.maxItemCount);
-                this.next(this.genItems(this.items.length, itemCount), this.frameCount);
-            }
+    ListView.prototype.reloadIndex = function(index, data) {
+        if (cm.okint(index) && data && index >= 0 && index < this.datas.length) {
+            this.datas[index] = data;
+            this.items.forEach(function(ele) {
+                if (ele.index === index) {
+                    ele.setData(data, this.bind);
+                }
+            });
         }
     };
     ListView.prototype.addNode = function(node) {

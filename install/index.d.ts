@@ -291,14 +291,16 @@ declare namespace cm {
         public readonly cacheCount: number;
         /** the item prefe of the list */
         public readonly itemPrefeb: cc.Prefab;
-        /** add static node to the scrollView.content */
+        /** add static node to the scrollView.content as last child */
         public readonly addNode: (node: cc.Node) => void;
+        /** insert static  node to the scrollView.content at child index */
+        public readonly insertNode: (node: cc.Node, atIndex: number) => void;
         /** append new datas to the last of list */
-        public readonly pushData: (datas: T[]) => void;
+        public readonly appendData: (datas: T[]) => void;
         /** reset the list status */
         public readonly reloadData: (datas: T[]) => void;
-        /** insert static  node to the scrollView.content at index */
-        public readonly insertdNode: (node: cc.Node, atIndex: number) => void;
+        /** reload @param data at @param index */
+        public readonly reloadIndex: (index: number, data: T) => void;
         /**
          * @description scroll to the head of the list
          * @param time scorll duration @default 0
