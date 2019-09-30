@@ -25,11 +25,12 @@ declare namespace cm {
     const entry: (apihost: string, debug?: boolean) => <T extends Game>(target: new () => T) => void;
     /** @description 以16进制字符串生成颜色 */
     const color: (hex: string) => cc.Color;
+    /** @param on  是否开启静音模式 此时会禁用所有的声音 */
+    const quiet: (on: boolean) => void;
     /** @description 全局游戏代理实例 */
     const game: Game;
     /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
     const isslim: boolean;
-
     /**@description loader progress description */
     interface IProgress {
         (completedCount: number, totalCount: number, item: any): void;
@@ -168,8 +169,12 @@ declare namespace cm {
      * @description cm.Button会依赖创建cc.Button,外观点击效果仍由cc.Button提供
      */
     class Button extends cc.Component {
+        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
+        public static quiet: boolean;
         /** 关联的cc.Button */
         public readonly ccbtn: cc.Button;
+        /** 当前 Button 是否静音 */
+        public quiet: boolean;
         /** 点击音效，优先级高于soundPath @default null  */
         public sound: cc.AudioClip;
         /** 点击音效的音量 @default 1 */
@@ -339,6 +344,10 @@ declare namespace cm {
 
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
     class Counter extends cc.Component {
+        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Counter 将不再有音效 */
+        public static quiet: boolean;
+        /** 当前Counter 是否静音 */
+        public quiet: boolean;
         /**设置label的数字，会触发滚动动画，和音效 */
         public digit: number;
         /**

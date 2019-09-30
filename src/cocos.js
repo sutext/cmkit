@@ -51,6 +51,18 @@
     ns.color = function(hex) {
         return cc.Color.WHITE.fromHEX(hex);
     };
+    var __play = cc.Audio.prototype.play;
+    cc.Audio.prototype.play = function() {
+        if (!ns.quiet.on) {
+            __play.call(this);
+        }
+    };
+    ns.quiet = function(on) {
+        ns.quiet.on = !!on;
+        if (ns.quiet.on) {
+            cc.audioEngine.stopAll();
+        }
+    };
     Object.defineProperty(ns, 'isslim', {
         get: function() {
             var size = cc.winSize;
@@ -344,6 +356,7 @@
             }
         }
     }));
+    Button.quiet = false;
     Button.prototype.onLoad = function() {
         var _this = this;
         this.ccbtn = this.node.on('click', function() {
@@ -355,6 +368,7 @@
                 }, _this.delayTime);
                 ns.call(_this.onclick);
             }
+            if (Button.quiet || this.quiet) return;
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
@@ -1223,6 +1237,7 @@
             this._rate = cc.game.getFrameRate();
         }
     }));
+    Counter.quiet = false;
     Object.defineProperty(Counter.prototype, 'digit', {
         get: function() {
             return this._goal;
@@ -1262,17 +1277,16 @@
         } else {
             var delta = this._goal - this._value;
             this._step = this.steper(delta);
-            if (this.sound) {
-                //播放音效
-                var dur = delta / (this._step * this._rate);
-                if (dur < 0.3) {
-                    dur = 0.3;
-                }
-                var sid = cc.audioEngine.play(this.sound, true, 1);
-                this.scheduleOnce(function() {
-                    cc.audioEngine.stop(sid);
-                }, dur);
+            if (Counter.quiet || this.quiet || !this.sound) return;
+            //播放音效
+            var dur = delta / (this._step * this._rate);
+            if (dur < 0.3) {
+                dur = 0.3;
             }
+            var sid = cc.audioEngine.play(this.sound, true, 1);
+            this.scheduleOnce(function() {
+                cc.audioEngine.stop(sid);
+            }, dur);
         }
     };
     Counter.prototype.setText = function(val) {
