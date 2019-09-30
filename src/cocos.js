@@ -333,6 +333,10 @@
             requireComponent: cc.Button
         },
         properties: {
+            quiet: {
+                default: false,
+                tooltip: '是否开启静音模式'
+            },
             sound: {
                 default: null,
                 type: cc.AudioClip,
@@ -368,7 +372,7 @@
                 }, _this.delayTime);
                 ns.call(_this.onclick);
             }
-            if (Button.quiet || this.quiet) return;
+            if (Button.quiet || _this.quiet) return;
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
@@ -1218,6 +1222,10 @@
             menu: 'CMKit/Counter'
         },
         properties: {
+            quiet: {
+                default: false,
+                tooltip: '是否开启静音模式'
+            },
             label: {
                 type: cc.Label,
                 default: null,
