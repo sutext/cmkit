@@ -340,17 +340,13 @@
             sound: {
                 default: null,
                 type: cc.AudioClip,
-                tooltip: '点击音效，如果设置了sound则soundPath无效'
+                tooltip: '点击音效，如果设置了sound则覆盖cm.Button.sound的全局设置'
             },
             volume: {
                 default: 1,
                 range: [0, 1, 0.01],
                 slide: true,
                 tooltip: '点击音效的音量，范围0-1'
-            },
-            soundPath: {
-                default: 'audios/btn_tap',
-                tooltip: '点击音效文件，相对于resources/目录的路径，设置了sound则soundPath无效'
             },
             delayTime: {
                 default: 0.2,
@@ -361,6 +357,7 @@
         }
     }));
     Button.quiet = false;
+    Button.sound = 'audios/btn_tap';
     Button.prototype.onLoad = function() {
         var _this = this;
         this.ccbtn = this.node.on('click', function() {
@@ -375,8 +372,8 @@
             if (Button.quiet || _this.quiet) return;
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
-            } else if (typeof _this.soundPath === 'string' && _this.soundPath.length > 0) {
-                cc.loader.loadRes(_this.soundPath, cc.AudioClip, function(err, asset) {
+            } else if (ns.okstr(Button.sound)) {
+                cc.loader.loadRes(Button.sound, cc.AudioClip, function(err, asset) {
                     if (!err) cc.audioEngine.play(asset, false, _this.volume);
                 });
             }
@@ -1070,7 +1067,7 @@
         }
     };
     ListView.prototype.reloadIndex = function(index, data) {
-        if (cm.okint(index) && data && index >= 0 && index < this.datas.length) {
+        if (ns.okint(index) && data && index >= 0 && index < this.datas.length) {
             this.datas[index] = data;
             this.items.forEach(function(ele) {
                 if (ele.index === index) {
@@ -1342,7 +1339,7 @@
     Shadow.prototype.onLoad = function() {
         var target = this.target || this.node.getComponent(cc.Label);
         if (!target) {
-            cm.warn('Shadow target must be  a cc.Label Node or mount on a cc.Label!!');
+            ns.warn('Shadow target must be  a cc.Label Node or mount on a cc.Label!!');
             return;
         }
         this.label.string = target.string;
@@ -1352,7 +1349,7 @@
             if (this._label) return this._label;
             var target = this.target || this.node.getComponent(cc.Label);
             if (!target) {
-                cm.warn('Shadow target must be  a cc.Label Node or mount on a cc.Label!!');
+                ns.warn('Shadow target must be  a cc.Label Node or mount on a cc.Label!!');
                 return;
             }
             var node = new cc.Node();

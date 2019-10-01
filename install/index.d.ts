@@ -169,18 +169,18 @@ declare namespace cm {
      * @description cm.Button会依赖创建cc.Button,外观点击效果仍由cc.Button提供
      */
     class Button extends cc.Component {
-        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
-        public static quiet: boolean;
         /** 关联的cc.Button */
         public readonly ccbtn: cc.Button;
+        /** 全局按钮点击音效，声音文件相对于resources目录的路径 @default 'audios/btn_tap' */
+        public static sound: string;
+        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
+        public static quiet: boolean;
         /** 当前 Button 是否静音 */
         public quiet: boolean;
         /** 点击音效，优先级高于soundPath @default null  */
         public sound: cc.AudioClip;
         /** 点击音效的音量 @default 1 */
         public volume: number;
-        /** 点击音效文件相对于resources目录的路径 @default 'audios/btn_tap' */
-        public soundPath: string;
         /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 0.2s */
         public delayTime: number;
         /** 点击回调事件 */
