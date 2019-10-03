@@ -51,18 +51,26 @@
     ns.color = function(hex) {
         return cc.Color.WHITE.fromHEX(hex);
     };
-    var __play = cc.Audio.prototype.play;
-    cc.Audio.prototype.play = function() {
-        if (!ns.quiet.on) {
-            __play.call(this);
-        }
-    };
     ns.quiet = function(on) {
         ns.quiet.on = !!on;
         if (ns.quiet.on) {
             cc.audioEngine.stopAll();
         }
     };
+    var __quiet = false;
+    Object.defineProperty(ns, 'quiet', {
+        get: function() {
+            return __quiet;
+        },
+        set: function(val) {
+            __quiet = !!val;
+            if (__quiet) {
+                cc.audioEngine.stopAll();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ns, 'isslim', {
         get: function() {
             var size = cc.winSize;
@@ -75,6 +83,12 @@
 //--------------------cc extentions----------------
 (function(ns, cc, dragonBones) {
     'use strict';
+    var __play = cc.Audio.prototype.play;
+    cc.Audio.prototype.play = function() {
+        if (!ns.quiet) {
+            __play.call(this);
+        }
+    };
     ///----------cc.Node----------
     cc.Node.prototype.setBone = function(dir, name) {
         var _this = this;
@@ -870,29 +884,31 @@
         }
     };
     Stack.prototype.push = function(name, props, finish) {
-        var page = this.genPage(name);
-        page.props = props;
         var top = this.top;
+        var page = this.genPage(name);
         var width = this.node.width;
+        page.props = props;
+        page.node.x = width;
         this.pageStack.push(page);
         this.node.addChild(page.node);
-        page.node.x = width;
-        page.willShow();
-        page.node.runAction(
-            cc.sequence([
-                cc.moveTo(0.25, cc.v2(0, 0)).easing(cc.easeInOut(5)),
-                cc.callFunc(function() {
-                    page.didShow();
-                    ns.call(finish);
-                })
-            ])
-        );
+
         top.willHide();
         top.node.runAction(
             cc.sequence([
                 cc.moveTo(0.25, cc.v2(-width / 3, 0)).easing(cc.easeInOut(5)),
                 cc.callFunc(function() {
                     top.didHide();
+                    ns.call(finish);
+                })
+            ])
+        );
+
+        page.willShow();
+        page.node.runAction(
+            cc.sequence([
+                cc.moveTo(0.25, cc.v2(0, 0)).easing(cc.easeInOut(5)),
+                cc.callFunc(function() {
+                    page.didShow();
                     ns.call(finish);
                 })
             ])
@@ -1110,7 +1126,9 @@
     ListView.prototype.next = function(g, size) {
         for (var index = 0; index < size; index++) {
             if (g.next().done) {
-                ns.call(this.onloaded);
+                if (this.delegate && this.delegate.itemsDidLoad) {
+                    this.delegate.itemsDidLoad(this);
+                }
                 return;
             }
         }
@@ -1167,7 +1185,9 @@
                     head.index = index;
                     this.items.push(this.items.shift());
                 } else {
-                    ns.call(this.ontail);
+                    if (this.delegate && this.delegate.didReachTail) {
+                        this.delegate.didReachTail(this);
+                    }
                 }
             }
         } else {
@@ -1178,7 +1198,9 @@
                     head.index = index;
                     this.items.unshift(this.items.pop());
                 } else {
-                    ns.call(this.onhead);
+                    if (this.delegate && this.delegate.didReachHead) {
+                        this.delegate.didReachHead(this);
+                    }
                 }
             }
         }
@@ -1207,6 +1229,11 @@
         enumerable: true,
         configurable: true
     });
+    ListItem.prototype.emit = function(event) {
+        if (this.list && this.list.delegate && this.list.delegate.itemDidOccur) {
+            this.list.delegate.itemDidOccur(event, this.list.datas[this.index], this, this.list);
+        }
+    };
     ListItem.prototype.setData = function() {};
     ListItem.prototype.init = function(list) {
         this.list = list;

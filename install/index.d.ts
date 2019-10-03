@@ -25,22 +25,26 @@ declare namespace cm {
     const entry: (apihost: string, debug?: boolean) => <T extends Game>(target: new () => T) => void;
     /** @description 以16进制字符串生成颜色 */
     const color: (hex: string) => cc.Color;
-    /** @param on  是否开启静音模式 此时会禁用所有的声音 */
-    const quiet: (on: boolean) => void;
     /** @description 全局游戏代理实例 */
     const game: Game;
     /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
     const isslim: boolean;
+
+    /** 是否开启静音模式 如果开启,则立即关闭所有声音 并且禁止播之后的声音 @default false */
+    let quiet: boolean;
+
     /**@description loader progress description */
     interface IProgress {
         (completedCount: number, totalCount: number, item: any): void;
     }
+
     /**@description cc.Asset meta class description */
     interface IMetaAsset<T extends cc.Asset> {
         new (): T;
         preventDeferredLoadDependents: boolean;
         preventPreloadNativeObject: boolean;
     }
+
     /**
      * @description 对cc.loader.loadRes的封装 加载并缓存 resources 目录里面的资源
      * @param type 资源类型
@@ -263,15 +267,22 @@ declare namespace cm {
      * @notice the template type T is the data model
      */
     abstract class ListItem<T = any> extends cc.Component {
-        /** the reference of the listView */
-        public readonly list: ListView<T>;
-        /** the current index off this item in list's datas set */
+        /** @description the data index of list */
         public readonly index: number;
+        /** @description emit event to list's delegate */
+        public readonly emit: (event: string) => void;
         /**
          * @description subclass must implement this method to refresh item data
          * @param bind the data which has been set on the list view.
          */
         protected abstract setData(data: T, bind?: any): void;
+    }
+    /** @description ListView envent delegate */
+    interface ListDelegate<T = any> {
+        didReachTail?(list: ListView<T>): void;
+        didReachHead?(list: ListView<T>): void;
+        itemsDidLoad?(list: ListView<T>): void;
+        itemDidOccur?(event: string, data: T, item: ListItem<T>, list: ListView<T>): void;
     }
     /**
      * @description Just implement the item cache and reuse mechanism of cc.ScrollView.
@@ -280,6 +291,10 @@ declare namespace cm {
      * @notice the list view only suport one scorll direction decide by the scrollView
      */
     class ListView<T = any> extends cc.Component {
+        /** binding data on the list view. it will be inject to every item */
+        public bind?: any;
+        /** the list view event delegate */
+        public delegate?: ListDelegate<T>;
         /** all created item of the list */
         public readonly items: ListItem<T>;
         /** the current datas of list */
@@ -338,8 +353,6 @@ declare namespace cm {
         public ontail: () => void;
         /** trigger when all items did finish load */
         public onloaded: () => void;
-        /** binding data on the list view. it will be inject to every item */
-        public bind?: any;
     }
 
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
