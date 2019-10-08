@@ -182,10 +182,10 @@
                 });
         } else {
             return ns
-                .loadres(cc.Texture2D, url, progress)
-                .then(function(txe) {
+                .loadres(cc.SpriteFrame, url, progress)
+                .then(function(frame) {
                     if (_this.node) {
-                        _this.spriteFrame = new cc.SpriteFrame(txe);
+                        _this.spriteFrame = frame;
                     }
                     return _this;
                 })
