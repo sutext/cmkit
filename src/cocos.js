@@ -375,14 +375,12 @@
     Button.prototype.onLoad = function() {
         var _this = this;
         this.ccbtn = this.node.on('click', function() {
-            if (!_this.enabledInHierarchy) return;
-            if (typeof _this.onclick === 'function' && !_this.__suspend) {
-                _this.__suspend = true;
-                _this.scheduleOnce(function() {
-                    _this.__suspend = false;
-                }, _this.delayTime);
-                ns.call(_this.onclick);
-            }
+            if (!_this.enabledInHierarchy || _this.__suspend) return;
+            _this.__suspend = true;
+            _this.scheduleOnce(function() {
+                _this.__suspend = false;
+            }, _this.delayTime);
+            ns.call(_this.onclick);
             if (Button.quiet || _this.quiet) return;
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
