@@ -1316,9 +1316,9 @@
                 dur = 0.3;
             }
             var sid = cc.audioEngine.play(this.sound, true, 1);
-            this.scheduleOnce(function() {
+            setTimeout(function() {
                 cc.audioEngine.stop(sid);
-            }, dur);
+            }, dur * 1000);
         }
     };
     Counter.prototype.setText = function(val) {
