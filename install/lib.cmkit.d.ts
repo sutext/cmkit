@@ -161,7 +161,8 @@ declare namespace cm {
     }
     abstract class Network {
         /**
-         * @override point you shoud overwrite this property and provide you custom headers
+         * @description the global http headers. every request will include this headers
+         * @override you shoud overwrite this property and provide you custom headers
          * @example
          * ``
          * protected get headers(): any {
@@ -174,7 +175,8 @@ declare namespace cm {
          */
         protected readonly headers: Record<string, string>;
         /**
-         * @override point you shoud overwrite this property and provide you custom headers
+         * @description the global http request method
+         * @override you shoud override this property and provide you custom headers
          * @example
          * ``
          * protected get method(): any {
@@ -184,21 +186,38 @@ declare namespace cm {
          */
         protected readonly method: Network.Method;
         /**
-         * @description resove relative uri to full url
+         * @description the global request body data reslover
+         * @override override point
          * @param data the user request data
          * @return the finnal request data
          */
         protected params(data: any): any;
         /**
-         * @description resove relative uri to full url
+         * @description the global hock before every request
+         * @override override point
+         * @param path the relative uri
+         * @param opts the request options
+         * @returns go on request or not @default true
+         */
+        protected before(path: string, opts?: Network.Options): boolean;
+        /**
+         * @description the global hock after every request
+         * @override override point
+         * @param path the relative uri
+         * @param resp the response data or error
+         */
+        protected after(path: string, resp?: any | Error): void;
+        /**
+         * @description global resove relative uri to full url
          * @param path the relative uri
          */
         protected abstract url(path: string): string;
         /**
-         * @description you must provid an resover and return you business object
+         * @description the global resp resolver
          * @param json the jsoned respons data
          */
         protected abstract resolve(json: any): any | Promise<any>;
+        /** ----- network data request methods */
         readonly upload: <T = any>(path: string, upload: Network.Upload) => Network.UploadTask<T>;
         readonly anyreq: <T = any>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly objreq: <T>(req: Network.Request<T>) => Network.DataTask<T>;
@@ -223,25 +242,33 @@ declare namespace cm {
             readonly name: string;
             readonly data: Blob;
             readonly type: string;
-            readonly opts?: Pick<Options, 'headers' | 'parser' | 'timeout'>;
+            readonly opts?: Pick<Options, 'headers' | 'parser' | 'timeout', 'loading'>;
             readonly params?: Record<string, any>;
         }
         interface Request<T> {
             readonly path: string;
             readonly meta: IMetaClass<T> | T;
             readonly data?: any;
-            readonly options?: Options;
+            readonly opts?: Options;
         }
         interface Options {
-            method?: Method;
-            headers?: Record<string, string>;
+            /** @description use for override global methods */
+            readonly method?: Method;
+            /** @description use for override global headers */
+            readonly headers?: Record<string, string>;
+            /** @default 10000 */
+            readonly timeout?: number;
+            /**
+             * @description You must provide your loading UI in before or after hock. otherwith it does't work!
+             * @see Network.before @see Network.after.
+             */
+            readonly loading?: boolean;
             /**
              * @description the response type for xhr.responseType
              * @default 'json'
              */
             readonly resptype?: 'json' | 'text';
-            /** @default 10000 */
-            readonly timeout?: number;
+            /** @description use for override global reslove method */
             readonly parser?: (resp: any) => any;
         }
         class Error {
@@ -254,7 +281,10 @@ declare namespace cm {
             static readonly service: (status: number) => Error;
         }
         interface DataTask<T> {
-            readonly then: <TResult1 = T, TResult2 = never>(onfulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) => Promise<TResult1 | TResult2>;
+            readonly then: <TResult1 = T, TResult2 = never>(
+                onfulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>,
+                onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>
+            ) => Promise<TResult1 | TResult2>;
             readonly catch: <TResult = never>(onrejected?: (reason: any) => TResult | PromiseLike<TResult>) => Promise<T | TResult>;
             readonly abort: () => void;
             readonly onProgress: (func: (evt: ProgressEvent) => void) => void;

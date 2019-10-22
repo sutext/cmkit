@@ -5734,7 +5734,7 @@ declare namespace cc {
 		/**
 		Returns the sprite frames in sprite atlas. 
 		*/
-		getSpriteFrames(): [SpriteFrame];	
+		getSpriteFrames(): SpriteFrame[];	
 	}	
 	/** !#en
 	A cc.SpriteFrame has:<br/>

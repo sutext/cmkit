@@ -36,7 +36,11 @@ var rmdir = function(dir) {
 var installDir = path.join(cmhome, 'install');
 var cocosDir = path.join(cmhome, 'cocos');
 var webDir = path.join(cmhome, 'web');
-if (fs.existsSync(path.join(cmhome, '../../project.json')) && fs.existsSync(path.join(cmhome, '../../settings/project.json')) && fs.existsSync(path.join(cmhome, '../../assets'))) {
+if (
+    fs.existsSync(path.join(cmhome, '../../project.json')) &&
+    fs.existsSync(path.join(cmhome, '../../settings/project.json')) &&
+    fs.existsSync(path.join(cmhome, '../../assets'))
+) {
     var packagesDir = path.join(cmhome, '../../packages');
     var packageTarget = path.join(packagesDir, 'cmkit');
     if (!fs.existsSync(packagesDir)) {

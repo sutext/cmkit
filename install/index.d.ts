@@ -85,10 +85,7 @@ declare namespace cm {
      * @example {name}_ske.json,{name}_tex.json,{name}_tex.png
      * @param progress 加载进度
      */
-    const loadbone: (
-        dir: string,
-        name: string
-    ) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
+    const loadbone: (dir: string, name: string) => Promise<[dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset]>;
 }
 declare namespace cc {
     interface Node {
@@ -157,10 +154,7 @@ declare namespace dragonBones {
          * @param completed the callback of animation completed
          * @param target the completed call back target
          */
-        readonly runani: (
-            name: string,
-            options?: { scale?: number; times?: number; completed?: (evt: cc.Event) => void; target?: any }
-        ) => void;
+        readonly runani: (name: string, options?: { scale?: number; times?: number; completed?: (evt: cc.Event) => void; target?: any }) => void;
         /**
          * @description stop current runed  animation from runani
          */

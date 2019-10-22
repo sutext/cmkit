@@ -304,6 +304,7 @@
         function Network() {
             var _this = this;
             this.upload = function(path, upload) {
+                if (!_this.before(path, upload.opts)) return;
                 var data = new FormData();
                 data.append(upload.name, upload.data);
                 if (upload.params) {
@@ -315,103 +316,159 @@
                 headers['Content-Type'] = upload.type;
                 var options = Object.assign({ headers: headers }, upload.opts);
                 var values = Network.post(_this.url(path), _this.params(data), options);
-                var promiss = values[0].then(function(json) {
-                    var parser = (options && options.parser) || _this.resolve.bind(_this);
-                    var value = parser(json);
-                    return value;
+                var promiss = new Promise(function(resolve, reject) {
+                    values[0]
+                        .then(function(json) {
+                            var parser = (options && options.parser) || _this.resolve.bind(_this);
+                            var value = parser(json);
+                            return value;
+                        })
+                        .then(function(obj) {
+                            resolve(obj);
+                            _this.after(path, obj);
+                        })
+                        .catch(function(e) {
+                            reject();
+                            _this.after(path, e);
+                        });
                 });
                 return new Network.UploadTask(promiss, values[1]);
             };
             this.anyreq = function(req) {
-                return _this.anytask(req.path, req.data, req.options);
+                return _this.anytask(req.path, req.data, req.opts);
             };
             this.objreq = function(req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of objreq must be a Constructor');
-                return _this.objtask(req.meta, req.path, req.data, req.options);
+                return _this.objtask(req.meta, req.path, req.data, req.opts);
             };
             this.aryreq = function(req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of aryreq must be a Constructor');
-                return _this.arytask(req.meta, req.path, req.data, req.options);
+                return _this.arytask(req.meta, req.path, req.data, req.opts);
             };
             this.mapreq = function(req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of mapreq must be a Constructor');
-                return _this.maptask(req.meta, req.path, req.data, req.options);
+                return _this.maptask(req.meta, req.path, req.data, req.opts);
             };
             this.anytask = function(path, data, opts) {
+                if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = values[0].then(function(json) {
-                    var parser = (options && options.parser) || _this.resolve.bind(_this);
-                    var value = parser(json);
-                    return value;
+                var promiss = new Promise(function(resolve, reject) {
+                    values[0]
+                        .then(function(json) {
+                            var parser = (options && options.parser) || _this.resolve.bind(_this);
+                            var value = parser(json);
+                            return value;
+                        })
+                        .then(function(obj) {
+                            resolve(obj);
+                            _this.after(path, obj);
+                        })
+                        .catch(function(e) {
+                            reject();
+                            _this.after(path, e);
+                        });
                 });
                 return new Network.DataTask(promiss, values[1]);
             };
             this.objtask = function(meta, path, data, opts) {
+                if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = values[0]
-                    .then(function(json) {
-                        var parser = (options && options.parser) || _this.resolve.bind(_this);
-                        return parser(json);
-                    })
-                    .then(function(value) {
-                        return new meta(value);
-                    });
+                var promiss = new Promise(function(resolve, reject) {
+                    values[0]
+                        .then(function(json) {
+                            var parser = (options && options.parser) || _this.resolve.bind(_this);
+                            return parser(json);
+                        })
+                        .then(function(value) {
+                            return new meta(value);
+                        })
+                        .then(function(obj) {
+                            resolve(obj);
+                            _this.after(path, obj);
+                        })
+                        .catch(function(e) {
+                            reject();
+                            _this.after(path, e);
+                        });
+                });
                 return new Network.DataTask(promiss, values[1]);
             };
             this.arytask = function(meta, path, data, opts) {
+                if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = values[0]
-                    .then(function(json) {
-                        var parser = (options && options.parser) || _this.resolve.bind(_this);
-                        return parser(json);
-                    })
-                    .then(function(value) {
-                        return Array.isArray(value)
-                            ? value.map(function(ele) {
-                                  return new meta(ele);
-                              })
-                            : [];
-                    });
+                var promiss = new Promise(function(resolve, reject) {
+                    values[0]
+                        .then(function(json) {
+                            var parser = (options && options.parser) || _this.resolve.bind(_this);
+                            return parser(json);
+                        })
+                        .then(function(value) {
+                            return Array.isArray(value)
+                                ? value.map(function(ele) {
+                                      return new meta(ele);
+                                  })
+                                : [];
+                        })
+                        .then(function(ary) {
+                            resolve(ary);
+                            _this.after(path, ary);
+                        })
+                        .catch(function(e) {
+                            reject();
+                            _this.after(path, e);
+                        });
+                });
                 return new Network.DataTask(promiss, values[1]);
             };
             this.maptask = function(meta, path, data, opts) {
+                if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = values[0]
-                    .then(function(json) {
-                        var parser = (options && options.parser) || _this.resolve.bind(_this);
-                        return parser(json);
-                    })
-                    .then(function(value) {
-                        var result = {};
-                        var mapkey = meta.__mapkey || 'id';
-                        if (Array.isArray(value)) {
-                            value.forEach(function(ele) {
-                                var obj = new meta(ele);
-                                var keyvalue = obj[mapkey];
-                                if (keyvalue) {
-                                    result[keyvalue] = obj;
-                                } else {
-                                    ns.warn('the mapkey:', mapkey, 'not exist in object:', obj);
-                                }
-                            });
-                        }
-                        if (typeof value === 'object') {
-                            for (var key in value) {
-                                if (value.hasOwnProperty(key)) {
-                                    var obj = new meta(value[key]);
+                var promiss = new Promise(function(resolve, reject) {
+                    values[0]
+                        .then(function(json) {
+                            var parser = (options && options.parser) || _this.resolve.bind(_this);
+                            return parser(json);
+                        })
+                        .then(function(value) {
+                            var result = {};
+                            var mapkey = meta.__mapkey || 'id';
+                            if (Array.isArray(value)) {
+                                value.forEach(function(ele) {
+                                    var obj = new meta(ele);
                                     var keyvalue = obj[mapkey];
-                                    if (keyvalue === key) {
+                                    if (keyvalue) {
                                         result[keyvalue] = obj;
+                                    } else {
+                                        ns.warn('the mapkey:', mapkey, 'not exist in object:', obj);
+                                    }
+                                });
+                            }
+                            if (typeof value === 'object') {
+                                for (var key in value) {
+                                    if (value.hasOwnProperty(key)) {
+                                        var obj = new meta(value[key]);
+                                        var keyvalue = obj[mapkey];
+                                        if (keyvalue === key) {
+                                            result[keyvalue] = obj;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        return result;
-                    });
+                            return result;
+                        })
+                        .then(function(map) {
+                            resolve(map);
+                            _this.after(path, map);
+                        })
+                        .catch(function(e) {
+                            reject();
+                            _this.after(path, e);
+                        });
+                });
                 return new Network.DataTask(promiss, values[1]);
             };
         }
@@ -438,6 +495,10 @@
         Network.prototype.params = function(data) {
             return data;
         };
+        Network.prototype.before = function() {
+            return true;
+        };
+        Network.prototype.after = function() {};
         return Network;
     })();
     (function(Network) {
@@ -589,11 +650,7 @@
             this.protocols = protocols;
             this.retry = new Socket.Retry(this.onRetryCallback.bind(this), this.onRetryFailed.bind(this));
             this.open = function() {
-                if (
-                    _this.readyState === Socket.CONNECTING ||
-                    _this.readyState === Socket.OPEN ||
-                    typeof _this.buildurl !== 'function'
-                ) {
+                if (_this.readyState === Socket.CONNECTING || _this.readyState === Socket.OPEN || typeof _this.buildurl !== 'function') {
                     return;
                 }
                 if (_this.ws) {
@@ -927,9 +984,7 @@
                 throw new Error('The privkey:' + idxkey + ' invalid!');
             }
             if (_stored[clskey]) {
-                throw new Error(
-                    'The clskey:' + clskey + " already exist!!You can't mark different class with same name!!"
-                );
+                throw new Error('The clskey:' + clskey + " already exist!!You can't mark different class with same name!!");
             }
             _stored[clskey] = true;
             return function(target) {
