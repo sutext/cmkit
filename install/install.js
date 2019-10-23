@@ -9,8 +9,8 @@ function cpdir(src, dist) {
     fs.mkdirSync(dist);
     var files = fs.readdirSync(src);
     files.forEach(function(file) {
-        var srcFile = src + '/' + file;
-        var distFile = dist + '/' + file;
+        var srcFile = path.join(src, file);
+        var distFile = path.join(dist, file);
         if (fs.statSync(srcFile).isDirectory()) {
             cpdir(srcFile, distFile);
         } else {
@@ -23,11 +23,11 @@ var rmdir = function(dir) {
     if (fs.existsSync(dir)) {
         files = fs.readdirSync(dir);
         files.forEach(function(file) {
-            var path = dir + '/' + file;
-            if (fs.statSync(path).isDirectory()) {
-                rmdir(path);
+            var sub = path.join(dir, file);
+            if (fs.statSync(sub).isDirectory()) {
+                rmdir(sub);
             } else {
-                fs.unlinkSync(path);
+                fs.unlinkSync(sub);
             }
         });
         fs.rmdirSync(dir);
