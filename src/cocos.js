@@ -208,14 +208,22 @@
             return _this;
         });
     };
-    cc.Sprite.prototype.adjust = function(width, height) {
+    cc.Sprite.prototype.adjust = function(sizeOrBoth) {
         if (!(this.node && this.spriteFrame)) return;
+        var width = sizeOrBoth;
+        var height = sizeOrBoth;
+        if (typeof sizeOrBoth === 'object') {
+            width = sizeOrBoth.width;
+            height = sizeOrBoth.height;
+        }
         var rect = this.spriteFrame.getRect();
         var scaleX = typeof width === 'number' && width / rect.width;
         var scaleY = typeof height === 'number' && height / rect.height;
         var scale = scaleX || scaleY;
         if (!scale) return;
-        this.node.scale = (scaleX && scaleY && Math.min(scaleX, scaleY)) || scale;
+        scale = (scaleX && scaleY && Math.min(scaleX, scaleY)) || scale;
+        this.node.width *= scale;
+        this.node.height *= scale;
     };
     ///----------dragonBones.ArmatureDisplay----------
     dragonBones.ArmatureDisplay.prototype.runani = function(name, option) {
@@ -1217,10 +1225,7 @@
         set: function(val) {
             this.__index = val;
             if (this.list) {
-                this.node.y =
-                    -this.node.anchorY * this.list.itemHeight -
-                    (this.list.spacing + this.list.itemHeight) * val -
-                    this.list.padding.head;
+                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.head;
                 this.setData(this.list.datas[val], this.list.bind);
             }
         },

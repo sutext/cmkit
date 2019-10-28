@@ -127,7 +127,7 @@ declare namespace cc {
          * @param width the max display width of sprite
          * @param height the max display height of sprite
          */
-        readonly adjust: (width: number, height: number) => void;
+        readonly adjust: (sizeOrBoth: { width?: number; height?: number } | number) => void;
         /**
          * @description 通过远程url 或者 相对于 resources目录的url 加载图片
          * @param url the image url
