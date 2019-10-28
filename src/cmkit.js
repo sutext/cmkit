@@ -328,7 +328,7 @@
                             _this.after(path, obj);
                         })
                         .catch(function(e) {
-                            reject();
+                            reject(e);
                             _this.after(path, e);
                         });
                 });
@@ -365,7 +365,7 @@
                             _this.after(path, obj);
                         })
                         .catch(function(e) {
-                            reject();
+                            reject(e);
                             _this.after(path, e);
                         });
                 });
@@ -389,7 +389,7 @@
                             _this.after(path, obj);
                         })
                         .catch(function(e) {
-                            reject();
+                            reject(e);
                             _this.after(path, e);
                         });
                 });
@@ -417,7 +417,7 @@
                             _this.after(path, ary);
                         })
                         .catch(function(e) {
-                            reject();
+                            reject(e);
                             _this.after(path, e);
                         });
                 });
@@ -465,7 +465,7 @@
                             _this.after(path, map);
                         })
                         .catch(function(e) {
-                            reject();
+                            reject(e);
                             _this.after(path, e);
                         });
                 });
