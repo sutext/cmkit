@@ -123,11 +123,19 @@ declare namespace cc {
     }
     interface Sprite {
         /**
-         * @description 自动适应精灵的尺寸
-         * @param width the max display width of sprite
+         * @description 约束精灵尺寸，保持宽高比例不变
+         * @param widthOrBothOrOnly the max display width or both width and height
          * @param height the max display height of sprite
+         * @example sprite.adjust(150) ** width<=150 height<=150
+         * @example sprite.adjust(150,250) ** width<=150 height<=250
+         * @example sprite.adjust({width:150}) ** width==150 height auto
+         * @example sprite.adjust({height:250}) ** height==250 width auto
+         * @warn sprite.adjust({width:150,height:250})  ** the same as sprite.adjust(150,250)
+         * @warn sprite.adjust({width:150,height:250},1000)  *the same as sprite.adjust(150,250) and 1000 will be ignore
+         * @warn sprite.adjust({width:150},1000)  ** the same as sprite.adjust({width:150}) and 1000 will be ignore
+         * @warn sprite.adjust({height:150},1000)  ** the same as sprite.adjust({height:150}) and 1000 will be ignore
          */
-        readonly adjust: (sizeOrBoth: { width?: number; height?: number } | number) => void;
+        readonly adjust: (widthOrBothOrOnly: number | { width?: number; height?: number }, height?: number) => void;
         /**
          * @description 通过远程url 或者 相对于 resources目录的url 加载图片
          * @param url the image url

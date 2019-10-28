@@ -208,22 +208,26 @@
             return _this;
         });
     };
-    cc.Sprite.prototype.adjust = function(sizeOrBoth) {
-        if (!(this.node && this.spriteFrame)) return;
+    cc.Sprite.prototype.adjust = function() {
+        if (!this.node || !this.spriteFrame || arguments.length === 0) return;
+        var rect = this.spriteFrame.getRect();
+        if (!rect.width || !rect.height) return;
+        var sizeOrBoth = arguments[0];
         var width = sizeOrBoth;
         var height = sizeOrBoth;
         if (typeof sizeOrBoth === 'object') {
             width = sizeOrBoth.width;
             height = sizeOrBoth.height;
+        } else if (typeof arguments[1] === 'number') {
+            height = arguments[1];
         }
-        var rect = this.spriteFrame.getRect();
         var scaleX = typeof width === 'number' && width / rect.width;
         var scaleY = typeof height === 'number' && height / rect.height;
         var scale = scaleX || scaleY;
         if (!scale) return;
         scale = (scaleX && scaleY && Math.min(scaleX, scaleY)) || scale;
-        this.node.width *= scale;
-        this.node.height *= scale;
+        this.node.width = rect.width * scale;
+        this.node.height = rect.height * scale;
     };
     ///----------dragonBones.ArmatureDisplay----------
     dragonBones.ArmatureDisplay.prototype.runani = function(name, option) {
