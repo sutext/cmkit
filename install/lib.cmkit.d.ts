@@ -150,6 +150,60 @@ declare namespace cm {
     const config: (host: string, debug?: boolean) => void;
 }
 declare namespace cm {
+    abstract class Emitter<Event extends string = string> {
+        /**
+         * @description register event handler to the emitter on target.
+         * @notice Only one handler will exist in same target and same event. The later one will be ignore
+         * @param event the event
+         * @param target the callback's caller
+         * @param callback the event handler
+         */
+        public readonly on: (event: Event, target: object, callback: Function) => void;
+        /**
+         * @description remove event handler of the emitter
+         * @example
+         * emiter.off('YOUR_EVENT') // remove all the handler of 'YOUR_EVENT'
+         * emiter.off(this) // remove all the handler on the 'this' target
+         * emiter.off('YOUR_EVENT',this) // only remove the handler of 'YOUR_EVENT' on this target
+         * //The following usage is not recommended
+         * emiter.off(this,other) // the same as emiter.off(this) other will be ignore.
+         */
+        public readonly off: (eventOrTarget: Event | object, target?: object) => void;
+        /**
+         * @description register once event handler to the emitter on target
+         * @notice Only one handler will exist in same target and same event. The later one will be ignore
+         * @param event the event
+         * @param target the callback's caller
+         * @param callback the event handler
+         */
+        public readonly once: (event: Event, target: object, callback: Function) => void;
+        /**
+         * @description remove all handler
+         */
+        protected readonly clear: () => void;
+        /**
+         * @description dispatch event to all the rigsted handler
+         * @param event the event
+         * @param args the arguments of callback function
+         */
+        protected readonly emit: (event: Event, ...args: any[]) => void;
+    }
+    class NoticeCenter extends Emitter<string> {
+        /**
+         * @description remove all handler
+         */
+        public readonly clear: () => void;
+        /**
+         * @description dispatch event to all the rigsted handler
+         * @param event the event
+         * @param args the arguments of callback function
+         */
+        public readonly emit: (event: string, ...args: any[]) => void;
+    }
+    /**
+     * @description A global shared notice center.
+     */
+    const notice: NoticeCenter;
     /**  @description  mark a field of IMetaClass as mapkey in Network.mapreq and Network.maptask. */
     const mapkey: (target: Object, field: string) => void;
     interface IMetaClass<T> {
@@ -242,7 +296,7 @@ declare namespace cm {
             readonly name: string;
             readonly data: Blob;
             readonly type: string;
-            readonly opts?: Pick<Options, 'headers' | 'parser' | 'timeout', 'loading'>;
+            readonly opts?: Pick<Options, 'headers' | 'parser' | 'timeout' | 'loading'>;
             readonly params?: Record<string, any>;
         }
         interface Request<T> {

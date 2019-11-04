@@ -300,6 +300,79 @@
                 d.prototype = b === null ? Object.create(b) : ((__.prototype = b.prototype), new __());
             };
         })();
+    var Emitter = (function() {
+        function Emitter() {
+            var _this = this;
+            this.observers = {};
+            this.on = function(evt, target, callback, once) {
+                var list = _this.observers[evt] || (_this.observers[evt] = []);
+                var idx = list.findIndex(function(ele) {
+                    return ele.target === target && ele.once === !!once;
+                });
+                if (idx === -1) {
+                    list.push({ callback: callback, target: target, once: !!once });
+                }
+            };
+            this.off = function(evt, target) {
+                if (typeof evt === 'string') {
+                    if (target) {
+                        this.removeByTarget(_this.observers[evt], target);
+                    } else {
+                        _this.observers[evt] = [];
+                    }
+                } else if (typeof evt === 'object') {
+                    for (var key in _this.observers) {
+                        this.removeByTarget(_this.observers[key], evt);
+                    }
+                }
+            };
+            this.once = function(event, target, callback) {
+                _this.on(event, target, callback, true);
+            };
+            this.emit = function(event) {
+                if (typeof event !== 'string') return;
+                var list = _this.observers[event];
+                if (!Array.isArray(list)) return;
+                var args = [];
+                for (var i = 1; i < arguments.length; i++) {
+                    args.push(arguments[i]);
+                }
+                for (var i = 0; i < list.length; i++) {
+                    var ele = list[i];
+                    ele.callback.apply(ele.target, args);
+                }
+                for (var i = list.length - 1; i >= 0; i--) {
+                    if (list[i].once) {
+                        list.splice(i, 1);
+                    }
+                }
+            };
+            this.clear = function() {
+                _this.observers = {};
+            };
+        }
+        Emitter.prototype.removeByTarget = function(list, target) {
+            if (Array.isArray(list)) {
+                for (var i = list.length - 1; i >= 0; i--) {
+                    if (list[i].target === target) {
+                        list.splice(i, 1);
+                    }
+                }
+            }
+        };
+        return Emitter;
+    })();
+    ns.Emitter = Emitter;
+    var NoticeCenter = (function(_super) {
+        __extends(NoticeCenter, _super);
+        function NoticeCenter() {
+            return (_super !== null && _super.apply(this, arguments)) || this;
+        }
+        return NoticeCenter;
+    })(Emitter);
+    ns.NoticeCenter = NoticeCenter;
+    ns.notice = new NoticeCenter();
+
     ns.Network = (function() {
         function Network() {
             var _this = this;

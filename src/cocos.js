@@ -1031,27 +1031,23 @@
                 tooltip: '列表item高度'
             },
             cacheCount: {
-                default: 4,
-                type: cc.Integer,
-                slide: true,
-                range: [1, 8, 1],
-                tooltip: '列表上下两侧各预加载的item个数(必须为整数)'
-            },
-            frameCount: {
                 default: 2,
                 type: cc.Integer,
                 slide: true,
-                range: [1, 6, 1],
-                tooltip: '列表每一帧最多加载的item个数(必须为整数)，优化加载速度。'
+                range: [1, 4, 1],
+                tooltip: '列表上下两侧各预加载的item个数(必须为整数)'
             },
-            scrollView: {
-                default: null,
-                type: cc.ScrollView,
-                tooltip: '注意请不要在ScrollView 的 content节点上增加cc.Layout组件'
+            frameCount: {
+                default: 3,
+                type: cc.Integer,
+                slide: true,
+                range: [1, 8, 1],
+                tooltip: '列表每一帧最多加载的item个数(必须为整数)，优化加载速度。'
             }
         },
         editor: CC_EDITOR && {
-            menu: 'CMKit/ListView'
+            menu: 'CMKit/ListView',
+            requireComponent: cc.ScrollView
         }
     }));
     ListView.prototype.onDestroy = function() {
@@ -1059,30 +1055,27 @@
         this.items = [];
     };
     ListView.prototype.onLoad = function() {
-        if (!this.scrollView) {
-            this.scrollView = this.node.getComponent(cc.ScrollView);
-        }
-        if (!this.scrollView) {
-            throw new Error('cm.ListView must be mount on cc.ScrollView node or appoint scrollView property!');
-        }
+        this.scrollView = this.node.getComponent(cc.ScrollView);
         this.scrollView.node.on('scrolling', this.onScrolling, this);
+        this.scrollView.node.on('scroll-to-top', this.onScrollTop, this);
+        this.scrollView.node.on('scroll-to-bottom', this.onScrollBottom, this);
         this.maskHeight = this.scrollView.content.parent.getContentSize().height;
         this.maxItemCount = Math.ceil(this.maskHeight / this.itemHeight) + 1 + this.cacheCount * 2;
         this.maxTop = this.cacheCount * this.itemHeight;
         this.maxBottom = -(this.maxItemCount - this.cacheCount) * this.itemHeight;
     };
     ListView.prototype.appendData = function(datas) {
-        if (Array.isArray(datas) && datas.length > 0) {
+        if (this.scrollView && Array.isArray(datas) && datas.length > 0) {
             this.datas.append(datas);
             this.setHeight();
             if (this.items.length < this.maxItemCount) {
-                var itemCount = Math.min(datas.length, this.maxItemCount);
+                var itemCount = Math.min(this.datas.length, this.maxItemCount);
                 this.next(this.genItems(this.items.length, itemCount), this.frameCount);
             }
         }
     };
     ListView.prototype.reloadData = function(datas) {
-        if (Array.isArray(datas) && datas.length > 0) {
+        if (this.scrollView && Array.isArray(datas)) {
             this.datas = datas;
             this.items = [];
             this.scrollView.content.removeAllChildren();
@@ -1174,6 +1167,16 @@
             }
         });
     };
+    ListView.prototype.onScrollTop = function() {
+        if (this.delegate && this.delegate.didReachHead) {
+            this.delegate.didReachHead(this);
+        }
+    };
+    ListView.prototype.onScrollBottom = function() {
+        if (this.delegate && this.delegate.didReachTail) {
+            this.delegate.didReachTail(this);
+        }
+    };
     ListView.prototype.setHeight = function() {
         var height = (this.itemHeight + this.spacing) * this.datas.length - this.spacing;
         height = height + this.padding.head + this.padding.tail;
@@ -1194,10 +1197,6 @@
                 if (index < this.datas.length) {
                     head.index = index;
                     this.items.push(this.items.shift());
-                } else {
-                    if (this.delegate && this.delegate.didReachTail) {
-                        this.delegate.didReachTail(this);
-                    }
                 }
             }
         } else {
@@ -1207,10 +1206,6 @@
                 if (index >= 0) {
                     head.index = index;
                     this.items.unshift(this.items.pop());
-                } else {
-                    if (this.delegate && this.delegate.didReachHead) {
-                        this.delegate.didReachHead(this);
-                    }
                 }
             }
         }
@@ -1229,7 +1224,7 @@
         set: function(val) {
             this.__index = val;
             if (this.list) {
-                this.node.y = -this.node.anchorY * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.head;
+                this.node.y = -0.5 * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.head;
                 this.setData(this.list.datas[val], this.list.bind);
             }
         },

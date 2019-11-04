@@ -126,14 +126,16 @@ declare namespace cc {
          * @description 约束精灵尺寸，保持宽高比例不变
          * @param widthOrBothOrOnly the max display width or both width and height
          * @param height the max display height of sprite
-         * @example sprite.adjust(150) ** width<=150 height<=150
-         * @example sprite.adjust(150,250) ** width<=150 height<=250
-         * @example sprite.adjust({width:150}) ** width==150 height auto
-         * @example sprite.adjust({height:250}) ** height==250 width auto
-         * @warn sprite.adjust({width:150,height:250})  ** the same as sprite.adjust(150,250)
-         * @warn sprite.adjust({width:150,height:250},1000)  *the same as sprite.adjust(150,250) and 1000 will be ignore
-         * @warn sprite.adjust({width:150},1000)  ** the same as sprite.adjust({width:150}) and 1000 will be ignore
-         * @warn sprite.adjust({height:150},1000)  ** the same as sprite.adjust({height:150}) and 1000 will be ignore
+         * @example
+         * sprite.adjust(150) // width<=150 height<=150
+         * sprite.adjust(150,250) // width<=150 height<=250
+         * sprite.adjust({width:150}) // width==150 height auto
+         * sprite.adjust({height:250}) // height==250 width auto
+         * //The following usage is not recommended
+         * sprite.adjust({width:150,height:250})  // the same as sprite.adjust(150,250)
+         * sprite.adjust({width:150,height:250},1000)  // the same as sprite.adjust(150,250) and 1000 will be ignore
+         * sprite.adjust({width:150},1000)  // the same as sprite.adjust({width:150}) and 1000 will be ignore
+         * sprite.adjust({height:150},1000)  // the same as sprite.adjust({height:150}) and 1000 will be ignore
          */
         readonly adjust: (widthOrBothOrOnly: number | { width?: number; height?: number }, height?: number) => void;
         /**
@@ -281,9 +283,28 @@ declare namespace cm {
     }
     /** @description ListView envent delegate */
     interface ListDelegate<T = any> {
-        didReachTail?(list: ListView<T>): void;
+        /**
+         * @description called when the list will reach the list tail
+         * @param list
+         */
         didReachHead?(list: ListView<T>): void;
+        /**
+         * @description called when the list will reach the list head
+         * @param list
+         */
+        didReachTail?(list: ListView<T>): void;
+        /**
+         * @description called when all item node did loaded
+         * @param list
+         */
         itemsDidLoad?(list: ListView<T>): void;
+        /**
+         * @description called when item emit some event
+         * @param event the special event
+         * @param data the data the item
+         * @param item the item whitch have emit some event
+         * @param list the list
+         */
         itemDidOccur?(event: string, data: T, item: ListItem<T>, list: ListView<T>): void;
     }
     /**
@@ -349,12 +370,6 @@ declare namespace cm {
          * @param attenuated attenuated or not @default true
          */
         public readonly scrollToOffset: (offset: number, time?: number, attenuated?: boolean) => void;
-        /** trigger when list will reach head */
-        public onhead: () => void;
-        /** trigger when list will reach tail */
-        public ontail: () => void;
-        /** trigger when all items did finish load */
-        public onloaded: () => void;
     }
 
     /** 实现cc.Label的滚动数字效果，和滚动音效 */
