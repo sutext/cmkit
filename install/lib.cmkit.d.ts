@@ -150,7 +150,7 @@ declare namespace cm {
     const config: (host: string, debug?: boolean) => void;
 }
 declare namespace cm {
-    abstract class Emitter<Event extends string = string> {
+    abstract class Emitter<E extends string = string> {
         /**
          * @description register event handler to the emitter on target.
          * @notice Only one handler will exist in same target and same event. The later one will be ignore
@@ -158,7 +158,7 @@ declare namespace cm {
          * @param target the callback's caller
          * @param callback the event handler
          */
-        public readonly on: (event: Event, target: object, callback: Function) => void;
+        public readonly on: (event: E, target: object, callback: Function) => void;
         /**
          * @description remove event handler of the emitter
          * @example
@@ -168,7 +168,7 @@ declare namespace cm {
          * //The following usage is not recommended
          * emiter.off(this,other) // the same as emiter.off(this) other will be ignore.
          */
-        public readonly off: (eventOrTarget: Event | object, target?: object) => void;
+        public readonly off: (eventOrTarget: E | object, target?: object) => void;
         /**
          * @description register once event handler to the emitter on target
          * @notice Only one handler will exist in same target and same event. The later one will be ignore
@@ -176,7 +176,7 @@ declare namespace cm {
          * @param target the callback's caller
          * @param callback the event handler
          */
-        public readonly once: (event: Event, target: object, callback: Function) => void;
+        public readonly once: (event: E, target: object, callback: Function) => void;
         /**
          * @description remove all handler
          */
@@ -186,12 +186,10 @@ declare namespace cm {
          * @param event the event
          * @param args the arguments of callback function
          */
-        protected readonly emit: (event: Event, ...args: any[]) => void;
+        protected readonly emit: (event: E, ...args: any[]) => void;
     }
     class NoticeCenter extends Emitter<string> {
-        /**
-         * @description remove all handler
-         */
+        /** @description remove all handler */
         public readonly clear: () => void;
         /**
          * @description dispatch event to all the rigsted handler
@@ -200,43 +198,33 @@ declare namespace cm {
          */
         public readonly emit: (event: string, ...args: any[]) => void;
     }
-    /**
-     * @description A global shared notice center.
-     */
+    /**  @description A global shared notice center. */
     const notice: NoticeCenter;
     /**  @description  mark a field of IMetaClass as mapkey in Network.mapreq and Network.maptask. */
     const mapkey: (target: Object, field: string) => void;
     interface IMetaClass<T> {
         new (json?: any): T;
     }
-    interface IObserver {
-        readonly target: any;
-        readonly callback: Function;
-    }
     abstract class Network {
         /**
          * @description the global http headers. every request will include this headers
          * @override you shoud overwrite this property and provide you custom headers
          * @example
-         * ``
          * protected get headers(): any {
          *     return {
          *         token:'yourtoken',
          *         account:'youraccount'
          *     }
          * }
-         * ``
          */
         protected readonly headers: Record<string, string>;
         /**
          * @description the global http request method
          * @override you shoud override this property and provide you custom headers
          * @example
-         * ``
          * protected get method(): any {
          *     return 'POST'
          * }
-         * ``
          */
         protected readonly method: Network.Method;
         /**
@@ -393,15 +381,9 @@ declare namespace cm {
         const CLOSED: number;
         const CLOSING: number;
         const CONNECTING: number;
-        type Events = keyof Observers;
         type Reason = 'user' | 'ping' | 'retry' | 'server';
+        type Events = 'open' | 'error' | 'close' | 'message';
         type Status = 'closed' | 'closing' | 'opened' | 'opening';
-        interface Observers {
-            readonly open: IObserver[];
-            readonly error: IObserver[];
-            readonly close: IObserver[];
-            readonly message: IObserver[];
-        }
         /** @description A retry machine for web socket  */
         interface Retry {
             /**
@@ -433,8 +415,9 @@ declare namespace cm {
          * @description you must inherit this class to implements your logic
          * @implements client PING heartbeat mechanis
          * @implements client reconnect  mechanis
+         * @notice by defualt the client never emit any event. you must emit it at override point yourself.
          */
-        abstract class Client {
+        abstract class Client<E extends string = Events> extends Emitter<E> {
             /**
              * @description the client ping mechanis
              * @ping use socket.send("{\"type\":\"PING\"}")
@@ -444,31 +427,19 @@ declare namespace cm {
             protected readonly ping: Ping;
             /** the realy websocket handler */
             protected readonly socket: Socket;
-            /**
-             * @notice all the observers will not be trigger
-             * @notice you must trigger it yourself at overwrite point
-             */
-            protected readonly observers: Observers;
             /** Tell me your login status if not no retry */
             protected abstract readonly isLogin: boolean;
             /** @overwrite this method to provide url for web socket */
             protected abstract buildurl(): string;
-            /** call when get some message @override point  @node the msg has been parsed using JSON.parse.*/
+            /** call when get some message @override point  @notice the msg has been parsed using JSON.parse.*/
             protected abstract onMessage(msg: any): void;
             /** call when some error occur @override point */
             protected onError(res: ErrorEvent): void;
-            /** call when socket closed . @override point */
+            /** call when socket opened @override point */
             protected onOpened(res: any, isRetry: boolean): void;
-            /** @description call when socket closed @param reason the close reason */
+            /** call when socket closed @override point */
             protected onClosed(res: CloseEvent, reason: Reason): void;
             readonly isConnected: boolean; /** the connection status */
-            /**
-             * @description add event listener
-             * @warn By default all the envents will not be triggered unless triggerde by userself.
-             */
-            readonly on: (evt: 'error' | 'message' | 'close' | 'open', target: any, callback: Function) => void;
-            /** @description remove listener */
-            readonly off: (evt: 'error' | 'message' | 'close' | 'open', target: any) => void;
             readonly stop: () => void; /** disconnect and stop ping pong retry */
             readonly start: () => void; /** connect the server and start ping pong retry */
         }

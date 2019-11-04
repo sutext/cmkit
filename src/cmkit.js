@@ -828,16 +828,6 @@
         Socket.CLOSED = WebSocket.CLOSED;
         Socket.CLOSING = WebSocket.CLOSING;
         Socket.CONNECTING = WebSocket.CONNECTING;
-        var Observers = /** @class */ (function() {
-            function Observers() {
-                this.open = [];
-                this.error = [];
-                this.close = [];
-                this.message = [];
-            }
-            return Observers;
-        })();
-        Socket.Observers = Observers;
         var Retry = /** @class */ (function() {
             function Retry(attempt, failed) {
                 var _this = this;
@@ -904,26 +894,10 @@
             }
             return Ping;
         })();
-        var Client = /** @class */ (function() {
+        var Client = /** @class */ (function(_super) {
+            __extends(Client, _super);
             function Client() {
                 var _this = this;
-                this.observers = new Observers();
-                this.on = function(evt, target, callback) {
-                    var idx = _this.observers[evt].findIndex(function(ele) {
-                        return ele.target === target;
-                    });
-                    if (idx === -1) {
-                        _this.observers[evt].push({ callback: callback, target: target });
-                    }
-                };
-                this.off = function(evt, target) {
-                    var idx = _this.observers[evt].findIndex(function(ele) {
-                        return ele.target === target;
-                    });
-                    if (idx !== -1) {
-                        _this.observers[evt].splice(idx, 1);
-                    }
-                };
                 this.stop = function() {
                     if (_this.socket.readyState === Socket.CLOSED || _this.socket.readyState === Socket.CLOSING) {
                         return;
@@ -986,7 +960,7 @@
                 configurable: true
             });
             return Client;
-        })();
+        })(Emitter);
         Socket.Client = Client;
     })(ns.Socket);
 
