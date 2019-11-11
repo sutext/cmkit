@@ -2088,7 +2088,7 @@ declare namespace cc {
 		var clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 10);
 		``` 
 		*/
-		static createWithSpriteFrames(spriteFrames: [SpriteFrame], sample: number): AnimationClip;	
+		static createWithSpriteFrames(spriteFrames: SpriteFrame[], sample: number): AnimationClip;	
 	}	
 	/** !#en
 	The AnimationState gives full control over animation playback process.

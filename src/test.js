@@ -13,5 +13,6 @@ emter.on('test1', center, function(test1) {
 });
 emter.emit('test1', 'i am msg1', 'i am msg2');
 emter.emit('test1', 'i am msg1', 'i am msg2');
+emter.offall();
 emter.off('test1');
 console.log(emter);

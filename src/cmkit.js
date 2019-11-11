@@ -277,34 +277,32 @@
 
 //--------------------Network Socket Storage ----------------
 (function(ns) {
-    var __extends =
-        (this && this.__extends) ||
-        (function() {
-            var extendStatics = function(d, b) {
-                extendStatics =
-                    Object.setPrototypeOf ||
-                    ({ __proto__: [] } instanceof Array &&
-                        function(d, b) {
-                            d.__proto__ = b;
-                        }) ||
+    var __extends = (function() {
+        var extendStatics = function(d, b) {
+            extendStatics =
+                Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array &&
                     function(d, b) {
-                        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-                    };
-                return extendStatics(d, b);
-            };
-            return function(d, b) {
-                extendStatics(d, b);
-                function __() {
-                    this.constructor = d;
-                }
-                d.prototype = b === null ? Object.create(b) : ((__.prototype = b.prototype), new __());
-            };
-        })();
+                        d.__proto__ = b;
+                    }) ||
+                function(d, b) {
+                    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+                };
+            return extendStatics(d, b);
+        };
+        return function(d, b) {
+            extendStatics(d, b);
+            function __() {
+                this.constructor = d;
+            }
+            d.prototype = b === null ? Object.create(b) : ((__.prototype = b.prototype), new __());
+        };
+    })();
     var Emitter = (function() {
         function Emitter() {
             var _this = this;
-            this.observers = {};
-            this.on = function(evt, target, callback, once) {
+            _this.observers = {};
+            _this.on = function(evt, target, callback, once) {
                 var list = _this.observers[evt] || (_this.observers[evt] = []);
                 var idx = list.findIndex(function(ele) {
                     return ele.target === target && ele.once === !!once;
@@ -313,23 +311,23 @@
                     list.push({ callback: callback, target: target, once: !!once });
                 }
             };
-            this.off = function(evt, target) {
+            _this.off = function(evt, target) {
                 if (typeof evt === 'string') {
                     if (target) {
-                        this.removeByTarget(_this.observers[evt], target);
+                        _this.removeByTarget(_this.observers[evt], target);
                     } else {
                         _this.observers[evt] = [];
                     }
                 } else if (typeof evt === 'object') {
                     for (var key in _this.observers) {
-                        this.removeByTarget(_this.observers[key], evt);
+                        _this.removeByTarget(_this.observers[key], evt);
                     }
                 }
             };
-            this.once = function(event, target, callback) {
+            _this.once = function(event, target, callback) {
                 _this.on(event, target, callback, true);
             };
-            this.emit = function(event) {
+            _this.emit = function(event) {
                 if (typeof event !== 'string') return;
                 var list = _this.observers[event];
                 if (!Array.isArray(list)) return;
@@ -347,7 +345,7 @@
                     }
                 }
             };
-            this.clear = function() {
+            _this.offall = function() {
                 _this.observers = {};
             };
         }
@@ -897,8 +895,8 @@
         var Client = /** @class */ (function(_super) {
             __extends(Client, _super);
             function Client() {
-                var _this = this;
-                this.stop = function() {
+                var _this = (_super !== null && _super.apply(this, arguments)) || this;
+                _this.stop = function() {
                     if (_this.socket.readyState === Socket.CLOSED || _this.socket.readyState === Socket.CLOSING) {
                         return;
                     }
@@ -906,7 +904,7 @@
                     _this.socket.close(1000, 'user');
                     _this.ping.stop();
                 };
-                this.start = function() {
+                _this.start = function() {
                     if (
                         !_this.isLogin ||
                         _this.socket.isRetrying ||
@@ -920,19 +918,19 @@
                     _this.socket.open();
                     _this.ping.start();
                 };
-                this.socket = new Socket(function() {
+                _this.socket = new Socket(function() {
                     return _this.buildurl();
                 });
-                this.ping = new Ping(this.socket);
-                this.socket.onopen = function(evt, isRetry) {
+                _this.ping = new Ping(_this.socket);
+                _this.socket.onopen = function(evt, isRetry) {
                     ns.log('Socket Client Opend', evt);
                     _this.onOpened(evt, isRetry);
                 };
-                this.socket.onerror = function(evt) {
+                _this.socket.onerror = function(evt) {
                     ns.warn('Socket Client Connect Failed！', evt);
                     _this.onError(evt);
                 };
-                this.socket.onmessage = function(evt) {
+                _this.socket.onmessage = function(evt) {
                     ns.log('Socket Client Received message=', evt);
                     if (typeof evt.data !== 'string') return;
                     var msg = JSON.parse(evt.data);
@@ -942,7 +940,7 @@
                         _this.onMessage(msg);
                     }
                 };
-                this.socket.onclose = function(evt, reason) {
+                _this.socket.onclose = function(evt, reason) {
                     ns.log('Socket Client  Closed', evt);
                     _this.ping.stop();
                     _this.onClosed(evt, reason);

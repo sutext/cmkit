@@ -178,25 +178,25 @@ declare namespace cm {
          */
         public readonly once: (event: E, target: object, callback: Function) => void;
         /**
-         * @description remove all handler
-         */
-        protected readonly clear: () => void;
-        /**
          * @description dispatch event to all the rigsted handler
          * @param event the event
          * @param args the arguments of callback function
          */
         protected readonly emit: (event: E, ...args: any[]) => void;
+        /**
+         * @description off all handlers
+         */
+        protected readonly offall: () => void;
     }
     class NoticeCenter extends Emitter<string> {
-        /** @description remove all handler */
-        public readonly clear: () => void;
         /**
          * @description dispatch event to all the rigsted handler
          * @param event the event
          * @param args the arguments of callback function
          */
         public readonly emit: (event: string, ...args: any[]) => void;
+        /** @description remove all handler */
+        public readonly offall: () => void;
     }
     /**  @description A global shared notice center. */
     const notice: NoticeCenter;
