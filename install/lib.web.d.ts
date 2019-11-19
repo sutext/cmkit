@@ -360,9 +360,9 @@ declare namespace cm {
     }
     /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {
-        binaryType: BinaryType; /** @default 'arraybuffer' */
+        binaryType: 'arraybuffer' | 'blob'; /** @default 'arraybuffer' */
         readonly retry: Socket.Retry; /** @description retry settings */
-        readonly send: (data: BlobPart) => void;
+        readonly send: (data: string | ArrayBuffer | Blob) => void;
         readonly open: () => void;
         readonly close: (code?: number, reason?: string) => void;
         readonly isRetrying: boolean;

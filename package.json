@@ -1,11 +1,11 @@
 {
     "name": "cmkit",
-    "version": "1.3.21",
+    "version": "1.4.0",
     "description": "common web developer tool box.",
     "main": "index.js",
     "scripts": {
         "install": "node install/install.js",
-        "prepublishOnly": "uglifyjs src/cmkit.js src/cocos.js -o cocos/assets/cmkit.js && uglifyjs src/module.js src/cmkit.js -o web/index.js"
+        "prepublishOnly": "sh build.sh"
     },
     "repository": {
         "type": "git",
@@ -18,9 +18,10 @@
         "plugin"
     ],
     "files": [
+        "web",
+        "egret",
         "cocos",
-        "install",
-        "web"
+        "install"
     ],
     "author": "supertext",
     "license": "ISC",

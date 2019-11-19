@@ -1,6 +1,6 @@
 global.window = { localStoage: {}, WebSocket: {} };
 global.WebSocket = {};
-require('./cmkit');
+require('../web/index');
 var emter = window.cm.notice;
 var center = { name: 'hellow emiter' };
 emter.once('test1', center, function(test1) {
@@ -15,4 +15,4 @@ emter.emit('test1', 'i am msg1', 'i am msg2');
 emter.emit('test1', 'i am msg1', 'i am msg2');
 emter.offall();
 emter.off('test1');
-console.log(emter);
+console.log(window.cm.Socket.Client);
