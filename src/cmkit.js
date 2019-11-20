@@ -262,17 +262,9 @@
     };
     ns.config = function(host, debug) {
         ns.apihost = host;
-        ns.debug = debug;
+        ns.debug = !!debug;
     };
-    ns.mapkey = function(target, field) {
-        if (!target || !target.constructor) {
-            throw new Error('The mapkey must mark on a MetaClass property');
-        }
-        if (target.constructor.__mapkey) {
-            throw new Error('The mapkey of MetaClass must be unique');
-        }
-        target.constructor.__mapkey = field;
-    };
+    ns.debug = false;
 })((window.cm = window.cm || {}));
 
 //--------------------Network Socket Storage ----------------
@@ -506,7 +498,7 @@
                         })
                         .then(function(value) {
                             var result = {};
-                            var mapkey = meta.__mapkey || 'id';
+                            var mapkey = (opts && opts.mapkey) || 'id';
                             if (Array.isArray(value)) {
                                 value.forEach(function(ele) {
                                     var obj = new meta(ele);
@@ -520,12 +512,12 @@
                             }
                             if (typeof value === 'object') {
                                 for (var key in value) {
-                                    if (value.hasOwnProperty(key)) {
-                                        var obj = new meta(value[key]);
-                                        var keyvalue = obj[mapkey];
-                                        if (keyvalue === key) {
-                                            result[keyvalue] = obj;
-                                        }
+                                    var obj = new meta(value[key]);
+                                    var keyvalue = obj[mapkey];
+                                    if (keyvalue) {
+                                        result[keyvalue] = obj;
+                                    } else {
+                                        ns.warn('the mapkey:', mapkey, 'not exist in object:', obj);
                                     }
                                 }
                             }
@@ -663,7 +655,7 @@
                 }
                 xhr.open('GET', url, true);
                 xhr.timeout = (opts && opts.timeout) || 20000;
-                xhr.responseType = (opts && opts.resptype) || 'json';
+                xhr.responseType = (opts && opts.restype) || 'json';
                 var headers = (opts && opts.headers) || {};
                 for (var key in headers) {
                     xhr.setRequestHeader(key, headers[key]);
@@ -697,7 +689,7 @@
                 };
                 xhr.open('POST', url, true);
                 xhr.timeout = (opts && opts.timeout) || 20000;
-                xhr.responseType = (opts && opts.resptype) || 'json';
+                xhr.responseType = (opts && opts.restype) || 'json';
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var headers = (opts && opts.headers) || {};
                 for (var key in headers) {

@@ -142,9 +142,9 @@ declare namespace cm {
      * @param value witch to be verify
      */
     const oknum: (value: any) => boolean;
-    /** @description show debug info or not*/
+    /** @description show debug info or not @default false*/
     const debug: boolean;
-    /** @description api server name*/
+    /** @description api server name @default undefined*/
     const apihost: string;
     /** @description config global value*/
     const config: (host: string, debug?: boolean) => void;
@@ -200,8 +200,6 @@ declare namespace cm {
     }
     /**  @description A global shared notice center. */
     const notice: NoticeCenter;
-    /**  @description  mark a field of IMetaClass as mapkey in Network.mapreq and Network.maptask. */
-    const mapkey: (target: Object, field: string) => void;
     interface IMetaClass<T> {
         new (json?: any): T;
     }
@@ -296,6 +294,11 @@ declare namespace cm {
         interface Options {
             /** @description use for override global methods */
             readonly method?: Method;
+            /**
+             * @description define the key of maptask and mapreq
+             * @default 'id'
+             */
+            readonly mapkey?: 'id' | string;
             /** @description use for override global headers */
             readonly headers?: Record<string, string>;
             /** @default 10000 */
@@ -309,7 +312,8 @@ declare namespace cm {
              * @description the response type for xhr.responseType
              * @default 'json'
              */
-            readonly resptype?: 'json' | 'text';
+            readonly restype?: 'json' | 'text';
+
             /** @description use for override global reslove method */
             readonly parser?: (resp: any) => any;
         }
