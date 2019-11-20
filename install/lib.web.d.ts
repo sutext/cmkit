@@ -262,18 +262,20 @@ declare namespace cm {
         readonly anyreq: <T = any>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly objreq: <T>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly aryreq: <T>(req: Network.Request<T>) => Network.DataTask<T[]>;
-        readonly mapreq: <T>(req: Network.Request<T>) => Network.DataTask<Record<string, T>>;
+        readonly mapreq: <K extends keyof any = string, T>(req: Network.Request<T>) => Network.DataTask<Record<K, T>>;
         readonly anytask: <T = any>(path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly objtask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly arytask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T[]>;
         /**
-         * @description create a map result http task.
-         * @param meta the meta class of Data @notice the cm.mapkey field must be exist in meta, otherwise 'id' used.
-         * @param path the uri of http request
-         * @param data the data of http request
-         * @param opts the options of http request
+         * @description convert respones data to map
+         * @notice use opts.mapkey to define the key field otherwise use 'id' by default
          */
-        readonly maptask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<Record<string, T>>;
+        readonly maptask: <K extends keyof any = string, T>(
+            meta: IMetaClass<T>,
+            path: string,
+            data?: any,
+            opts?: Network.Options
+        ) => Network.DataTask<Record<K, T>>;
     }
     namespace Network {
         type Method = 'POST' | 'GET';
