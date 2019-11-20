@@ -262,7 +262,7 @@ declare namespace cm {
         readonly anyreq: <T = any>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly objreq: <T>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly aryreq: <T>(req: Network.Request<T>) => Network.DataTask<T[]>;
-        readonly mapreq: <K extends keyof any = string, T>(req: Network.Request<T>) => Network.DataTask<Record<K, T>>;
+        readonly mapreq: <T>(req: Network.Request<T>) => Network.DataTask<Record<keyof any, T>>;
         readonly anytask: <T = any>(path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly objtask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T>;
         readonly arytask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<T[]>;
@@ -270,12 +270,7 @@ declare namespace cm {
          * @description convert respones data to map
          * @notice use opts.mapkey to define the key field otherwise use 'id' by default
          */
-        readonly maptask: <K extends keyof any = string, T>(
-            meta: IMetaClass<T>,
-            path: string,
-            data?: any,
-            opts?: Network.Options
-        ) => Network.DataTask<Record<K, T>>;
+        readonly maptask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<Record<keyof any, T>>;
     }
     namespace Network {
         type Method = 'POST' | 'GET';
