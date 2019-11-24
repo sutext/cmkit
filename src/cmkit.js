@@ -268,7 +268,7 @@
     ns.debug = false;
     Object.defineProperty(ns, 'isslim', {
         get: function() {
-            var size = cc.winSize;
+            var size = window.screen;
             return size.height / size.width > 1.78;
         },
         enumerable: true,
