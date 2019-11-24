@@ -290,6 +290,7 @@
             d.prototype = b === null ? Object.create(b) : ((__.prototype = b.prototype), new __());
         };
     })();
+    ns.__extends = __extends;
     var Emitter = (function() {
         function Emitter() {
             var _this = this;

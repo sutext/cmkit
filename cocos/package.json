@@ -1,6 +1,6 @@
 {
     "name": "cmkit",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "description": "cocos creator common tool box.",
     "main": "main.js",
     "author": "supertext",
