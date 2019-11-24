@@ -260,11 +260,20 @@
                 return false;
         }
     };
+
     ns.config = function(host, debug) {
         ns.apihost = host;
         ns.debug = !!debug;
     };
     ns.debug = false;
+    Object.defineProperty(ns, 'isslim', {
+        get: function() {
+            var size = cc.winSize;
+            return size.height / size.width > 1.78;
+        },
+        enumerable: true,
+        configurable: true
+    });
 })((window.cm = window.cm || {}));
 
 //--------------------Network Socket Storage ----------------

@@ -27,9 +27,6 @@ declare namespace cm {
     const color: (hex: string) => cc.Color;
     /** @description 全局游戏代理实例 */
     const game: Game;
-    /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
-    const isslim: boolean;
-
     /** 是否开启静音模式 如果开启,则立即关闭所有声音 并且禁止播之后的声音 @default false */
     let quiet: boolean;
 

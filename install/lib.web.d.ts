@@ -142,12 +142,14 @@ declare namespace cm {
      * @param value witch to be verify
      */
     const oknum: (value: any) => boolean;
+    /** @description config global value*/
+    const config: (host: string, debug?: boolean) => void;
     /** @description show debug info or not @default false*/
     const debug: boolean;
     /** @description api server name @default undefined*/
     const apihost: string;
-    /** @description config global value*/
-    const config: (host: string, debug?: boolean) => void;
+    /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
+    const isslim: boolean;
 }
 declare namespace cm {
     abstract class Emitter<E extends string = string> {

@@ -71,14 +71,6 @@
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ns, 'isslim', {
-        get: function() {
-            var size = cc.winSize;
-            return size.height / size.width > 1.78;
-        },
-        enumerable: true,
-        configurable: true
-    });
 })((window.cm = window.cm || {}));
 //--------------------cc extentions----------------
 (function(ns, cc, dragonBones) {

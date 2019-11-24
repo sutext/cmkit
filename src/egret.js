@@ -8,6 +8,12 @@
             this._goal = 0;
             this._stack = [];
             this._rate = 60;
+            var _this = this;
+            this._onRemove = function() {
+                egret.stopTick(_this.update, _this);
+            };
+            egret.startTick(this.update, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
         }
         DigitLabel.quiet = false;
         Object.defineProperty(DigitLabel.prototype, 'digit', {
@@ -93,6 +99,7 @@
                     this.next();
                 }
             }
+            return false;
         };
         return DigitLabel;
     })(eui.Label);
