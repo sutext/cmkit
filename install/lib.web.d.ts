@@ -457,7 +457,7 @@ declare namespace cm {
          * @description  A property decorate to mark a field  also a store class.
          * @param cls the class of field.
          */
-        const field: <T>(cls: IMetaClass<T>) => (target: Object, field: string) => void;
+        const field: <T>(cls: IMetaClass<T>, map?: boolean) => (target: Object, field: string) => void;
         /**
          * @description save an storage able class.
          * @param model the model class must be mark with @storage(...)

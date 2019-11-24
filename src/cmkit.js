@@ -971,12 +971,18 @@
                 var _loop_1 = function(field_1) {
                     var subjson = obj[field_1];
                     if (!subjson) return 'continue';
+                    var conf = fields[field_1];
                     if (Array.isArray(subjson)) {
-                        obj[field_1] = subjson.map(function(json) {
-                            return awake(fields[field_1], json);
+                        obj[field_1] = subjson.map(function(sb) {
+                            return awake(conf.cls, sb);
                         });
+                    } else if (conf.map) {
+                        var result = (obj[field_1] = {});
+                        for (var key in subjson) {
+                            result[key] = awake(conf.cls, subjson[key]);
+                        }
                     } else {
-                        obj[field_1] = awake(fields[field_1], subjson);
+                        obj[field_1] = awake(conf.cls, subjson);
                     }
                 };
                 for (var field_1 in fields) {
@@ -1030,10 +1036,10 @@
                 target[INDEX_KEY] = idxkey;
             };
         };
-        orm.field = function(cls) {
+        orm.field = function(cls, map) {
             return function(target, field) {
                 var fields = target.constructor[FIELD_KEY] || (target.constructor[FIELD_KEY] = {});
-                fields[field] = cls;
+                fields[field] = { map: !!map, cls: cls };
             };
         };
         orm.save = function(model) {
