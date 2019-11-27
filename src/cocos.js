@@ -900,7 +900,6 @@
                 cc.moveTo(0.25, cc.v2(-width / 3, 0)).easing(cc.easeInOut(5)),
                 cc.callFunc(function() {
                     top.didHide();
-                    ns.call(finish);
                 })
             ])
         );

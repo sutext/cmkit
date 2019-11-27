@@ -1,11 +1,11 @@
 {
     "name": "cmkit",
-    "version": "1.4.6",
+    "version": "1.4.8",
     "description": "common web developer tool box.",
     "main": "index.js",
     "scripts": {
         "install": "node install/install.js",
-        "prepublishOnly": "sh build.sh"
+        "prepublishOnly": "node build.js"
     },
     "repository": {
         "type": "git",
@@ -30,6 +30,7 @@
     },
     "homepage": "https://github.com/sutext/cmkit#readme",
     "devDependencies": {
+        "@sutxt/fs": "^1.0.7",
         "uglify-js": "^3.6.0"
     }
 }
