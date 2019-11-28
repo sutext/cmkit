@@ -10,15 +10,15 @@
         this.height = height;
     };
     egret.DisplayObject.prototype.setEdge = function(edge) {
-        if (!edge) return;
         if (typeof edge === 'number') {
             this.top = this.left = this.bottom = this.right = 0;
             return;
-        }
-        for (var key in edge) {
-            var val = edge[key];
-            if (typeof val === 'number') {
-                this[key] = val;
+        } else {
+            for (var key in edge) {
+                var val = edge[key];
+                if (typeof val === 'number') {
+                    this[key] = val;
+                }
             }
         }
     };
@@ -54,6 +54,7 @@
             this.audio = RES.getRes(Button.sound);
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
+        return Button;
     })(eui.Button);
     Button.quiet = false;
     Button.sound = 'btn_tap_mp3';
@@ -98,9 +99,9 @@
         configurable: true
     });
     ns.Button = Button;
-    var DigitLabel = (function(_super) {
-        ns.__extends(DigitLabel, _super);
-        function DigitLabel() {
+    var Label = (function(_super) {
+        ns.__extends(Label, _super);
+        function Label() {
             _super && _super.apply(this, arguments);
             this._value = 0;
             this._step = 0;
@@ -114,10 +115,10 @@
             egret.startTick(this.update, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
         }
-        return DigitLabel;
+        return Label;
     })(eui.Label);
-    DigitLabel.quiet = false;
-    Object.defineProperty(DigitLabel.prototype, 'sound', {
+    Label.quiet = false;
+    Object.defineProperty(Label.prototype, 'sound', {
         get: function() {
             return this.audio && this.audio.source;
         },
@@ -126,13 +127,13 @@
             if (audio) {
                 this.audio = audio;
             } else {
-                ns.warn('DigitLabel sound:', val, 'resource not found!');
+                ns.warn('Label sound:', val, 'resource not found!');
             }
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(DigitLabel.prototype, 'digit', {
+    Object.defineProperty(Label.prototype, 'digit', {
         get: function() {
             return this._goal;
         },
@@ -141,22 +142,22 @@
                 this._stack.push(val);
                 this.next();
             } else {
-                throw new Error('The digit of DigitLabel must be number!');
+                throw new Error('The digit of Label must be number!');
             }
         },
         enumerable: true,
         configurable: true
     });
-    DigitLabel.prototype.formater = function(value) {
+    Label.prototype.formater = function(value) {
         return value.round().comma();
     };
-    DigitLabel.prototype.steper = function(delta) {
+    Label.prototype.steper = function(delta) {
         if (delta < this._rate) {
             return 1;
         }
         return Math.floor(delta / this._rate);
     };
-    DigitLabel.prototype.next = function() {
+    Label.prototype.next = function() {
         if (this._step) return;
         if (this._stack.length === 0) return;
         var goal = this._stack.shift();
@@ -171,7 +172,7 @@
         } else {
             var delta = this._goal - this._value;
             this._step = this.steper(delta);
-            if (DigitLabel.quiet || this.quiet || !this.audio) return;
+            if (Label.quiet || this.quiet || !this.audio) return;
             //播放音效
             var dur = delta / (this._step * this._rate);
             if (dur < 0.3) {
@@ -183,13 +184,13 @@
             }, dur * 1000);
         }
     };
-    DigitLabel.prototype.setText = function(val) {
+    Label.prototype.setText = function(val) {
         if (this._value !== val) {
             this._value = val;
             this.text = this.formater(val);
         }
     };
-    DigitLabel.prototype.update = function(dt) {
+    Label.prototype.update = function(dt) {
         if (this._step > 0 && this._goal > this._value) {
             var value = this._value + this._step;
             if (value > this._goal) {
@@ -203,21 +204,14 @@
         }
         return false;
     };
-    ns.DigitLabel = DigitLabel;
+    ns.Label = Label;
 })(window.cm || (window.cm = {}));
-(function() {
+(function(ns) {
     var Stack = (function(_super) {
-        cm.__extends(Stack, _super);
-        function Stack() {
+        ns.__extends(Stack, _super);
+        function Stack(root) {
             _super && _super.apply(this, arguments);
-            this.touchEnabled = false;
-        }
-    })(eui.UILayer);
-    Object.defineProperty(Stack.prototype, 'root', {
-        get: function() {
-            return this._root;
-        },
-        set: function() {
+            this.touchEnabled = true;
             this._root = root;
             this.pageStack = [];
             this.removeChildren();
@@ -225,6 +219,12 @@
             this.addChild(root);
             root.willShow();
             root.didShow();
+        }
+        return Stack;
+    })(eui.UILayer);
+    Object.defineProperty(Stack.prototype, 'root', {
+        get: function() {
+            return this._root;
         },
         enumerable: true,
         configurable: true
@@ -268,6 +268,7 @@
             });
     };
     Stack.prototype.pop = function() {
+        var _this = this;
         var length = this.pageStack.length;
         if (length <= 0) return;
         var delta = arguments[0];
@@ -288,8 +289,8 @@
         }
         var ani = this.pageStack.pop();
         while ((delta = delta - 1) > 0) {
-            var ele = this.pageStack.pop();
-            this.removeChild(ele);
+            var ele = _this.pageStack.pop();
+            _this.removeChild(ele);
         }
         var width = this.width;
         var top = this.top;
@@ -298,7 +299,7 @@
             .to({ x: width }, 250, egret.Ease.sineInOut)
             .call(function() {
                 ani.didHide();
-                this.removeChild(ani);
+                _this.removeChild(ani);
                 ns.call(finish);
             });
         top.willShow();
@@ -324,6 +325,7 @@
         function Page() {
             _super && _super.apply(this, arguments);
         }
+        return Page;
     })(eui.Component);
     Page.prototype.willShow = function() {};
     Page.prototype.didShow = function() {};
@@ -331,7 +333,7 @@
     Page.prototype.didHide = function() {};
     Stack.Page = Page;
 })(window.cm || (window.cm = {}));
-(function() {
+(function(ns) {
     var Popup = (function(_super) {
         ns.__extends(Popup, _super);
         function Popup() {
@@ -339,8 +341,13 @@
             this.showed = {};
             this.opqueue = [];
             this.errmsg = 'System Error!';
-            this.opacity = 0.8;
+            this.opacity = 0.4;
+            this.touchEnabled = false;
+            this.Wait = Popup.Wait;
+            this.Alert = Popup.Alert;
+            this.Remind = Popup.remind;
         }
+        return Popup;
     })(eui.UILayer);
     Popup.prototype.present = function(meta, opts) {
         this.add({ type: 'present', meta: meta, opts: opts });
@@ -404,7 +411,7 @@
         var _a = this.current,
             type = _a.type,
             name = _a.name,
-            prefeb = _a.prefeb,
+            meta = _a.meta,
             finish = _a.finish,
             opts = _a.opts,
             title = _a.title,
@@ -418,7 +425,7 @@
                 this._dismiss(name, finish);
                 break;
             case 'present':
-                this._present(prefeb, opts);
+                this._present(meta, opts);
                 break;
             case 'wait':
                 this._wait(msg);
@@ -484,7 +491,7 @@
             if (opacity > 0) {
                 modal.background.alpha = opacity;
             }
-            modal.opacity = 0;
+            modal.alpha = 0;
             egret.Tween.get(modal)
                 .to({ alpha: 1 }, 250)
                 .call(function() {
@@ -509,7 +516,7 @@
             .to({ alpha: 0 }, 250)
             .call(function() {
                 modal.onDismiss();
-                this.removeChild(modal);
+                _this.removeChild(modal);
                 ns.call(finish);
                 _this.current = null;
                 _this.next();
@@ -531,7 +538,7 @@
                 for (var key in showed) {
                     var ele = showed[key];
                     ele.onDismiss();
-                    this.removeChild(ele);
+                    _this.removeChild(ele);
                 }
                 ns.call(finish);
                 _this.alpha = 1;
@@ -580,24 +587,26 @@
         this.addChild(modal);
         return modal;
     };
+    ns.Popup = Popup;
     var Modal = (function(_super) {
         ns.__extends(Modal, _super);
         function Modal() {
             _super && _super.apply(this, arguments);
             this.animator = null;
             this.opacity = -1;
-            this.alpha = 0;
-            this.touchEnabled = false;
+            this.touchEnabled = true;
+        }
+        Modal.prototype.createChildren = function() {
             this.background = new eui.Rect();
             this.background.fillColor = 0x000000;
             this.background.fillAlpha = 1;
+            this.background.alpha = 0;
             this.background.setEdge(0);
             this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onBackClick, this);
-        }
-        Modal.prototype.createChildren = function() {
+            this.addChild(this.background, 0);
             _super.prototype.createChildren.call(this);
-            this.addChild(this.background);
         };
+        return Modal;
     })(eui.Component);
     Modal.NAME = 'COMMON';
     Modal.prototype.onBackClick = function() {
@@ -613,22 +622,27 @@
     Modal.prototype.dismiss = function(finish) {
         this.pop && this.pop.dismiss(this.constructor, finish);
     };
+    Popup.Modal = Modal;
     var Wait = (function(_super) {
         ns.__extends(Wait, _super);
         function Wait() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1001;
-            this.background.touchEnabled = false;
+            this.background.touchEnabled = true;
+            this.hostComponentKey = 'cm.Wait';
         }
+        return Wait;
     })(Modal);
     Wait.NAME = 'WAIT';
-
+    Popup.Wait = Wait;
     var Alert = (function(_super) {
         ns.__extends(Alert, _super);
         function Alert() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1000;
+            this.hostComponentKey = 'cm.Alert';
         }
+        return Alert;
     })(Modal);
     Alert.NAME = 'ALERT';
     Alert.prototype.onCreate = function(opts) {
@@ -670,12 +684,15 @@
             };
         }
     };
+    Popup.Alert = Alert;
     var Remind = (function(_super) {
         ns.__extends(Remind, _super);
         function Remind() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1002;
+            this.hostComponentKey = 'cm.Remind';
         }
+        return Remind;
     })(Modal);
     Remind.NAME = 'REMIND';
     Remind.prototype.onCreate = function(opts) {
@@ -685,4 +702,5 @@
         this.title && (this.title.text = title || '');
         this.onhide = opts && opts.onhide;
     };
+    Popup.Remind = Remind;
 })(window.cm || (window.cm = {}));

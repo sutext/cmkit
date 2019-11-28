@@ -1,5 +1,4 @@
 /// <reference path="lib.web.d.ts" />
-/// <reference path="lib.cocos.d.ts"/>
 
 declare namespace egret {
     interface DisplayObject {
@@ -87,6 +86,7 @@ declare namespace cm {
      * @notice Usually the Stack Component will mount on the Canvas Node
      */
     class Stack extends eui.UILayer {
+        constructor(root: Stack.Page);
         public readonly top: Stack.Page;
         public readonly root: Stack.Page;
         public readonly count: number;
