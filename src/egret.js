@@ -52,6 +52,7 @@
             this._delay = 200;
             this.quiet = false;
             this.audio = RES.getRes(Button.sound);
+            this.hostComponentKey = 'cm.Button';
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
         return Button;
@@ -209,19 +210,21 @@
 (function(ns) {
     var Stack = (function(_super) {
         ns.__extends(Stack, _super);
-        function Stack(root) {
+        function Stack() {
             _super && _super.apply(this, arguments);
-            this.touchEnabled = true;
-            this._root = root;
-            this.pageStack = [];
-            this.removeChildren();
-            this.setupPage(root);
-            this.addChild(root);
-            root.willShow();
-            root.didShow();
         }
+        Stack.prototype.onResize = function() {
+            _super.prototype.onResize.call(this);
+            if (!this._root) return;
+            var _this = this;
+            this._root.setRect(0, 0, this.width, this.height);
+            this.pageStack.forEach(function(page) {
+                page.setRect(0, 0, _this.width, _this.height);
+            });
+        };
         return Stack;
     })(eui.UILayer);
+
     Object.defineProperty(Stack.prototype, 'root', {
         get: function() {
             return this._root;
@@ -243,11 +246,31 @@
         enumerable: true,
         configurable: true
     });
+    Stack.prototype.reload = function(root) {
+        if (!root instanceof Stack.Page) {
+            throw new Error('Root class must be subclass of cm.Stack.Page!');
+        }
+        this.removeChildren();
+        this.pageStack = [];
+        root.stack = this;
+        root.alpha = 0;
+        root.setRect(0, 0, this.width, this.height);
+        this.addChild(root);
+        this._root = root;
+        root.willShow();
+        egret.Tween.get(root)
+            .to({ alpha: 1 }, 150)
+            .call(function() {
+                root.didShow();
+            });
+    };
     Stack.prototype.push = function(page, props, finish) {
+        if (!this._root) throw new Error('You must set root page using Stack.reload(root)');
         if (!page) throw new Error('stack push: page must be provide');
         var top = this.top;
-        this.setupPage(page);
         var width = this.width;
+        page.stack = this;
+        page.setRect(0, 0, width, this.height);
         page.props = props;
         page.x = width;
         this.pageStack.push(page);
@@ -314,11 +337,6 @@
             this.removeChild(page);
         }
     };
-    Stack.prototype.setupPage = function(page) {
-        page.stack = this;
-        page.touchEnabled = false;
-        page.setEdge(0);
-    };
     ns.Stack = Stack;
     var Page = (function(_super) {
         ns.__extends(Page, _super);
@@ -345,7 +363,7 @@
             this.touchEnabled = false;
             this.Wait = Popup.Wait;
             this.Alert = Popup.Alert;
-            this.Remind = Popup.remind;
+            this.Remind = Popup.Remind;
         }
         return Popup;
     })(eui.UILayer);
@@ -358,7 +376,7 @@
             return;
         }
         if (!duration) {
-            duration = 1;
+            duration = 2;
         }
         this.add({ type: 'remind', title: title, msg: msg, duration: duration });
     };
@@ -454,7 +472,7 @@
             .call(function() {
                 modal.onPresent(opts);
             })
-            .wait(duration)
+            .wait(duration * 1000)
             .to({ alpha: 0 }, 250)
             .call(function() {
                 _this.delete(this.Remind);
@@ -560,7 +578,7 @@
         this.current = null;
         this.next();
     };
-    Popup.prototype._delete = function(meta) {
+    Popup.prototype.delete = function(meta) {
         var name = meta && meta.NAME;
         var modal = name && this.showed[name];
         if (modal) {
@@ -628,12 +646,25 @@
         function Wait() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1001;
-            this.background.touchEnabled = true;
             this.hostComponentKey = 'cm.Wait';
         }
+        Wait.prototype.createChildren = function() {
+            _super.prototype.createChildren.call(this);
+            var _this = this;
+            this.background.touchEnabled = false;
+            if (this.animator) {
+                egret.Tween.get(this.animator, { loop: true }).to({ rotation: 360 }, 2200);
+                setTimeout(function() {
+                    _this.background.touchEnabled = true;
+                }, (_this.keepTime || 20) * 1000);
+            } else {
+                ns.warn('The part animator must be provide!');
+            }
+        };
         return Wait;
     })(Modal);
     Wait.NAME = 'WAIT';
+
     Popup.Wait = Wait;
     var Alert = (function(_super) {
         ns.__extends(Alert, _super);

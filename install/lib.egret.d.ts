@@ -86,7 +86,6 @@ declare namespace cm {
      * @notice Usually the Stack Component will mount on the Canvas Node
      */
     class Stack extends eui.UILayer {
-        constructor(root: Stack.Page);
         public readonly top: Stack.Page;
         public readonly root: Stack.Page;
         public readonly count: number;
@@ -98,6 +97,7 @@ declare namespace cm {
          */
         public readonly pop: (deltaOrFinish?: number | (() => void), finish?: () => void) => void;
         public readonly push: (page: Stack.Page, props?: any, finish?: () => void) => void;
+        public readonly reload: (root: Stack.Page) => void;
         /** @description remove and destroy a page node from the stack */
         public readonly remove: (page: Stack.Page) => void;
     }
@@ -116,11 +116,8 @@ declare namespace cm {
 }
 declare namespace cm {
     abstract class Popup extends eui.UILayer {
-        protected Wait: typeof Popup.Modal; /** Wait class @default undefined */
-        protected Alert: typeof Popup.Modal; /** Alert class @default undefined */
-        protected Remind: typeof Popup.Modal; /** Remind class @default undefined */
         protected errmsg: string; /** defalut error mesaage @default 'System Error!'' */
-        protected opacity: number; /** The background fillAlpha @default 0.8 */
+        protected opacity: number; /** The background fillAlpha @default 0.4 */
         public readonly present: (meta: typeof Popup.Modal, opts?: { onhide?: () => void; [key: string]: any }) => void;
         public readonly dismiss: (meta?: typeof Popup.Modal, finish?: () => void) => void;
         public readonly remind: (msg: string, title?: string, duration?: number) => void;
@@ -140,7 +137,7 @@ declare namespace cm {
              * }
              */
             protected static NAME: string;
-            protected readonly background: eui.Rect;
+            protected opacity: number; /** @default -1 use parent opacity */
             /**@description insert by present opts.onhide */
             protected onhide?: () => void;
             /**@default this.onhide=opts&&opts.onhide 如果重写此需要考虑是否调用super */
