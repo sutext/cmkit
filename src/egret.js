@@ -614,14 +614,14 @@
             this.touchEnabled = true;
         }
         Modal.prototype.createChildren = function() {
+            _super.prototype.createChildren.call(this);
             this.background = new eui.Rect();
             this.background.fillColor = 0x000000;
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
             this.background.setEdge(0);
             this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onBackClick, this);
-            this.addChild(this.background, 0);
-            _super.prototype.createChildren.call(this);
+            this.addChildAt(this.background, 0);
         };
         return Modal;
     })(eui.Component);
