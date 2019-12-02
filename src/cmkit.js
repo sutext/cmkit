@@ -269,7 +269,9 @@
     Object.defineProperty(ns, 'isslim', {
         get: function() {
             var size = window.screen;
-            return size.height / size.width > 1.78;
+            var max = Math.max(size.width, size.height);
+            var min = Math.min(size.width, size.height);
+            return max / min > 1.78;
         },
         enumerable: true,
         configurable: true

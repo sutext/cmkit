@@ -109,12 +109,6 @@
             this._goal = 0;
             this._stack = [];
             this._rate = 60;
-            var _this = this;
-            this._onRemove = function() {
-                egret.stopTick(_this.update, _this);
-            };
-            egret.startTick(this.update, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
         }
         return Label;
     })(eui.Label);
@@ -173,8 +167,8 @@
         } else {
             var delta = this._goal - this._value;
             this._step = this.steper(delta);
+            egret.startTick(this.update, this);
             if (Label.quiet || this.quiet || !this.audio) return;
-            //播放音效
             var dur = delta / (this._step * this._rate);
             if (dur < 0.3) {
                 dur = 0.3;
@@ -200,6 +194,7 @@
             this.setText(value);
             if (this._value === this._goal) {
                 this._step = 0;
+                egret.stopTick(this.update, this);
                 this.next();
             }
         }
@@ -279,9 +274,11 @@
         egret.Tween.get(top)
             .to({ x: -width / 3 }, 250, egret.Ease.sineInOut)
             .call(function() {
+                top.visible = false;
                 top.didHide();
                 ns.call(finish);
             });
+        page.visible = true;
         page.willShow();
         egret.Tween.get(page)
             .to({ x: 0 }, 250, egret.Ease.sineInOut)
@@ -321,10 +318,12 @@
         egret.Tween.get(ani)
             .to({ x: width }, 250, egret.Ease.sineInOut)
             .call(function() {
+                ani.visible = false;
                 ani.didHide();
                 _this.removeChild(ani);
                 ns.call(finish);
             });
+        top.visible = true;
         top.willShow();
         egret.Tween.get(top)
             .to({ x: 0 }, 250, egret.Ease.sineInOut)
@@ -600,7 +599,7 @@
         if (this.showed[name]) return;
         var modal = new meta();
         this.showed[name] = modal;
-        modal.setRect(0, 0, this.width, this.height);
+        modal.setEdge(0);
         modal.pop = this;
         this.addChild(modal);
         return modal;

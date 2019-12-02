@@ -115,7 +115,7 @@ declare namespace cm {
     }
 }
 declare namespace cm {
-    abstract class Popup extends eui.UILayer {
+    class Popup extends eui.UILayer {
         protected errmsg: string; /** defalut error mesaage @default 'System Error!'' */
         protected opacity: number; /** The background fillAlpha @default 0.4 */
         public readonly present: (meta: typeof Popup.Modal, opts?: { onhide?: () => void; [key: string]: any }) => void;
