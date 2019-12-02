@@ -55,6 +55,12 @@
             this.hostComponentKey = 'cm.Button';
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
+        Button.prototype.partAdded = function(partName, instance) {
+            _super.prototype.partAdded.call(this, partName, instance);
+            if (instance === this.titleDisplay) {
+                this.titleDisplay.text = this._title;
+            }
+        };
         return Button;
     })(eui.Button);
     Button.quiet = false;
@@ -74,9 +80,10 @@
     };
     Object.defineProperty(Button.prototype, 'title', {
         get: function() {
-            return this.titleDisplay && this.titleDisplay.text;
+            return this._title;
         },
         set: function(val) {
+            this._title = val;
             if (this.titleDisplay) {
                 this.titleDisplay.text = val;
             }
