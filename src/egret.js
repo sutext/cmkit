@@ -72,6 +72,18 @@
             _this.audio.play(0, 1);
         }
     };
+    Object.defineProperty(Button.prototype, 'title', {
+        get: function() {
+            return this.titleDisplay && this.titleDisplay.text;
+        },
+        set: function(val) {
+            if (this.titleDisplay) {
+                this.titleDisplay.text = val;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Button.prototype, 'sound', {
         get: function() {
             return this.audio && this.audio.source;
@@ -104,11 +116,21 @@
         ns.__extends(Label, _super);
         function Label() {
             _super && _super.apply(this, arguments);
+            var _this = this;
             this._value = 0;
             this._step = 0;
             this._goal = 0;
             this._stack = [];
             this._rate = 60;
+            this.formater = function(value) {
+                return value.round().comma();
+            };
+            this.steper = function(delta) {
+                if (delta < _this._rate) {
+                    return 1;
+                }
+                return Math.floor(delta / _this._rate);
+            };
         }
         return Label;
     })(eui.Label);
@@ -143,15 +165,6 @@
         enumerable: true,
         configurable: true
     });
-    Label.prototype.formater = function(value) {
-        return value.round().comma();
-    };
-    Label.prototype.steper = function(delta) {
-        if (delta < this._rate) {
-            return 1;
-        }
-        return Math.floor(delta / this._rate);
-    };
     Label.prototype.next = function() {
         if (this._step) return;
         if (this._stack.length === 0) return;
@@ -609,9 +622,13 @@
         ns.__extends(Modal, _super);
         function Modal() {
             _super && _super.apply(this, arguments);
+            var _this = this;
             this.animator = null;
             this.opacity = -1;
             this.touchEnabled = true;
+            this.onblur = function() {
+                _this.dismiss();
+            };
         }
         Modal.prototype.createChildren = function() {
             _super.prototype.createChildren.call(this);
@@ -620,15 +637,12 @@
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
             this.background.setEdge(0);
-            this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onBackClick, this);
+            this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onblur, this);
             this.addChildAt(this.background, 0);
         };
         return Modal;
     })(eui.Component);
     Modal.NAME = 'COMMON';
-    Modal.prototype.onBackClick = function() {
-        this.dismiss();
-    };
     Modal.prototype.onCreate = function(opts) {
         this.onhide = opts && opts.onhide;
     };

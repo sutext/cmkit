@@ -1,5 +1,6 @@
 declare namespace egret {
     class Sound {}
+    class Texture {}
 }
 declare namespace eui {
     class Label {}

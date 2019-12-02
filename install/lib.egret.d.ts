@@ -39,6 +39,18 @@ declare namespace cm {
         public static sound: string;
         /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
         public static quiet: boolean;
+        /** 按钮图标 此字段继承自 eui.Button */
+        public icon: string | egret.Texture;
+        /** 按钮标签label 此字段继承于 eui.Button */
+        public label: string;
+        /** 按钮标题title 与按钮label 分别独立使用，可用于按钮上显示两种不同样式的文本 */
+        public title: string;
+        /** 显示图标的Image对象 */
+        public iconDisplay: eui.Image;
+        /** 显示title的label */
+        public titleDisplay: eui.Label;
+        /** 显示title的label */
+        public labelDisplay: eui.Label;
         /** 当前 Button 是否静音 */
         public quiet: boolean;
         /** 点击音效 资源KEY  */
@@ -130,24 +142,25 @@ declare namespace cm {
         abstract class Modal extends eui.Component {
             /**
              * @description Popup.Modal.NAME means a kind of Modal. Popup can only present one by same NAME
-             * @notice For custom Modal you must overwride this and provide a single name
+             * @notice For custom Modal you must overwride this and provide an unique name
              * @example
              * class CustomModal extends cm.Popup.Modal{
              *      protected static NAME = 'CustomModal'
              * }
              */
             protected static NAME: string;
-            protected opacity: number; /** @default -1 use parent opacity */
+            /** @default -1 use parent opacity */
+            protected opacity: number;
             /**@description insert by present opts.onhide */
             protected onhide?: () => void;
-            /**@default this.onhide=opts&&opts.onhide 如果重写此需要考虑是否调用super */
+            /**@description The click action fom dimming blur @default this.dismiss .set null for disable auto dismiss*/
+            protected onblur?: () => void;
+            /**@default this.onhide=opts&&opts.onhide If you overwride this method. You must consider call super or not */
             protected onCreate(opts?: any): void;
             /**@default empty */
             protected onPresent(opts?: any): void;
-            /**@default cm.call(this.onhide) 如果重写此需要考虑是否调用super */
+            /**@default cm.call(this.onhide) If you overwride this method. You must consider call super or not */
             protected onDismiss(): void;
-            /**@default this.dismiss() */
-            protected onBackClick(): void;
             protected readonly dismiss: (finish?: () => void) => void;
         }
         class Alert extends Modal {
