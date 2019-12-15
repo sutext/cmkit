@@ -8,4 +8,5 @@ declare namespace eui {
     class UILayer {}
     class Component {}
     class Rect {}
+    interface IViewport {}
 }

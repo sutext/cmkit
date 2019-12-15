@@ -755,3 +755,453 @@
     };
     Popup.Remind = Remind;
 })(window.cm || (window.cm = {}));
+(function(ns) {
+    var PageView = (function(_super) {
+        ns.__extends(PageView, _super);
+        function PageView() {
+            var _this = _super.call(this) || this;
+            _this.$bounces = true;
+            _this.$viewport = null;
+            _this.$disabled = false;
+            _this.$vertical = false;
+            _this.$velocity = 0;
+            _this.$pageSize = 0;
+            _this.$pageIndex = 0;
+            _this.$scrollThreshold = 5;
+            _this.$changeThreshold = 0.3;
+
+            _this.$canscroll = false;
+            _this.$touchMoved = false;
+            _this.$touchCancel = false;
+            _this.$touchStart = 0;
+            _this.$touchPoint = 0;
+            _this.$touchTime = 0;
+            _this.$viewprotRemovedEvent = false;
+            _this.$animation = new eui.sys.Animation(function(ani) {
+                _this.$setPosition(ani.currentValue);
+            }, _this);
+            _this.$animation.endFunction = _this.animationEnd;
+            return _this;
+        }
+        Object.defineProperty(PageView.prototype, 'bounces', {
+            get: function() {
+                return this.$bounces;
+            },
+            set: function(value) {
+                this.$bounces = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'vertical', {
+            get: function() {
+                return this.$vertical;
+            },
+            set: function(value) {
+                if (!this.$touchMoved) {
+                    this.$vertical = !!value;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'pageSize', {
+            get: function() {
+                return this.$pageSize || this.width;
+            },
+            set: function(val) {
+                this.$pageSize = val;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'pageIndex', {
+            get: function() {
+                return this.$pageIndex;
+            },
+            set: function(index) {
+                if (!Number.isInteger(index)) {
+                    throw new Error('pageIndex must be ingeger');
+                }
+                if (this.$pageIndex !== index) {
+                    if (this.$touchMoved) {
+                        return;
+                    }
+                    if (this.$animation.isPlaying) {
+                        this.$animation.stop();
+                    }
+                    this.$pageIndex = index;
+                    var posTo = index * this.pageSize;
+                    var maxPos = this.$getMaxPosition();
+                    if (posTo < 0) {
+                        posTo = 0;
+                    } else if (posTo > maxPos) {
+                        posTo = maxPos;
+                    }
+                    this.$setPosition(pos);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'disabled', {
+            get: function() {
+                return this.$disabled;
+            },
+            set: function(value) {
+                if (value !== this.$disabled) {
+                    this.$disabled = value;
+                    this.checkScrollAble();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'viewport', {
+            get: function() {
+                return this.$viewport;
+            },
+            set: function(value) {
+                if (value !== this.$viewport) {
+                    this.uninstallViewport();
+                    this.$viewport = value;
+                    this.$viewprotRemovedEvent = false;
+                    this.installViewport();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'scrollThreshold', {
+            get: function() {
+                return this.$scrollThreshold;
+            },
+            set: function(value) {
+                if (value < 1 || value > 100) {
+                    throw new Error('scrollThreshold must be between 1 and 100');
+                }
+                this.$scrollThreshold = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PageView.prototype, 'changeThreshold', {
+            get: function() {
+                return this.$changeThreshold;
+            },
+            set: function(value) {
+                if (value < 0 || value > 1) {
+                    throw new Error('changeThreshold must be between 0 and 1');
+                }
+                this.$changeThreshold = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PageView.prototype.$setPosition = function(pos) {
+            var viewport = this.$viewport;
+            if (viewport) {
+                if (this.$vertical) {
+                    viewport.scrollV = pos;
+                } else {
+                    viewport.scrollH = pos;
+                }
+                this.dispatchEventWith(egret.Event.CHANGE);
+            }
+        };
+        PageView.prototype.$getPosition = function() {
+            var viewport = this.$viewport;
+            if (!viewport) return 0;
+            if (this.$vertical) {
+                return viewport.scrollV;
+            } else {
+                return viewport.scrollH;
+            }
+        };
+        PageView.prototype.$getMaxPosition = function() {
+            var viewport = this.$viewport;
+            if (!viewport) return 0;
+            var uiValues = viewport.$UIComponent;
+            if (this.$vertical) {
+                return viewport.contentHeight - uiValues[11];
+            } else {
+                return viewport.contentWidth - uiValues[10];
+            }
+        };
+        PageView.prototype.installViewport = function() {
+            var viewport = this.viewport;
+            if (viewport) {
+                this.addChildAt(viewport, 0);
+                viewport.scrollEnabled = true;
+                viewport.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBeginCapture, this, true);
+                viewport.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEndCapture, this, true);
+                viewport.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
+                viewport.addEventListener(egret.Event.REMOVED, this.onViewPortRemove, this);
+            }
+        };
+        PageView.prototype.uninstallViewport = function() {
+            var viewport = this.viewport;
+            if (viewport) {
+                viewport.scrollEnabled = false;
+                viewport.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBeginCapture, this, true);
+                viewport.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEndCapture, this, true);
+                viewport.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
+                viewport.removeEventListener(egret.Event.REMOVED, this.onViewPortRemove, this);
+                if (this.$viewprotRemovedEvent == false) {
+                    this.removeChild(viewport);
+                }
+            }
+        };
+        PageView.prototype.onViewPortRemove = function(event) {
+            if (event.target == this.$viewport) {
+                this.$viewprotRemovedEvent = true;
+                this.viewport = null;
+            }
+        };
+        PageView.prototype.setSkin = function(skin) {
+            _super.prototype.setSkin.call(this, skin);
+            if (this.$viewport) {
+                this.addChildAt(this.$viewport, 0);
+            }
+        };
+        PageView.prototype.onTouchBeginCapture = function(event) {
+            if (!this.$stage) return;
+            this.$touchCancel = false;
+            if (this.checkScrollAble()) {
+                this.onTouchBegin(event);
+            }
+        };
+        PageView.prototype.onTouchEndCapture = function(event) {
+            if (this.$touchCancel) {
+                event.$bubbles = false;
+                this.dispatchBubbleEvent(event);
+                event.$bubbles = true;
+                event.stopPropagation();
+                this.onTouchEnd(event);
+            }
+        };
+        PageView.prototype.onTouchTapCapture = function(event) {
+            if (this.$touchCancel) {
+                event.$bubbles = false;
+                this.dispatchBubbleEvent(event);
+                event.$bubbles = true;
+                event.stopPropagation();
+            }
+        };
+        PageView.prototype.checkScrollAble = function() {
+            var viewport = this.$viewport;
+            if (!viewport) return false;
+            var uiValues = viewport.$UIComponent;
+            if (this.$vertical) {
+                this.$canscroll = (!this.$disabled && viewport.contentHeight > uiValues[11]) || viewport.scrollV !== 0;
+            } else {
+                this.$canscroll = (!this.$disabled && viewport.contentWidth > uiValues[10]) || viewport.scrollH !== 0;
+            }
+            return this.$canscroll;
+        };
+        PageView.prototype.onTouchBegin = function(event) {
+            if (event.isDefaultPrevented()) {
+                return;
+            }
+            if (!this.$canscroll) {
+                return;
+            }
+            this.downTarget = event.target;
+            this.$animation.stop();
+            if (this.$vertical) {
+                this.$touchStart = event.$stageY;
+            } else {
+                this.$touchStart = event.$stageX;
+            }
+            this.$touchTime = egret.getTimer();
+            this.$touchPoint = this.$touchStart;
+            var stage = this.$stage;
+            this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+            stage.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this, true);
+            this.addEventListener(egret.TouchEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
+            this.tempStage = stage;
+        };
+        PageView.prototype.onTouchMove = function(event) {
+            if (event.isDefaultPrevented()) {
+                return;
+            }
+            if (!this.$touchMoved) {
+                if (this.$disabled) {
+                    return;
+                }
+                if (this.$vertical) {
+                    if (Math.abs(this.$touchStart - event.$stageY) < this.$scrollThreshold) {
+                        return;
+                    }
+                } else {
+                    if (Math.abs(this.$touchStart - event.$stageX) < this.$scrollThreshold) {
+                        return;
+                    }
+                }
+                this.$touchCancel = true;
+                this.$touchMoved = true;
+                this.dispatchCancelEvent(event);
+                this.$stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+            }
+            event.preventDefault();
+            if (!this.$canscroll) {
+                return;
+            }
+            var viewport = this.$viewport;
+            var uiValues = viewport.$UIComponent;
+
+            if (this.$vertical) {
+                this.update(event.$stageY, viewport.contentHeight - uiValues[11], viewport.scrollV);
+            } else {
+                this.update(event.$stageX, viewport.contentWidth - uiValues[10], viewport.scrollH);
+            }
+        };
+        PageView.prototype.update = function(touchPoint, maxScrollValue, scrollValue) {
+            maxScrollValue = Math.max(maxScrollValue, 0);
+            var delta = this.$touchPoint - touchPoint;
+            var pos = delta + scrollValue;
+            var time = egret.getTimer();
+            this.$touchPoint = touchPoint;
+            this.$velocity = delta / (time - this.$touchTime);
+            this.$touchTime = time;
+            if (pos < 0) {
+                if (!this.$bounces) {
+                    pos = 0;
+                } else {
+                    pos -= delta * 0.5;
+                }
+            }
+            if (pos > maxScrollValue) {
+                if (!this.$bounces) {
+                    pos = maxScrollValue;
+                } else {
+                    pos -= delta * 0.5;
+                }
+            }
+            this.$setPosition(pos);
+        };
+        PageView.prototype.onTouchCancel = function(event) {
+            if (!this.$touchMoved) {
+                this.onRemoveListeners();
+            }
+        };
+        PageView.prototype.onTouchEnd = function(event) {
+            this.$touchMoved = false;
+            this.onRemoveListeners();
+            var viewport = this.$viewport;
+            var uiValues = viewport.$UIComponent;
+            if (this.$vertical) {
+                this.$touchPoint = event.$stageY;
+                this.finish(viewport.scrollV, viewport.contentHeight - uiValues[11]);
+            } else {
+                this.touchPoint = event.$stageX;
+                this.finish(viewport.scrollH, viewport.contentWidth - uiValues[10]);
+            }
+        };
+        PageView.prototype.finish = function(currentScrollPos, maxScrollPos) {
+            var index = currentScrollPos / this.pageSize;
+            if (this.$touchPoint - this.$touchStart > this.$changeThreshold * this.pageSize) {
+                index = Math.floor(index);
+            } else if (this.$touchStart - this.$touchPoint > this.$changeThreshold * this.pageSize) {
+                index = Math.ceil(index);
+            } else if (Math.abs(this.$velocity) > 2) {
+                if (this.$velocity > 0) {
+                    index = Math.ceil(index);
+                } else {
+                    index = Math.floor(index);
+                }
+            } else {
+                index = this.$pageIndex;
+            }
+            var posTo = index * this.pageSize;
+            if (posTo < 0) {
+                posTo = 0;
+            } else if (posTo > maxScrollPos) {
+                posTo = maxScrollPos;
+            }
+            var animation = this.$animation;
+            animation.duration = 250;
+            animation.from = currentScrollPos;
+            animation.to = posTo;
+            animation.$pageIndex = index;
+            animation.play();
+        };
+        PageView.prototype.dispatchBubbleEvent = function(event) {
+            var viewport = this.$viewport;
+            if (!viewport) return;
+            var cancelEvent = egret.Event.create(egret.TouchEvent, event.type, event.bubbles, event.cancelable);
+            cancelEvent.$initTo(event.$stageX, event.$stageY, event.touchPointID);
+            var target = this.downTarget;
+            cancelEvent.$setTarget(target);
+            var list = this.$getPropagationList(target);
+            var length = list.length;
+            var targetIndex = list.length * 0.5;
+            var startIndex = -1;
+            for (var i = 0; i < length; i++) {
+                if (list[i] === viewport) {
+                    startIndex = i;
+                    break;
+                }
+            }
+            list.splice(0, list.length - startIndex + 1);
+            targetIndex = 0;
+            this.$dispatchPropagationEvent(cancelEvent, list, targetIndex);
+            egret.Event.release(cancelEvent);
+        };
+
+        PageView.prototype.dispatchCancelEvent = function(event) {
+            var viewport = this.$viewport;
+            if (!viewport) return;
+            var cancelEvent = egret.Event.create(egret.TouchEvent, egret.TouchEvent.TOUCH_CANCEL, event.bubbles, event.cancelable);
+            cancelEvent.$initTo(event.$stageX, event.$stageY, event.touchPointID);
+            var target = this.downTarget;
+            cancelEvent.$setTarget(target);
+            var list = this.$getPropagationList(target);
+            var length = list.length;
+            var targetIndex = list.length * 0.5;
+            var startIndex = -1;
+            for (var i = 0; i < length; i++) {
+                if (list[i] === viewport) {
+                    startIndex = i;
+                    break;
+                }
+            }
+            list.splice(0, startIndex + 1 - 2);
+            list.splice(list.length - 1 - startIndex + 2, startIndex + 1 - 2);
+            targetIndex -= startIndex + 1;
+            this.$dispatchPropagationEvent(cancelEvent, list, targetIndex);
+            egret.Event.release(cancelEvent);
+        };
+
+        PageView.prototype.onRemoveListeners = function() {
+            var stage = this.tempStage || this.$stage;
+            stage.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this, true);
+            stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+            this.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+            this.removeEventListener(egret.TouchEvent.TOUCH_CANCEL, this.onTouchCancel, this);
+            this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
+        };
+
+        PageView.prototype.animationEnd = function(ani) {
+            if (ani.$pageIndex != this.$pageIndex) {
+                this.$pageIndex = ani.$pageIndex;
+                if (typeof this.onchanged === 'function') {
+                    this.onchanged(this.$pageIndex);
+                }
+            }
+        };
+
+        PageView.prototype.updateDisplayList = function(unscaledWidth, unscaledHeight) {
+            _super.prototype.updateDisplayList.call(this, unscaledWidth, unscaledHeight);
+            var viewport = this.$viewport;
+            if (viewport) {
+                viewport.setLayoutBoundsSize(unscaledWidth, unscaledHeight);
+                viewport.setLayoutBoundsPosition(0, 0);
+            }
+        };
+        return PageView;
+    })(eui.Component);
+    ns.PageView = PageView;
+    eui.registerProperty(PageView, 'viewport', 'eui.IViewport', true);
+})(window.cm || (window.cm = {}));

@@ -190,3 +190,24 @@ declare namespace cm {
         }
     }
 }
+declare namespace cm {
+    class PageView extends eui.Component {
+        /** bounces or not @default true */
+        public bounces: boolean;
+        /** scroll direction is vertical or not @default false means horizontal */
+        public vertical: boolean;
+        /** PageView disabled means can scroll or not @default false */
+        public disabled: boolean;
+        /** The content of the pageview */
+        public viewport: eui.IViewport;
+        /** The size per page. @default 'this.width or this.height' */
+        public pageSize: number;
+        /** The current pageIndex set this value may change scroll offset. */
+        public pageIndex: number;
+        /**
+         * @description call when pageIndex changed with user interface;
+         * @notice this function will not be call when set pageIndex directly,
+         */
+        public onchanged: (page: number) => void;
+    }
+}
