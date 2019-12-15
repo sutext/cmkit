@@ -196,13 +196,13 @@ declare namespace cm {
         public bounces: boolean;
         /** scroll direction is vertical or not @default false means horizontal */
         public vertical: boolean;
-        /** PageView disabled means can scroll or not @default false */
+        /** PageView disabled means disable scroll or not @default false */
         public disabled: boolean;
         /** The content of the pageview */
         public viewport: eui.IViewport;
-        /** The size per page. @default 'this.width or this.height' */
+        /** The size per page @default 'viewport.width or viewport.height'  */
         public pageSize: number;
-        /** The current pageIndex set this value may change scroll offset. */
+        /** The current pageIndex set this value will change scroll offset. */
         public pageIndex: number;
         /**
          * @description call when pageIndex changed with user interface;

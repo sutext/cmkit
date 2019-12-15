@@ -765,10 +765,9 @@
             _this.$disabled = false;
             _this.$vertical = false;
             _this.$velocity = 0;
-            _this.$pageSize = 0;
             _this.$pageIndex = 0;
             _this.$scrollThreshold = 5;
-            _this.$changeThreshold = 0.3;
+            _this.$changeThreshold = 0.4;
 
             _this.$canscroll = false;
             _this.$touchMoved = false;
@@ -777,10 +776,6 @@
             _this.$touchPoint = 0;
             _this.$touchTime = 0;
             _this.$viewprotRemovedEvent = false;
-            _this.$animation = new eui.sys.Animation(function(ani) {
-                _this.$setPosition(ani.currentValue);
-            }, _this);
-            _this.$animation.endFunction = _this.animationEnd;
             return _this;
         }
         Object.defineProperty(PageView.prototype, 'bounces', {
@@ -800,17 +795,27 @@
             set: function(value) {
                 if (!this.$touchMoved) {
                     this.$vertical = !!value;
+                } else {
+                    console.warn('Can not change vertical when scrolling');
                 }
             },
             enumerable: true,
             configurable: true
         });
+
         Object.defineProperty(PageView.prototype, 'pageSize', {
             get: function() {
-                return this.$pageSize || this.width;
+                if (!this.$viewport) {
+                    return 0;
+                }
+                return this.$getParamInfo().size;
             },
-            set: function(val) {
-                this.$pageSize = val;
+            set: function(value) {
+                if (value > 0) {
+                    this.$pageSize = value;
+                } else {
+                    throw new Error('pageSize must be greater than zero');
+                }
             },
             enumerable: true,
             configurable: true
@@ -820,25 +825,23 @@
                 return this.$pageIndex;
             },
             set: function(index) {
-                if (!Number.isInteger(index)) {
-                    throw new Error('pageIndex must be ingeger');
+                if (!Number.isInteger(index) || index < 0) {
+                    throw new Error('pageIndex must be unsigned ingeger');
                 }
                 if (this.$pageIndex !== index) {
-                    if (this.$touchMoved) {
+                    if (this.$touchMoved || !this.$viewport) {
                         return;
                     }
-                    if (this.$animation.isPlaying) {
-                        this.$animation.stop();
-                    }
+                    this.stopAnimation();
+                    var info = this.$getParamInfo();
                     this.$pageIndex = index;
-                    var posTo = index * this.pageSize;
-                    var maxPos = this.$getMaxPosition();
-                    if (posTo < 0) {
-                        posTo = 0;
-                    } else if (posTo > maxPos) {
-                        posTo = maxPos;
+                    var pos = index * info.size;
+                    if (pos < 0) {
+                        pos = 0;
+                    } else if (pos > info.max) {
+                        pos = info.max;
                     }
-                    this.$setPosition(pos);
+                    this.viewport[info.key] = pos;
                 }
             },
             enumerable: true,
@@ -849,6 +852,7 @@
                 return this.$disabled;
             },
             set: function(value) {
+                value = !!value;
                 if (value !== this.$disabled) {
                     this.$disabled = value;
                     this.checkScrollAble();
@@ -898,35 +902,23 @@
             enumerable: true,
             configurable: true
         });
-        PageView.prototype.$setPosition = function(pos) {
+        PageView.prototype.$getParamInfo = function() {
+            var max, key, size;
             var viewport = this.$viewport;
-            if (viewport) {
-                if (this.$vertical) {
-                    viewport.scrollV = pos;
-                } else {
-                    viewport.scrollH = pos;
-                }
-                this.dispatchEventWith(egret.Event.CHANGE);
-            }
-        };
-        PageView.prototype.$getPosition = function() {
-            var viewport = this.$viewport;
-            if (!viewport) return 0;
+            var uivalues = viewport.$UIComponent;
             if (this.$vertical) {
-                return viewport.scrollV;
+                key = 'scrollV';
+                max = viewport.contentHeight - uivalues[11];
+                size = uivalues[11];
             } else {
-                return viewport.scrollH;
+                key = 'scrollH';
+                max = viewport.contentWidth - uivalues[10];
+                size = uivalues[10];
             }
-        };
-        PageView.prototype.$getMaxPosition = function() {
-            var viewport = this.$viewport;
-            if (!viewport) return 0;
-            var uiValues = viewport.$UIComponent;
-            if (this.$vertical) {
-                return viewport.contentHeight - uiValues[11];
-            } else {
-                return viewport.contentWidth - uiValues[10];
+            if (this.$pageSize) {
+                size = Math.min(this.$pageSize, size);
             }
+            return { max: Math.max(0, max), key: key, size: size };
         };
         PageView.prototype.installViewport = function() {
             var viewport = this.viewport;
@@ -993,9 +985,9 @@
             if (!viewport) return false;
             var uiValues = viewport.$UIComponent;
             if (this.$vertical) {
-                this.$canscroll = (!this.$disabled && viewport.contentHeight > uiValues[11]) || viewport.scrollV !== 0;
+                this.$canscroll = !this.$disabled && viewport.contentHeight > uiValues[11];
             } else {
-                this.$canscroll = (!this.$disabled && viewport.contentWidth > uiValues[10]) || viewport.scrollH !== 0;
+                this.$canscroll = !this.$disabled && viewport.contentWidth > uiValues[10];
             }
             return this.$canscroll;
         };
@@ -1007,7 +999,7 @@
                 return;
             }
             this.downTarget = event.target;
-            this.$animation.stop();
+            this.stopAnimation();
             if (this.$vertical) {
                 this.$touchStart = event.$stageY;
             } else {
@@ -1048,20 +1040,19 @@
             if (!this.$canscroll) {
                 return;
             }
-            var viewport = this.$viewport;
-            var uiValues = viewport.$UIComponent;
-
             if (this.$vertical) {
-                this.update(event.$stageY, viewport.contentHeight - uiValues[11], viewport.scrollV);
+                this.update(event.$stageY);
             } else {
-                this.update(event.$stageX, viewport.contentWidth - uiValues[10], viewport.scrollH);
+                this.update(event.$stageX);
             }
         };
-        PageView.prototype.update = function(touchPoint, maxScrollValue, scrollValue) {
-            maxScrollValue = Math.max(maxScrollValue, 0);
-            var delta = this.$touchPoint - touchPoint;
-            var pos = delta + scrollValue;
+        PageView.prototype.update = function(touchPoint) {
+            var info = this.$getParamInfo();
+            var key = info.key;
+            var max = info.max;
             var time = egret.getTimer();
+            var delta = touchPoint - this.$touchPoint;
+            var pos = this.$viewport[key] - delta;
             this.$touchPoint = touchPoint;
             this.$velocity = delta / (time - this.$touchTime);
             this.$touchTime = time;
@@ -1072,14 +1063,14 @@
                     pos -= delta * 0.5;
                 }
             }
-            if (pos > maxScrollValue) {
+            if (pos > max) {
                 if (!this.$bounces) {
-                    pos = maxScrollValue;
+                    pos = max;
                 } else {
                     pos -= delta * 0.5;
                 }
             }
-            this.$setPosition(pos);
+            this.$viewport[key] = pos;
         };
         PageView.prototype.onTouchCancel = function(event) {
             if (!this.$touchMoved) {
@@ -1089,43 +1080,42 @@
         PageView.prototype.onTouchEnd = function(event) {
             this.$touchMoved = false;
             this.onRemoveListeners();
-            var viewport = this.$viewport;
-            var uiValues = viewport.$UIComponent;
-            if (this.$vertical) {
-                this.$touchPoint = event.$stageY;
-                this.finish(viewport.scrollV, viewport.contentHeight - uiValues[11]);
-            } else {
-                this.touchPoint = event.$stageX;
-                this.finish(viewport.scrollH, viewport.contentWidth - uiValues[10]);
-            }
-        };
-        PageView.prototype.finish = function(currentScrollPos, maxScrollPos) {
-            var index = currentScrollPos / this.pageSize;
-            if (this.$touchPoint - this.$touchStart > this.$changeThreshold * this.pageSize) {
+            var info = this.$getParamInfo();
+            var max = info.max;
+            var key = info.key;
+            var current = this.$viewport[key];
+            var pageSize = info.size;
+            var fastMove = false;
+            var index = current / pageSize;
+            if (this.$touchPoint - this.$touchStart > this.$changeThreshold * pageSize) {
                 index = Math.floor(index);
-            } else if (this.$touchStart - this.$touchPoint > this.$changeThreshold * this.pageSize) {
+            } else if (this.$touchStart - this.$touchPoint > this.$changeThreshold * pageSize) {
                 index = Math.ceil(index);
-            } else if (Math.abs(this.$velocity) > 2) {
-                if (this.$velocity > 0) {
-                    index = Math.ceil(index);
-                } else {
-                    index = Math.floor(index);
-                }
+            } else if (this.$velocity > 1.2) {
+                index = Math.floor(index);
+                fastMove = true;
+            } else if (this.$velocity < -1.2) {
+                index = Math.ceil(index);
+                fastMove = true;
             } else {
                 index = this.$pageIndex;
             }
-            var posTo = index * this.pageSize;
-            if (posTo < 0) {
-                posTo = 0;
-            } else if (posTo > maxScrollPos) {
-                posTo = maxScrollPos;
+            var pos = index * pageSize;
+            if (pos < 0) {
+                pos = 0;
+            } else if (pos > max) {
+                pos = max;
             }
-            var animation = this.$animation;
-            animation.duration = 250;
-            animation.from = currentScrollPos;
-            animation.to = posTo;
-            animation.$pageIndex = index;
-            animation.play();
+            var param = {};
+            param[key] = pos;
+            var duration = fastMove ? Math.abs(pos - current) / 4 : 250;
+            egret.Tween.get(this.viewport).to(param, duration, egret.Ease.sineInOut);
+            if (index !== this.$pageIndex) {
+                this.$pageIndex = index;
+                if (typeof this.onchanged === 'function') {
+                    this.onchanged(index);
+                }
+            }
         };
         PageView.prototype.dispatchBubbleEvent = function(event) {
             var viewport = this.$viewport;
@@ -1183,12 +1173,9 @@
             this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
         };
 
-        PageView.prototype.animationEnd = function(ani) {
-            if (ani.$pageIndex != this.$pageIndex) {
-                this.$pageIndex = ani.$pageIndex;
-                if (typeof this.onchanged === 'function') {
-                    this.onchanged(this.$pageIndex);
-                }
+        PageView.prototype.stopAnimation = function() {
+            if (this.$viewport) {
+                egret.Tween.removeTweens(this.$viewport);
             }
         };
 
