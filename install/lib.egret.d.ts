@@ -33,30 +33,39 @@ declare namespace eui {
 declare namespace cm {
     /**
      * @description 用于快速添加点击事件 和实现点击音效
+     * @description 增加按钮常见属性描述，可用于构建复杂的按钮UI
      */
     class Button extends eui.Button {
         /** 全局按钮点击音效，声音文件的资源名称 @default 'btn_tap_mp3' */
         public static sound: string;
         /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
         public static quiet: boolean;
+        /** 按钮填充色 */
+        public fill: number;
         /** 按钮图标 此字段继承自 eui.Button */
         public icon: string | egret.Texture;
+        /** 按钮背景图片 此字段可 主要用于显示按钮背景图片可以为 color imageKey textrue*/
+        public image: string | egret.Texture;
         /** 按钮标签label 此字段继承于 eui.Button */
         public label: string;
         /** 按钮标题title 与按钮label 分别独立使用，可用于按钮上显示两种不同样式的文本 */
         public title: string;
-        /** 显示图标的Image对象 */
-        public iconDisplay: eui.Image;
-        /** 显示title的label */
-        public titleDisplay: eui.Label;
-        /** 显示title的label */
-        public labelDisplay: eui.Label;
         /** 当前 Button 是否静音 */
         public quiet: boolean;
         /** 点击音效 资源KEY  */
         public sound: string;
         /** 相邻两次触发点击事件的最小间隔时间，防止点击过快 @default 200 ms */
         public delay: number;
+        /** 显示填充色的eui.Rect对象*/
+        public fillDisplay: eui.Rect;
+        /** 显示icon的Image对象 */
+        public iconDisplay: eui.Image;
+        /** 显示背景图片的的Image对象 */
+        public imageDisplay: eui.Image;
+        /** 显示title的Label对象 */
+        public titleDisplay: eui.Label;
+        /** 显示label的Label对象 */
+        public labelDisplay: eui.Label;
         /** 点击回调事件 */
         public onclick: () => void;
     }
@@ -151,6 +160,10 @@ declare namespace cm {
             protected static NAME: string;
             /** @default -1 use parent opacity */
             protected opacity: number;
+            /** @description the root node of modal , use for fade animation */
+            protected content: eui.Group;
+            /** @description use for special animation @example bounce in Popup.present and rotate in Popup.wait */
+            protected animator: eui.Group;
             /**@description insert by present opts.onhide */
             protected onhide?: () => void;
             /**@description The click action fom dimming blur @default this.dismiss .set null for disable auto dismiss*/
@@ -191,7 +204,9 @@ declare namespace cm {
     }
 }
 declare namespace cm {
-    class PageView extends eui.Component {
+    class PageView<T extends eui.IViewport = eui.IViewport> extends eui.Component {
+        /** the page view is animating or not */
+        public readonly moving: boolean;
         /** bounces or not @default true */
         public bounces: boolean;
         /** scroll direction is vertical or not @default false means horizontal */
@@ -199,7 +214,7 @@ declare namespace cm {
         /** PageView disabled means disable scroll or not @default false */
         public disabled: boolean;
         /** The content of the pageview */
-        public viewport: eui.IViewport;
+        public viewport: T;
         /** The size per page @default 'viewport.width or viewport.height'  */
         public pageSize: number;
         /** The current pageIndex set this value will change scroll offset. */

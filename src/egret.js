@@ -1,3 +1,8 @@
+var __reflect =
+    (this && this.__reflect) ||
+    function(p, c, t) {
+        (p.__class__ = c), t ? t.push(c) : (t = [c]), (p.__types__ = p.__types__ ? t.concat(p.__types__) : t);
+    };
 (function() {
     egret.DisplayObject.prototype.setRect = function(x, y, width, height) {
         this.x = x;
@@ -59,6 +64,10 @@
             _super.prototype.partAdded.call(this, partName, instance);
             if (instance === this.titleDisplay) {
                 this.titleDisplay.text = this._title;
+            } else if (instance === this.imageDisplay) {
+                this.imageDisplay.source = this._image;
+            } else if (instance === this.fillDisplay) {
+                this.fillDisplay.fillColor = this._fill;
             }
         };
         return Button;
@@ -78,6 +87,19 @@
             _this.audio.play(0, 1);
         }
     };
+    Object.defineProperty(Button.prototype, 'fill', {
+        get: function() {
+            return this._fill;
+        },
+        set: function(val) {
+            this._fill = val;
+            if (this.fillDisplay) {
+                this.fillDisplay.fillColor = val;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Button.prototype, 'title', {
         get: function() {
             return this._title;
@@ -86,6 +108,19 @@
             this._title = val;
             if (this.titleDisplay) {
                 this.titleDisplay.text = val;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Button.prototype, 'image', {
+        get: function() {
+            return this._image;
+        },
+        set: function(val) {
+            this._image = val;
+            if (this.imageDisplay) {
+                this.imageDisplay.source = val;
             }
         },
         enumerable: true,
@@ -510,10 +545,10 @@
         }
         modal.onCreate(opts);
         var opacity = modal.opacity < 0 ? this.opacity : modal.opacity;
+        if (opacity > 0) {
+            egret.Tween.get(modal.background).to({ alpha: opacity }, 250);
+        }
         if (modal.animator) {
-            if (opacity > 0) {
-                egret.Tween.get(modal.background).to({ alpha: opacity }, 250);
-            }
             modal.animator.alpha = 0;
             egret.Tween.get(modal.animator)
                 .wait(50)
@@ -524,18 +559,19 @@
                     _this.current = null;
                     _this.next();
                 });
-        } else {
-            if (opacity > 0) {
-                modal.background.alpha = opacity;
-            }
-            modal.alpha = 0;
-            egret.Tween.get(modal)
+        } else if (modal.content) {
+            modal.content.alpha = 0;
+            egret.Tween.get(modal.content)
                 .to({ alpha: 1 }, 250)
                 .call(function() {
                     modal.onPresent(opts);
                     _this.current = null;
                     _this.next();
                 });
+        } else {
+            modal.onPresent(opts);
+            _this.current = null;
+            _this.next();
         }
         return modal;
     };
@@ -549,15 +585,24 @@
             return;
         }
         delete this.showed[name];
-        egret.Tween.get(modal)
-            .to({ alpha: 0 }, 250)
-            .call(function() {
-                modal.onDismiss();
-                _this.removeChild(modal);
-                ns.call(finish);
-                _this.current = null;
-                _this.next();
-            });
+        egret.Tween.get(modal.background).to({ alpha: 0 }, 250);
+        if (modal.content) {
+            egret.Tween.get(modal.content)
+                .to({ alpha: 0 }, 250)
+                .call(function() {
+                    modal.onDismiss();
+                    _this.removeChild(modal);
+                    ns.call(finish);
+                    _this.current = null;
+                    _this.next();
+                });
+        } else {
+            modal.onDismiss();
+            _this.removeChild(modal);
+            ns.call(finish);
+            _this.current = null;
+            _this.next();
+        }
     };
     Popup.prototype._clear = function(finish) {
         var _this = this;
@@ -631,6 +676,7 @@
             _super && _super.apply(this, arguments);
             var _this = this;
             this.animator = null;
+            this.content = null;
             this.opacity = -1;
             this.touchEnabled = true;
             this.onblur = function() {
@@ -644,7 +690,14 @@
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
             this.background.setEdge(0);
-            this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onblur, this);
+            var _this = this;
+            this.background.addEventListener(
+                egret.TouchEvent.TOUCH_TAP,
+                function() {
+                    _this.onblur();
+                },
+                this
+            );
             this.addChildAt(this.background, 0);
         };
         return Modal;
@@ -766,10 +819,12 @@
             _this.$vertical = false;
             _this.$velocity = 0;
             _this.$pageIndex = 0;
+            _this.$pageSize = 0;
             _this.$scrollThreshold = 5;
             _this.$changeThreshold = 0.4;
 
             _this.$canscroll = false;
+            _this.$tweening = false;
             _this.$touchMoved = false;
             _this.$touchCancel = false;
             _this.$touchStart = 0;
@@ -778,6 +833,13 @@
             _this.$viewprotRemovedEvent = false;
             return _this;
         }
+        Object.defineProperty(PageView.prototype, 'moving', {
+            get: function() {
+                return this.$touchMoved || this.$tweening;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(PageView.prototype, 'bounces', {
             get: function() {
                 return this.$bounces;
@@ -1109,7 +1171,13 @@
             var param = {};
             param[key] = pos;
             var duration = fastMove ? Math.abs(pos - current) / 4 : 250;
-            egret.Tween.get(this.viewport).to(param, duration, egret.Ease.sineInOut);
+            this.$tweening = true;
+            var _this = this;
+            egret.Tween.get(this.viewport)
+                .to(param, duration, egret.Ease.sineInOut)
+                .call(function() {
+                    _this.$tweening = false;
+                });
             if (index !== this.$pageIndex) {
                 this.$pageIndex = index;
                 if (typeof this.onchanged === 'function') {
@@ -1177,6 +1245,7 @@
             if (this.$viewport) {
                 egret.Tween.removeTweens(this.$viewport);
             }
+            this.$tweening = false;
         };
 
         PageView.prototype.updateDisplayList = function(unscaledWidth, unscaledHeight) {
@@ -1190,5 +1259,6 @@
         return PageView;
     })(eui.Component);
     ns.PageView = PageView;
+    __reflect(PageView.prototype, 'cm.PageView');
     eui.registerProperty(PageView, 'viewport', 'eui.IViewport', true);
 })(window.cm || (window.cm = {}));
