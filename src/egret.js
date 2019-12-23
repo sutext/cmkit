@@ -1,7 +1,11 @@
-var __reflect =
-    (this && this.__reflect) ||
-    function(p, c, t) {
-        (p.__class__ = c), t ? t.push(c) : (t = [c]), (p.__types__ = p.__types__ ? t.concat(p.__types__) : t);
+var __extends =
+    (this && this.__extends) ||
+    function(t, e) {
+        for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
+        function r() {
+            this.constructor = t;
+        }
+        (r.prototype = e.prototype), (t.prototype = new r());
     };
 (function() {
     egret.DisplayObject.prototype.setRect = function(x, y, width, height) {
@@ -51,7 +55,7 @@ var __reflect =
 })();
 (function(ns) {
     var Button = (function(_super) {
-        ns.__extends(Button, _super);
+        __extends(Button, _super);
         function Button() {
             _super && _super.apply(this, arguments);
             this._delay = 200;
@@ -155,7 +159,7 @@ var __reflect =
     });
     ns.Button = Button;
     var Label = (function(_super) {
-        ns.__extends(Label, _super);
+        __extends(Label, _super);
         function Label() {
             _super && _super.apply(this, arguments);
             var _this = this;
@@ -259,7 +263,7 @@ var __reflect =
 })(window.cm || (window.cm = {}));
 (function(ns) {
     var Stack = (function(_super) {
-        ns.__extends(Stack, _super);
+        __extends(Stack, _super);
         function Stack() {
             _super && _super.apply(this, arguments);
         }
@@ -393,7 +397,7 @@ var __reflect =
     };
     ns.Stack = Stack;
     var Page = (function(_super) {
-        ns.__extends(Page, _super);
+        __extends(Page, _super);
         function Page() {
             _super && _super.apply(this, arguments);
         }
@@ -407,7 +411,7 @@ var __reflect =
 })(window.cm || (window.cm = {}));
 (function(ns) {
     var Popup = (function(_super) {
-        ns.__extends(Popup, _super);
+        __extends(Popup, _super);
         function Popup() {
             _super && _super.apply(this, arguments);
             this.showed = {};
@@ -544,34 +548,34 @@ var __reflect =
             return;
         }
         modal.onCreate(opts);
-        var opacity = modal.opacity < 0 ? this.opacity : modal.opacity;
-        if (opacity > 0) {
-            egret.Tween.get(modal.background).to({ alpha: opacity }, 250);
+        function func() {
+            modal.onPresent(opts);
+            _this.current = null;
+            _this.next();
         }
+        var opacity = modal.opacity < 0 ? this.opacity : modal.opacity;
         if (modal.animator) {
+            if (opacity > 0) {
+                egret.Tween.get(modal.background).to({ alpha: opacity }, 250);
+            }
             modal.animator.alpha = 0;
             egret.Tween.get(modal.animator)
                 .wait(50)
                 .to({ scaleX: 0, scaleY: 0, alpha: 1 }, 0)
                 .to({ scaleX: 1, scaleY: 1 }, 300, egret.Ease.elasticInOut)
-                .call(function() {
-                    modal.onPresent(opts);
-                    _this.current = null;
-                    _this.next();
-                });
-        } else if (modal.content) {
-            modal.content.alpha = 0;
-            egret.Tween.get(modal.content)
-                .to({ alpha: 1 }, 250)
-                .call(function() {
-                    modal.onPresent(opts);
-                    _this.current = null;
-                    _this.next();
-                });
+                .call(func);
+        } else if (modal.fadeback) {
+            egret.Tween.get(modal.background)
+                .to({ alpha: opacity }, 250)
+                .call(func);
         } else {
-            modal.onPresent(opts);
-            _this.current = null;
-            _this.next();
+            if (opacity > 0) {
+                modal.background.alpha = opacity;
+            }
+            modal.alpha = 0;
+            egret.Tween.get(modal)
+                .to({ alpha: 1 }, 250)
+                .call(func);
         }
         return modal;
     };
@@ -585,23 +589,21 @@ var __reflect =
             return;
         }
         delete this.showed[name];
-        egret.Tween.get(modal.background).to({ alpha: 0 }, 250);
-        if (modal.content) {
-            egret.Tween.get(modal.content)
-                .to({ alpha: 0 }, 250)
-                .call(function() {
-                    modal.onDismiss();
-                    _this.removeChild(modal);
-                    ns.call(finish);
-                    _this.current = null;
-                    _this.next();
-                });
-        } else {
+        function func() {
             modal.onDismiss();
             _this.removeChild(modal);
             ns.call(finish);
             _this.current = null;
             _this.next();
+        }
+        if (modal.fadeback) {
+            egret.Tween.get(modal.background)
+                .to({ alpha: 0 }, 250)
+                .call(func);
+        } else {
+            egret.Tween.get(modal)
+                .to({ alpha: 0 }, 250)
+                .call(func);
         }
     };
     Popup.prototype._clear = function(finish) {
@@ -671,7 +673,7 @@ var __reflect =
     };
     ns.Popup = Popup;
     var Modal = (function(_super) {
-        ns.__extends(Modal, _super);
+        __extends(Modal, _super);
         function Modal() {
             _super && _super.apply(this, arguments);
             var _this = this;
@@ -715,7 +717,7 @@ var __reflect =
     };
     Popup.Modal = Modal;
     var Wait = (function(_super) {
-        ns.__extends(Wait, _super);
+        __extends(Wait, _super);
         function Wait() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1001;
@@ -740,7 +742,7 @@ var __reflect =
 
     Popup.Wait = Wait;
     var Alert = (function(_super) {
-        ns.__extends(Alert, _super);
+        __extends(Alert, _super);
         function Alert() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1000;
@@ -790,7 +792,7 @@ var __reflect =
     };
     Popup.Alert = Alert;
     var Remind = (function(_super) {
-        ns.__extends(Remind, _super);
+        __extends(Remind, _super);
         function Remind() {
             _super && _super.apply(this, arguments);
             this.zIndex = 1002;
@@ -809,72 +811,143 @@ var __reflect =
     Popup.Remind = Remind;
 })(window.cm || (window.cm = {}));
 (function(ns) {
-    var PageView = (function(_super) {
-        ns.__extends(PageView, _super);
-        function PageView() {
+    var ListView = (function(_super) {
+        __extends(ListView, _super);
+        function ListView() {
             var _this = _super.call(this) || this;
-            _this.$bounces = true;
-            _this.$viewport = null;
-            _this.$disabled = false;
-            _this.$vertical = false;
-            _this.$velocity = 0;
-            _this.$pageIndex = 0;
-            _this.$pageSize = 0;
-            _this.$scrollThreshold = 5;
-            _this.$changeThreshold = 0.4;
+            _this._bounces = true;
+            _this._disabled = false;
+            _this._vertical = false;
+            _this._pageable = false;
+            _this._velocity = 0;
+            _this._friction = 5;
+            _this._pageSize = 0;
+            _this._pageIndex = 0;
+            _this._maxThrowSpeed = 20;
+            _this._changeThreshold = 0.4;
+            _this._scrollThreshold = 5;
 
-            _this.$canscroll = false;
-            _this.$tweening = false;
-            _this.$touchMoved = false;
-            _this.$touchCancel = false;
-            _this.$touchStart = 0;
-            _this.$touchPoint = 0;
-            _this.$touchTime = 0;
-            _this.$viewprotRemovedEvent = false;
+            _this._canscroll = false;
+            _this._tweening = false;
+            _this._touchMoved = false;
+            _this._touchCancel = false;
+            _this._touchStart = 0;
+            _this._touchPoint = 0;
+            _this._touchTime = 0;
             return _this;
         }
-        Object.defineProperty(PageView.prototype, 'moving', {
-            get: function() {
-                return this.$touchMoved || this.$tweening;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PageView.prototype, 'bounces', {
-            get: function() {
-                return this.$bounces;
-            },
-            set: function(value) {
-                this.$bounces = !!value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PageView.prototype, 'vertical', {
-            get: function() {
-                return this.$vertical;
-            },
-            set: function(value) {
-                if (!this.$touchMoved) {
-                    this.$vertical = !!value;
+        ListView.CHANGE_PAGE = 'ListView_CHANGE_PAGE';
+        ListView.prototype.createChildren = function() {
+            if (!this.$layout) {
+                if (this._vertical) {
+                    var layout = new eui.VerticalLayout();
+                    layout.gap = 0;
+                    layout.horizontalAlign = eui.JustifyAlign.CONTENT_JUSTIFY;
+                    this.$setLayout(layout);
                 } else {
-                    console.warn('Can not change vertical when scrolling');
+                    var layout = new eui.HorizontalLayout();
+                    layout.gap = 0;
+                    layout.horizontalAlign = eui.JustifyAlign.JUSTIFY;
+                    layout.verticalAlign = eui.JustifyAlign.CONTENT_JUSTIFY;
+                    this.$setLayout(layout);
+                }
+            }
+            _super.prototype.createChildren.call(this);
+            this.scrollEnabled = true;
+            this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBeginCapture, this, true);
+            this.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEndCapture, this, true);
+            this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
+        };
+        Object.defineProperty(ListView.prototype, 'scroling', {
+            get: function() {
+                return this._touchMoved || this._tweening;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'bounces', {
+            get: function() {
+                return this._bounces;
+            },
+            set: function(value) {
+                if (this._touchMoved) {
+                    ns.warn('Can not change property bounces when scroling!');
+                    return;
+                }
+                this._bounces = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'pageable', {
+            get: function() {
+                return this._pageable;
+            },
+            set: function(value) {
+                if (this._touchMoved) {
+                    ns.warn('Can not change property pageable when scroling!');
+                    return;
+                }
+                this._pageable = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'vertical', {
+            get: function() {
+                return this._vertical;
+            },
+            set: function(value) {
+                if (this._touchMoved) {
+                    ns.warn('Can not change property vertical when scroling!');
+                    return;
+                }
+                this._vertical = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'disabled', {
+            get: function() {
+                return this._disabled;
+            },
+            set: function(value) {
+                value = !!value;
+                if (value !== this._disabled) {
+                    this._disabled = value;
+                    this.checkScrollAble();
                 }
             },
             enumerable: true,
             configurable: true
         });
-
-        Object.defineProperty(PageView.prototype, 'pageSize', {
+        Object.defineProperty(ListView.prototype, 'friction', {
             get: function() {
-                if (!this.$viewport) {
-                    return 0;
+                return this._friction;
+            },
+            set: function(value) {
+                if (value < 1) {
+                    throw new Error('friction must be  greater than 1');
                 }
-                return this.$getParamInfo().size;
+                this._friction = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'pageSize', {
+            get: function() {
+                if (this._pageSize > 0) {
+                    return _pageSize;
+                }
+                if (this._vertical) {
+                    return (this.$layout && this.$layout.$typicalHeight) || 0;
+                } else {
+                    return (this.$layout && this.$layout.$typicalWidth) || 0;
+                }
             },
             set: function(value) {
                 if (value > 0) {
-                    this.$pageSize = value;
+                    this._pageSize = value;
                 } else {
                     throw new Error('pageSize must be greater than zero');
                 }
@@ -882,193 +955,162 @@ var __reflect =
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PageView.prototype, 'pageIndex', {
+        Object.defineProperty(ListView.prototype, 'pageIndex', {
             get: function() {
-                return this.$pageIndex;
+                return this._pageIndex;
             },
             set: function(index) {
+                if (!this._pageable) {
+                    throw Error('Cannot set page index when not pageable!');
+                }
                 if (!Number.isInteger(index) || index < 0) {
                     throw new Error('pageIndex must be unsigned ingeger');
                 }
-                if (this.$pageIndex !== index) {
-                    if (this.$touchMoved || !this.$viewport) {
+                if (this._pageIndex !== index) {
+                    if (this._touchMoved) {
                         return;
                     }
-                    this.stopAnimation();
-                    var info = this.$getParamInfo();
-                    this.$pageIndex = index;
-                    var pos = index * info.size;
-                    if (pos < 0) {
-                        pos = 0;
-                    } else if (pos > info.max) {
-                        pos = info.max;
-                    }
-                    this.viewport[info.key] = pos;
+                    this._pageIndex = index;
+                    this.scrollToOffset(index * this.pageSize);
                 }
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PageView.prototype, 'disabled', {
+        Object.defineProperty(ListView.prototype, 'maxThrowSpeed', {
             get: function() {
-                return this.$disabled;
+                return this._maxThrowSpeed;
             },
             set: function(value) {
-                value = !!value;
-                if (value !== this.$disabled) {
-                    this.$disabled = value;
-                    this.checkScrollAble();
+                if (value < 4) {
+                    throw new Error('friction must be  greater than 1');
                 }
+                this._maxThrowSpeed = value;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PageView.prototype, 'viewport', {
+        Object.defineProperty(ListView.prototype, 'changeThreshold', {
             get: function() {
-                return this.$viewport;
-            },
-            set: function(value) {
-                if (value !== this.$viewport) {
-                    this.uninstallViewport();
-                    this.$viewport = value;
-                    this.$viewprotRemovedEvent = false;
-                    this.installViewport();
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PageView.prototype, 'scrollThreshold', {
-            get: function() {
-                return this.$scrollThreshold;
-            },
-            set: function(value) {
-                if (value < 1 || value > 100) {
-                    throw new Error('scrollThreshold must be between 1 and 100');
-                }
-                this.$scrollThreshold = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PageView.prototype, 'changeThreshold', {
-            get: function() {
-                return this.$changeThreshold;
+                return this._changeThreshold;
             },
             set: function(value) {
                 if (value < 0 || value > 1) {
                     throw new Error('changeThreshold must be between 0 and 1');
                 }
-                this.$changeThreshold = value;
+                this._changeThreshold = value;
             },
             enumerable: true,
             configurable: true
         });
-        PageView.prototype.$getParamInfo = function() {
-            var max, key, size;
-            var viewport = this.$viewport;
-            var uivalues = viewport.$UIComponent;
-            if (this.$vertical) {
+        Object.defineProperty(ListView.prototype, 'scrollThreshold', {
+            get: function() {
+                return this._scrollThreshold;
+            },
+            set: function(value) {
+                if (value < 1 || value > 100) {
+                    throw new Error('scrollThreshold must be between 1 and 100');
+                }
+                this._scrollThreshold = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ListView.prototype.scrollToHead = function(time) {
+            this.scrollToOffset(0, time);
+        };
+        ListView.prototype.scrollToTail = function(time) {
+            var info = this.getParamInfo();
+            this.scrollToOffset(info.max, time);
+        };
+        ListView.prototype.scrollToIndex = function(index, time) {
+            var size = this.pageSize;
+            if (size > 0) {
+                this.scrollToOffset(index * size, time);
+            }
+        };
+        ListView.prototype.scrollToOffset = function(offset, time) {
+            if (typeof time !== 'number' || time < 0) {
+                time = 0;
+            }
+            var info = this.getParamInfo();
+            var key = info.key;
+            var max = info.max;
+            var pos = offset;
+            if (pos < 0) {
+                pos = 0;
+            } else if (pos > max) {
+                pos = max;
+            }
+            if (time === 0) {
+                this[key] = pos;
+            } else {
+                var param = {};
+                param[key] = pos;
+                eui.UIEvent.dispatchUIEvent(eui.UIEvent.CHANGE_START);
+                this.startAnimation(param, time, egret.Ease.sineOut);
+            }
+        };
+        ListView.prototype.getParamInfo = function() {
+            var max, key;
+            var uivalues = this.$UIComponent;
+            if (this._vertical) {
                 key = 'scrollV';
-                max = viewport.contentHeight - uivalues[11];
-                size = uivalues[11];
+                max = this.contentHeight - uivalues[11];
             } else {
                 key = 'scrollH';
-                max = viewport.contentWidth - uivalues[10];
-                size = uivalues[10];
+                max = this.contentWidth - uivalues[10];
             }
-            if (this.$pageSize) {
-                size = Math.min(this.$pageSize, size);
-            }
-            return { max: Math.max(0, max), key: key, size: size };
+            return { max: Math.max(0, max), key: key };
         };
-        PageView.prototype.installViewport = function() {
-            var viewport = this.viewport;
-            if (viewport) {
-                this.addChildAt(viewport, 0);
-                viewport.scrollEnabled = true;
-                viewport.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBeginCapture, this, true);
-                viewport.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEndCapture, this, true);
-                viewport.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
-                viewport.addEventListener(egret.Event.REMOVED, this.onViewPortRemove, this);
-            }
-        };
-        PageView.prototype.uninstallViewport = function() {
-            var viewport = this.viewport;
-            if (viewport) {
-                viewport.scrollEnabled = false;
-                viewport.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBeginCapture, this, true);
-                viewport.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEndCapture, this, true);
-                viewport.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
-                viewport.removeEventListener(egret.Event.REMOVED, this.onViewPortRemove, this);
-                if (this.$viewprotRemovedEvent == false) {
-                    this.removeChild(viewport);
-                }
-            }
-        };
-        PageView.prototype.onViewPortRemove = function(event) {
-            if (event.target == this.$viewport) {
-                this.$viewprotRemovedEvent = true;
-                this.viewport = null;
-            }
-        };
-        PageView.prototype.setSkin = function(skin) {
-            _super.prototype.setSkin.call(this, skin);
-            if (this.$viewport) {
-                this.addChildAt(this.$viewport, 0);
-            }
-        };
-        PageView.prototype.onTouchBeginCapture = function(event) {
+        ListView.prototype.onTouchBeginCapture = function(event) {
             if (!this.$stage) return;
-            this.$touchCancel = false;
+            this._touchCancel = false;
             if (this.checkScrollAble()) {
                 this.onTouchBegin(event);
             }
         };
-        PageView.prototype.onTouchEndCapture = function(event) {
-            if (this.$touchCancel) {
-                event.$bubbles = false;
-                this.dispatchBubbleEvent(event);
-                event.$bubbles = true;
-                event.stopPropagation();
-                this.onTouchEnd(event);
-            }
-        };
-        PageView.prototype.onTouchTapCapture = function(event) {
-            if (this.$touchCancel) {
+        ListView.prototype.onTouchEndCapture = function(event) {
+            if (this._touchCancel) {
                 event.$bubbles = false;
                 this.dispatchBubbleEvent(event);
                 event.$bubbles = true;
                 event.stopPropagation();
             }
         };
-        PageView.prototype.checkScrollAble = function() {
-            var viewport = this.$viewport;
-            if (!viewport) return false;
-            var uiValues = viewport.$UIComponent;
-            if (this.$vertical) {
-                this.$canscroll = !this.$disabled && viewport.contentHeight > uiValues[11];
+        ListView.prototype.onTouchTapCapture = function(event) {
+            if (this._touchCancel) {
+                event.$bubbles = false;
+                this.dispatchBubbleEvent(event);
+                event.$bubbles = true;
+                event.stopPropagation();
+            }
+        };
+        ListView.prototype.checkScrollAble = function() {
+            var uiValues = this.$UIComponent;
+            if (this._vertical) {
+                this._canscroll = !this._disabled && this.contentHeight > uiValues[11];
             } else {
-                this.$canscroll = !this.$disabled && viewport.contentWidth > uiValues[10];
+                this._canscroll = !this._disabled && this.contentWidth > uiValues[10];
             }
-            return this.$canscroll;
+            return this._canscroll;
         };
-        PageView.prototype.onTouchBegin = function(event) {
+        ListView.prototype.onTouchBegin = function(event) {
             if (event.isDefaultPrevented()) {
                 return;
             }
-            if (!this.$canscroll) {
+            if (!this._canscroll) {
                 return;
             }
             this.downTarget = event.target;
             this.stopAnimation();
-            if (this.$vertical) {
-                this.$touchStart = event.$stageY;
+            if (this._vertical) {
+                this._touchStart = event.$stageY;
             } else {
-                this.$touchStart = event.$stageX;
+                this._touchStart = event.$stageX;
             }
-            this.$touchTime = egret.getTimer();
-            this.$touchPoint = this.$touchStart;
+            this._touchTime = egret.getTimer();
+            this._touchPoint = this._touchStart;
             var stage = this.$stage;
             this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
             stage.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this, true);
@@ -1076,163 +1118,181 @@ var __reflect =
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
             this.tempStage = stage;
         };
-        PageView.prototype.onTouchMove = function(event) {
+        ListView.prototype.onTouchMove = function(event) {
             if (event.isDefaultPrevented()) {
                 return;
             }
-            if (!this.$touchMoved) {
-                if (this.$disabled) {
+            if (!this._touchMoved) {
+                if (this._disabled) {
                     return;
                 }
-                if (this.$vertical) {
-                    if (Math.abs(this.$touchStart - event.$stageY) < this.$scrollThreshold) {
+                if (this._vertical) {
+                    if (Math.abs(this._touchStart - event.$stageY) < this._scrollThreshold) {
                         return;
                     }
                 } else {
-                    if (Math.abs(this.$touchStart - event.$stageX) < this.$scrollThreshold) {
+                    if (Math.abs(this._touchStart - event.$stageX) < this._scrollThreshold) {
                         return;
                     }
                 }
-                this.$touchCancel = true;
-                this.$touchMoved = true;
+                this._touchCancel = true;
+                this._touchMoved = true;
                 this.dispatchCancelEvent(event);
+                eui.UIEvent.dispatchUIEvent(this, eui.UIEvent.CHANGE_START);
                 this.$stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
             }
             event.preventDefault();
-            if (!this.$canscroll) {
+            if (!this._canscroll) {
                 return;
             }
-            if (this.$vertical) {
+            if (this._vertical) {
                 this.update(event.$stageY);
             } else {
                 this.update(event.$stageX);
             }
         };
-        PageView.prototype.update = function(touchPoint) {
-            var info = this.$getParamInfo();
+        ListView.prototype.update = function(touchPoint) {
+            var info = this.getParamInfo();
             var key = info.key;
             var max = info.max;
             var time = egret.getTimer();
-            var delta = touchPoint - this.$touchPoint;
-            var pos = this.$viewport[key] - delta;
-            this.$touchPoint = touchPoint;
-            this.$velocity = delta / (time - this.$touchTime);
-            this.$touchTime = time;
+            var delta = touchPoint - this._touchPoint;
+            var pos = this[key] - delta;
+            this._touchPoint = touchPoint;
+            this._velocity = delta / (time - this._touchTime);
+            this._touchTime = time;
             if (pos < 0) {
-                if (!this.$bounces) {
+                if (!this._bounces) {
                     pos = 0;
                 } else {
-                    pos -= delta * 0.5;
+                    pos += delta * 0.5;
                 }
             }
             if (pos > max) {
-                if (!this.$bounces) {
+                if (!this._bounces) {
                     pos = max;
                 } else {
-                    pos -= delta * 0.5;
+                    pos += delta * 0.5;
                 }
             }
-            this.$viewport[key] = pos;
+            this[key] = pos;
         };
-        PageView.prototype.onTouchCancel = function(event) {
-            if (!this.$touchMoved) {
+        ListView.prototype.onTouchCancel = function(event) {
+            if (!this._touchMoved) {
                 this.onRemoveListeners();
             }
         };
-        PageView.prototype.onTouchEnd = function(event) {
-            this.$touchMoved = false;
-            this.onRemoveListeners();
-            var info = this.$getParamInfo();
+        ListView.prototype.onTouchEnd = function(event) {
+            if (this._touchMoved) {
+                this._touchMoved = false;
+                this.onRemoveListeners();
+                if (this._pageable) {
+                    this.doPaging();
+                } else {
+                    this.doThrow();
+                }
+            }
+        };
+        ListView.prototype.doThrow = function() {
+            var info = this.getParamInfo();
             var max = info.max;
             var key = info.key;
-            var current = this.$viewport[key];
-            var pageSize = info.size;
-            var fastMove = false;
-            var index = current / pageSize;
-            if (this.$touchPoint - this.$touchStart > this.$changeThreshold * pageSize) {
-                index = Math.floor(index);
-            } else if (this.$touchStart - this.$touchPoint > this.$changeThreshold * pageSize) {
-                index = Math.ceil(index);
-            } else if (this.$velocity > 1.2) {
-                index = Math.floor(index);
-                fastMove = true;
-            } else if (this.$velocity < -1.2) {
-                index = Math.ceil(index);
-                fastMove = true;
-            } else {
-                index = this.$pageIndex;
+            var current = this[key];
+            var u = this._friction / 1000.0;
+            var v = this._velocity;
+            var absv = Math.abs(v);
+            if (absv > this.maxThrowSpeed) {
+                v = (v * this.maxThrowSpeed) / absv;
+                absv = this.maxThrowSpeed;
             }
-            var pos = index * pageSize;
+            var t = absv / u;
+            var s = v * t * 0.5;
+            if (Math.abs(s) < this._scrollThreshold) {
+                return;
+            }
+            var pos = current - s;
+            var ease = egret.Ease.cubicOut;
             if (pos < 0) {
                 pos = 0;
+                ease = egret.Ease.getBackOut(0.6);
+                t = Math.sqrt((Math.abs(pos - current) * 2) / u);
             } else if (pos > max) {
                 pos = max;
+                ease = egret.Ease.getBackOut(0.6);
+                t = Math.sqrt((Math.abs(pos - current) * 2) / u);
             }
             var param = {};
             param[key] = pos;
-            var duration = fastMove ? Math.abs(pos - current) / 4 : 250;
-            this.$tweening = true;
-            var _this = this;
-            egret.Tween.get(this.viewport)
-                .to(param, duration, egret.Ease.sineInOut)
-                .call(function() {
-                    _this.$tweening = false;
-                });
-            if (index !== this.$pageIndex) {
-                this.$pageIndex = index;
-                if (typeof this.onchanged === 'function') {
-                    this.onchanged(index);
-                }
-            }
-        };
-        PageView.prototype.dispatchBubbleEvent = function(event) {
-            var viewport = this.$viewport;
-            if (!viewport) return;
-            var cancelEvent = egret.Event.create(egret.TouchEvent, event.type, event.bubbles, event.cancelable);
-            cancelEvent.$initTo(event.$stageX, event.$stageY, event.touchPointID);
-            var target = this.downTarget;
-            cancelEvent.$setTarget(target);
-            var list = this.$getPropagationList(target);
-            var length = list.length;
-            var targetIndex = list.length * 0.5;
-            var startIndex = -1;
-            for (var i = 0; i < length; i++) {
-                if (list[i] === viewport) {
-                    startIndex = i;
-                    break;
-                }
-            }
-            list.splice(0, list.length - startIndex + 1);
-            targetIndex = 0;
-            this.$dispatchPropagationEvent(cancelEvent, list, targetIndex);
-            egret.Event.release(cancelEvent);
+            this.startAnimation(param, t, ease);
         };
 
-        PageView.prototype.dispatchCancelEvent = function(event) {
-            var viewport = this.$viewport;
-            if (!viewport) return;
+        ListView.prototype.doPaging = function(event) {
+            var info = this.getParamInfo();
+            var max = info.max;
+            var key = info.key;
+            var current = this[key];
+            var pageSize = this.pageSize;
+            var fastMove = false;
+            var index = current / pageSize;
+            if (this._touchPoint - this._touchStart > this._changeThreshold * pageSize) {
+                index = Math.floor(index);
+            } else if (this._touchStart - this._touchPoint > this._changeThreshold * pageSize) {
+                index = Math.ceil(index);
+            } else if (this._velocity > 1.2) {
+                index = Math.floor(index);
+                fastMove = true;
+            } else if (this._velocity < -1.2) {
+                index = Math.ceil(index);
+                fastMove = true;
+            } else {
+                index = this._pageIndex;
+            }
+            if (index < 0) {
+                index = 0;
+            }
+            var param = {};
+            var pos = index * pageSize;
+            if (pos > max) {
+                pos = max;
+            }
+            param[key] = pos;
+            this.startAnimation(param, fastMove ? Math.abs(pos - current) / 3 : 500, egret.Ease.sineOut);
+            this.doChangePage(index);
+        };
+        ListView.prototype.dispatchBubbleEvent = function(event) {
+            var evt = egret.Event.create(egret.TouchEvent, event.type, event.bubbles, event.cancelable);
+            evt.$initTo(event.$stageX, event.$stageY, event.touchPointID);
+            var target = this.downTarget;
+            evt.$setTarget(target);
+            var list = [];
+            var parent = this.$parent;
+            while (parent) {
+                list.push(parent);
+                parent = parent.$parent;
+            }
+            this.$dispatchPropagationEvent(evt, list, 0);
+            egret.Event.release(evt);
+        };
+
+        ListView.prototype.dispatchCancelEvent = function(event) {
             var cancelEvent = egret.Event.create(egret.TouchEvent, egret.TouchEvent.TOUCH_CANCEL, event.bubbles, event.cancelable);
             cancelEvent.$initTo(event.$stageX, event.$stageY, event.touchPointID);
             var target = this.downTarget;
             cancelEvent.$setTarget(target);
-            var list = this.$getPropagationList(target);
-            var length = list.length;
-            var targetIndex = list.length * 0.5;
-            var startIndex = -1;
-            for (var i = 0; i < length; i++) {
-                if (list[i] === viewport) {
-                    startIndex = i;
-                    break;
-                }
+            var list = [];
+            var parent = target;
+            while (parent !== this) {
+                list.push(parent);
+                parent = parent.$parent;
             }
-            list.splice(0, startIndex + 1 - 2);
-            list.splice(list.length - 1 - startIndex + 2, startIndex + 1 - 2);
-            targetIndex -= startIndex + 1;
-            this.$dispatchPropagationEvent(cancelEvent, list, targetIndex);
+            var captureList = list.concat();
+            captureList.reverse();
+            list = captureList.concat(list);
+            this.$dispatchPropagationEvent(cancelEvent, list, list.length * 0.5);
             egret.Event.release(cancelEvent);
         };
 
-        PageView.prototype.onRemoveListeners = function() {
+        ListView.prototype.onRemoveListeners = function() {
             var stage = this.tempStage || this.$stage;
             stage.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this, true);
             stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
@@ -1240,25 +1300,41 @@ var __reflect =
             this.removeEventListener(egret.TouchEvent.TOUCH_CANCEL, this.onTouchCancel, this);
             this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
         };
-
-        PageView.prototype.stopAnimation = function() {
-            if (this.$viewport) {
-                egret.Tween.removeTweens(this.$viewport);
-            }
-            this.$tweening = false;
-        };
-
-        PageView.prototype.updateDisplayList = function(unscaledWidth, unscaledHeight) {
-            _super.prototype.updateDisplayList.call(this, unscaledWidth, unscaledHeight);
-            var viewport = this.$viewport;
-            if (viewport) {
-                viewport.setLayoutBoundsSize(unscaledWidth, unscaledHeight);
-                viewport.setLayoutBoundsPosition(0, 0);
+        ListView.prototype.commitProperties = function(event) {
+            var dataProviderChanged = this.$dataProviderChanged;
+            _super.prototype.commitProperties.call(this);
+            if (this._pageable && dataProviderChanged) {
+                this.doChangePage(0);
             }
         };
-        return PageView;
-    })(eui.Component);
-    ns.PageView = PageView;
-    __reflect(PageView.prototype, 'cm.PageView');
-    eui.registerProperty(PageView, 'viewport', 'eui.IViewport', true);
+
+        ListView.prototype.startAnimation = function(param, duration, func) {
+            this.stopAnimation();
+            this._tweening = true;
+            egret.Tween.get(this, { onChange: this.onChanging, onChangeObj: this })
+                .to(param, duration, func)
+                .call(this.onChangeEnd);
+        };
+        ListView.prototype.stopAnimation = function() {
+            if (this._tweening) {
+                egret.Tween.removeTweens(this);
+                this.onChangeEnd();
+            }
+        };
+        ListView.prototype.onChangeEnd = function() {
+            this._tweening = false;
+            eui.UIEvent.dispatchUIEvent(this, eui.UIEvent.CHANGE_END);
+        };
+        ListView.prototype.onChanging = function() {
+            this.dispatchEventWith(egret.Event.CHANGE);
+        };
+        ListView.prototype.doChangePage = function(index) {
+            if (index != this._pageIndex) {
+                this._pageIndex = index;
+                this.dispatchEventWith(ListView.CHANGE_PAGE, false, index);
+            }
+        };
+        return ListView;
+    })(eui.DataGroup);
+    ns.ListView = ListView;
 })(window.cm || (window.cm = {}));

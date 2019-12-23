@@ -9,5 +9,7 @@ declare namespace eui {
     class Component {}
     class Rect {}
     class Group {}
+    class List {}
+    class DataGroup {}
     interface IViewport {}
 }

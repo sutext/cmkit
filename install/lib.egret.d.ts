@@ -160,10 +160,10 @@ declare namespace cm {
             protected static NAME: string;
             /** @default -1 use parent opacity */
             protected opacity: number;
-            /** @description the root node of modal , use for fade animation */
-            protected content: eui.Group;
             /** @description use for special animation @example bounce in Popup.present and rotate in Popup.wait */
             protected animator: eui.Group;
+            /** @description fade-in-out background only or fade-in-out all */
+            protected fadeback: boolean;
             /**@description insert by present opts.onhide */
             protected onhide?: () => void;
             /**@description The click action fom dimming blur @default this.dismiss .set null for disable auto dismiss*/
@@ -204,25 +204,60 @@ declare namespace cm {
     }
 }
 declare namespace cm {
-    class PageView<T extends eui.IViewport = eui.IViewport> extends eui.Component {
-        /** the page view is animating or not */
-        public readonly moving: boolean;
+    /**
+     * @description A scrollable list view impl
+     * @event egret.Event.CHANGE trigger when ListView scroling
+     * @event eui.UIEvent.CHANGE_START trigger when ListView scroll start
+     * @event eui.UIEvent.CHANGE_END  trigger when ListView scroll stop
+     * @event cm.ListView.CHANGE_PAGE trigger when ListView page index change.
+     */
+    class ListView extends eui.DataGroup {
+        /** page index change event. only dispatch by user interface. @notice event.data=pageIndex */
+        public static readonly CHANGE_PAGE: string;
         /** bounces or not @default true */
         public bounces: boolean;
+        /** ListView disabled means disable scroll or not @default false */
+        public disabled: boolean;
         /** scroll direction is vertical or not @default false means horizontal */
         public vertical: boolean;
-        /** PageView disabled means disable scroll or not @default false */
-        public disabled: boolean;
-        /** The content of the pageview */
-        public viewport: T;
-        /** The size per page @default 'viewport.width or viewport.height'  */
+        /** The accelerated speed when scroll throw  @unit px/ms/s @default 5*/
+        public friction: number;
+        /** Enable page scroll and pageIndex @default false*/
+        public pageable: boolean;
+        /** The size per page @default typical  */
         public pageSize: number;
         /** The current pageIndex set this value will change scroll offset. */
         public pageIndex: number;
+        /** The max speed that you can throw @unit px/ms @default 20 */
+        public maxThrowSpeed: number;
+        /** The min offset for start scroll and ent throw @default 5 */
+        public scrollThreshold: number;
+        /** The percent value of page  change threshold @default 0.4 */
+        public changeThreshold: number;
+        /** the ListView is moving or animating */
+        public readonly scroling: boolean;
         /**
-         * @description call when pageIndex changed with user interface;
-         * @notice this function will not be call when set pageIndex directly,
+         * @description scroll to the head of the list
+         * @param time scorll duration @default 0
          */
-        public onchanged: (page: number) => void;
+        public readonly scrollToHead: (time?: number) => void;
+        /**
+         * @description scroll to the head of the list
+         * @param time scorll duration @default 0
+         */
+        public readonly scrollToTail: (time?: number) => void;
+        /**
+         * @description scroll to the speacil index of the list
+         * @notice The scorll result decide by @pageSize and index.
+         * @param index the target index.
+         * @param time scorll duration @default 0
+         */
+        public readonly scrollToIndex: (index: number, time?: number) => void;
+        /**
+         * @description scroll to the speacil index of the list
+         * @param offset the target scroll offset.
+         * @param time scorll duration @default 0
+         */
+        public readonly scrollToOffset: (offset: number, time?: number) => void;
     }
 }
