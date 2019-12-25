@@ -4,10 +4,16 @@ declare namespace egret {
     interface DisplayObject {
         readonly setRect: (x: number, y: number, width: number, height: number) => void;
         readonly setSize: (width: number, height: number) => void;
-        readonly setEdge: (allOrPart: number | { top?: number; left?: number; bottom?: number; right?: number }) => void;
     }
 }
 declare namespace eui {
+    interface Component {
+        /**
+         * @description set the componet margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
+    }
     interface Image {
         /**
          * @description auto resize image size and keep perfect

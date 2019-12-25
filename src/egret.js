@@ -18,19 +18,38 @@ var __extends =
         this.width = width;
         this.height = height;
     };
-    egret.DisplayObject.prototype.setEdge = function(edge) {
-        if (typeof edge === 'number') {
-            this.top = this.left = this.bottom = this.right = 0;
-            return;
-        } else {
-            for (var key in edge) {
-                var val = edge[key];
-                if (typeof val === 'number') {
-                    this[key] = val;
+    Object.defineProperty(eui.Component.prototype, 'edge', {
+        get: function() {
+            return this._$edge;
+        },
+        set: function(edge) {
+            if (this._$edge == edge) return;
+            var values = this.$UIComponent;
+            if (typeof edge === 'number') {
+                values[0] = values[1] = values[2] = values[3] = edge;
+            } else if (typeof edge === 'string') {
+                var strs = edge.split(',');
+                strs = strs.map(function(str) {
+                    return str.trim();
+                });
+                if (strs.length === 1) {
+                    values[0] = values[1] = values[2] = values[3] = strs[0];
+                } else if (strs.length === 4) {
+                    strs.forEach(function(str, idx) {
+                        values[idx] = str;
+                    });
+                } else {
+                    throw new Error('edge must be number or string like 10,10,10,10 ');
                 }
+            } else {
+                throw new Error('edge must be number or string like 10,10,10,10 ');
             }
-        }
-    };
+            this._$edge = edge;
+            this.invalidateParentLayout();
+        },
+        enumerable: true,
+        configurable: true
+    });
     eui.Image.prototype.adjust = function() {
         if (!this.texture || arguments.length === 0) return;
         var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };
@@ -62,7 +81,6 @@ var __extends =
             this.quiet = false;
             this.audio = RES.getRes(Button.sound);
             this.hostComponentKey = 'cm.Button';
-            this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
         Button.prototype.partAdded = function(partName, instance) {
             _super.prototype.partAdded.call(this, partName, instance);
@@ -74,23 +92,24 @@ var __extends =
                 this.fillDisplay.fillColor = this._fill;
             }
         };
+        Button.prototype.buttonReleased = function() {
+            _super.prototype.buttonReleased.call(this);
+            if (this.__suspend) return;
+            var _this = this;
+            _this.__suspend = true;
+            setTimeout(function() {
+                _this.__suspend = false;
+            }, _this._delay);
+            ns.call(_this.onclick);
+            if (Button.quiet || _this.quiet) return;
+            if (_this.audio) {
+                _this.audio.play(0, 1);
+            }
+        };
         return Button;
     })(eui.Button);
     Button.quiet = false;
     Button.sound = 'btn_tap_mp3';
-    Button.prototype.onClicked = function() {
-        if (this.__suspend) return;
-        var _this = this;
-        _this.__suspend = true;
-        setTimeout(function() {
-            _this.__suspend = false;
-        }, _this._delay);
-        ns.call(_this.onclick);
-        if (Button.quiet || _this.quiet) return;
-        if (_this.audio) {
-            _this.audio.play(0, 1);
-        }
-    };
     Object.defineProperty(Button.prototype, 'fill', {
         get: function() {
             return this._fill;
@@ -666,7 +685,7 @@ var __extends =
         if (this.showed[name]) return;
         var modal = new meta();
         this.showed[name] = modal;
-        modal.setEdge(0);
+        modal.edge = 0;
         modal.pop = this;
         this.addChild(modal);
         return modal;
@@ -691,7 +710,7 @@ var __extends =
             this.background.fillColor = 0x000000;
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
-            this.background.setEdge(0);
+            this.background.edge = 0;
             var _this = this;
             this.background.addEventListener(
                 egret.TouchEvent.TOUCH_TAP,
