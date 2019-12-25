@@ -250,14 +250,13 @@ declare namespace cm {
 declare namespace cm {
     /**
      * @description A scrollable list view impl
-     * @event egret.Event.CHANGE trigger when ListView scroling
+     * @event egret.Event.CHANGE trigger when pageIndex change
+     * @notice egret.Event.CHANGE only dispatch by user interface. and event.data=pageIndex .
+     * @event egret.Event.CHANGING trigger when ListView scroling
      * @event eui.UIEvent.CHANGE_START trigger when ListView scroll start
      * @event eui.UIEvent.CHANGE_END  trigger when ListView scroll stop
-     * @event cm.ListView.CHANGE_PAGE trigger when ListView page index change.
      */
     class ListView extends eui.DataGroup {
-        /** page index change event. only dispatch by user interface. @notice event.data=pageIndex */
-        public static readonly CHANGE_PAGE: string;
         /** bounces or not @default true */
         public bounces: boolean;
         /** ListView disabled means disable scroll or not @default false */
@@ -270,7 +269,7 @@ declare namespace cm {
         public pageSize: number;
         /** The current pageIndex set this value will change scroll offset. */
         public pageIndex: number;
-        /** scroll direction H:horizontal V:vertical  @default 'H' */
+        /** scroll direction H:horizontal V:vertical  @default 'V' */
         public direction: 'H' | 'V';
         /** The max speed that you can throw @unit px/ms @default 20 */
         public maxThrowSpeed: number;

@@ -866,7 +866,7 @@ var __extends =
             var _this = _super.call(this) || this;
             _this._bounces = true;
             _this._disabled = false;
-            _this._vertical = false;
+            _this._vertical = true;
             _this._pageable = false;
             _this._velocity = 0;
             _this._friction = 5;
@@ -885,19 +885,18 @@ var __extends =
             _this._touchTime = 0;
             return _this;
         }
-        ListView.CHANGE_PAGE = 'ListView_CHANGE_PAGE';
         ListView.prototype.createChildren = function() {
             if (!this.$layout) {
                 if (this._vertical) {
                     var layout = new eui.VerticalLayout();
                     layout.gap = 0;
-                    layout.horizontalAlign = eui.JustifyAlign.CONTENT_JUSTIFY;
+                    layout.horizontalAlign = egret.HorizontalAlign.CENTER;
                     this.$setLayout(layout);
                 } else {
                     var layout = new eui.HorizontalLayout();
                     layout.gap = 0;
-                    layout.horizontalAlign = eui.JustifyAlign.JUSTIFY;
-                    layout.verticalAlign = eui.JustifyAlign.CONTENT_JUSTIFY;
+                    layout.horizontalAlign = egret.HorizontalAlign.CENTER;
+                    layout.verticalAlign = egret.VerticalAlign.MIDDLE;
                     this.$setLayout(layout);
                 }
             }
@@ -947,16 +946,16 @@ var __extends =
                 return this._vertical ? 'V' : 'H';
             },
             set: function(value) {
-                if (this._touchMoved) {
-                    ns.warn('Can not change property direction when scroling!');
-                    return;
-                }
-                if (value === 'V') {
-                    this._vertical = true;
-                } else if (value === 'H') {
-                    this._vertical = false;
+                if (!this._touchMoved) {
+                    if (value == 'V') {
+                        this._vertical = true;
+                    } else if (value == 'H') {
+                        this._vertical = false;
+                    } else {
+                        ns.warn('Illegal value for direction!');
+                    }
                 } else {
-                    throw new Error('Illegal value(' + value + ') for direction!');
+                    ns.warn('Can not change direction when scroling!');
                 }
             },
             enumerable: true,
@@ -1386,7 +1385,7 @@ var __extends =
         ListView.prototype.doChangePage = function(index) {
             if (index != this._pageIndex) {
                 this._pageIndex = index;
-                this.dispatchEventWith(ListView.CHANGE_PAGE, false, index);
+                this.dispatchEventWith(egret.Event.CHANGE, false, index);
             }
         };
         return ListView;
