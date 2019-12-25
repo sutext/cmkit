@@ -111,6 +111,7 @@ var __extends =
             this.quiet = false;
             this.audio = RES.getRes(Button.sound);
             this.hostComponentKey = 'cm.Button';
+            this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
         Button.prototype.partAdded = function(partName, instance) {
             _super.prototype.partAdded.call(this, partName, instance);
@@ -122,8 +123,7 @@ var __extends =
                 this.fillDisplay.fillColor = this._fill;
             }
         };
-        Button.prototype.buttonReleased = function() {
-            _super.prototype.buttonReleased.call(this);
+        Button.prototype.onClicked = function() {
             if (this.__suspend) return;
             var _this = this;
             _this.__suspend = true;
