@@ -44,11 +44,11 @@ var __extends =
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(eui.sys.UIComponentImpl.prototype, 'edge', {
-        get: function() {
+    function EdgeDesc() {
+        this.get = function() {
             return this._$edge;
-        },
-        set: function(edge) {
+        };
+        this.set = function(edge) {
             if (this._$edge == edge) return;
             var values = this.$UIComponent;
             if (typeof edge === 'number') {
@@ -69,10 +69,17 @@ var __extends =
             }
             this._$edge = edge;
             this.invalidateParentLayout();
-        },
-        enumerable: true,
-        configurable: true
-    });
+        };
+        this.enumerable = true;
+        this.configurable = true;
+    }
+    var desc = new EdgeDesc();
+    Object.defineProperty(eui.Group.prototype, 'edge', desc);
+    Object.defineProperty(eui.Image.prototype, 'edge', desc);
+    Object.defineProperty(eui.Label.prototype, 'edge', desc);
+    Object.defineProperty(eui.Component.prototype, 'edge', desc);
+    Object.defineProperty(eui.BitmapLabel.prototype, 'edge', desc);
+    Object.defineProperty(eui.EditableText.prototype, 'edge', desc);
     eui.Image.prototype.adjust = function() {
         if (!this.texture || arguments.length === 0) return;
         var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };

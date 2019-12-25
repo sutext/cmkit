@@ -2,24 +2,36 @@
 
 declare namespace egret {
     interface DisplayObject {
-        readonly setRect: (x: number, y: number, width: number, height: number) => void;
-        readonly setSize: (width: number, height: number) => void;
-    }
-}
-declare namespace eui {
-    interface UIComponent {
-        /**
-         * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
-         */
-        edge: number | string;
         /**
          * @description set the UIComponent scale fastly
          * @notice '10,10' means scaleX,scaleY
          */
         scale: number | string;
+        readonly setRect: (x: number, y: number, width: number, height: number) => void;
+        readonly setSize: (width: number, height: number) => void;
+    }
+}
+declare namespace eui {
+    interface Component {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
+    }
+    interface Group {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
     }
     interface Image {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
         /**
          * @description auto resize image size and keep perfect
          * @warn if this.texture is empty this method will not work.
@@ -39,6 +51,27 @@ declare namespace eui {
          * ```
          */
         readonly adjust: (widthOrBothOrOnly: number | { width?: number; height?: number }, height?: number) => void;
+    }
+    interface Label {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
+    }
+    interface EditableText {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
+    }
+    interface BitmapLabel {
+        /**
+         * @description set the UIComponent margin fastly
+         * @notice '10,10,20,20' means left,right,top,bottom
+         */
+        edge: number | string;
     }
 }
 declare namespace cm {
