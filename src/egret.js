@@ -942,16 +942,22 @@ var __extends =
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ListView.prototype, 'vertical', {
+        Object.defineProperty(ListView.prototype, 'direction', {
             get: function() {
-                return this._vertical;
+                return this._vertical ? 'V' : 'H';
             },
             set: function(value) {
                 if (this._touchMoved) {
-                    ns.warn('Can not change property vertical when scroling!');
+                    ns.warn('Can not change property direction when scroling!');
                     return;
                 }
-                this._vertical = !!value;
+                if (value === 'V') {
+                    this._vertical = true;
+                } else if (value === 'H') {
+                    this._vertical = false;
+                } else {
+                    throw new Error('Illegal value(' + value + ') for direction!');
+                }
             },
             enumerable: true,
             configurable: true

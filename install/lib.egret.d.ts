@@ -262,8 +262,6 @@ declare namespace cm {
         public bounces: boolean;
         /** ListView disabled means disable scroll or not @default false */
         public disabled: boolean;
-        /** scroll direction is vertical or not @default false means horizontal */
-        public vertical: boolean;
         /** The accelerated speed when scroll throw  @unit px/ms/s @default 5*/
         public friction: number;
         /** Enable page scroll and pageIndex @default false*/
@@ -272,6 +270,8 @@ declare namespace cm {
         public pageSize: number;
         /** The current pageIndex set this value will change scroll offset. */
         public pageIndex: number;
+        /** scroll direction H:horizontal V:vertical  @default 'H' */
+        public direction: 'H' | 'V';
         /** The max speed that you can throw @unit px/ms @default 20 */
         public maxThrowSpeed: number;
         /** The min offset for start scroll and ent throw @default 5 */
