@@ -18,7 +18,33 @@ var __extends =
         this.width = width;
         this.height = height;
     };
-    Object.defineProperty(eui.Component.prototype, 'edge', {
+    Object.defineProperty(egret.DisplayObject.prototype, 'scale', {
+        get: function() {
+            return this._$scale;
+        },
+        set: function(scale) {
+            if (this._$scale == scale) return;
+            if (typeof scale === 'number') {
+                this.scaleX = this.scaleY = scale;
+            } else if (typeof scale === 'string') {
+                var strs = scale.split(',');
+                if (strs.length === 1) {
+                    this.scaleX = this.scaleY = Number(strs[0]);
+                } else if (strs.length === 2) {
+                    this.scaleX = Number(strs[0]);
+                    this.scaleY = Number(strs[1]);
+                } else {
+                    throw new Error('scale must be number or string like 0.5,0.7');
+                }
+            } else {
+                throw new Error('scale must be number or string like 0.5,0.7');
+            }
+            this._$scale = scale;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(eui.sys.UIComponentImpl.prototype, 'edge', {
         get: function() {
             return this._$edge;
         },
@@ -29,14 +55,11 @@ var __extends =
                 values[0] = values[1] = values[2] = values[3] = edge;
             } else if (typeof edge === 'string') {
                 var strs = edge.split(',');
-                strs = strs.map(function(str) {
-                    return str.trim();
-                });
                 if (strs.length === 1) {
-                    values[0] = values[1] = values[2] = values[3] = strs[0];
+                    values[0] = values[1] = values[2] = values[3] = Number(strs[0]);
                 } else if (strs.length === 4) {
                     strs.forEach(function(str, idx) {
-                        values[idx] = str;
+                        values[idx] = Number(str);
                     });
                 } else {
                     throw new Error('edge must be number or string like 10,10,10,10 ');

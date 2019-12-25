@@ -7,12 +7,17 @@ declare namespace egret {
     }
 }
 declare namespace eui {
-    interface Component {
+    interface UIComponent {
         /**
-         * @description set the componet margin fastly
+         * @description set the UIComponent margin fastly
          * @notice '10,10,20,20' means left,right,top,bottom
          */
         edge: number | string;
+        /**
+         * @description set the UIComponent scale fastly
+         * @notice '10,10' means scaleX,scaleY
+         */
+        scale: number | string;
     }
     interface Image {
         /**
