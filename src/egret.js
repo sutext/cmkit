@@ -20,7 +20,7 @@ var __extends =
     };
     Object.defineProperty(egret.DisplayObject.prototype, 'scale', {
         get: function() {
-            return this._$scale;
+            return this._$scale || '';
         },
         set: function(scale) {
             if (this._$scale == scale) return;
@@ -39,16 +39,16 @@ var __extends =
             } else {
                 throw new Error('scale must be number or string like 0.5,0.7');
             }
-            this._$scale = scale;
+            this._$scale = scale.toString();
         },
         enumerable: true,
         configurable: true
     });
-    function EdgeDesc() {
-        this.get = function() {
-            return this._$edge;
-        };
-        this.set = function(edge) {
+    var desc = {
+        get: function() {
+            return this._$edge || '';
+        },
+        set: function(edge) {
             if (this._$edge == edge) return;
             var values = this.$UIComponent;
             if (typeof edge === 'number') {
@@ -67,13 +67,12 @@ var __extends =
             } else {
                 throw new Error('edge must be number or string like 10,10,10,10 ');
             }
-            this._$edge = edge;
+            this._$edge = edge.toString();
             this.invalidateParentLayout();
-        };
-        this.enumerable = true;
-        this.configurable = true;
-    }
-    var desc = new EdgeDesc();
+        },
+        enumerable: true,
+        configurable: true
+    };
     Object.defineProperty(eui.Group.prototype, 'edge', desc);
     Object.defineProperty(eui.Image.prototype, 'edge', desc);
     Object.defineProperty(eui.Label.prototype, 'edge', desc);
@@ -109,7 +108,7 @@ var __extends =
             _super && _super.apply(this, arguments);
             this._delay = 200;
             this.quiet = false;
-            this.audio = RES.getRes(Button.sound);
+            this._audio = RES.getRes(Button.sound);
             this.hostComponentKey = 'cm.Button';
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
@@ -132,8 +131,8 @@ var __extends =
             }, _this._delay);
             ns.call(_this.onclick);
             if (Button.quiet || _this.quiet) return;
-            if (_this.audio) {
-                _this.audio.play(0, 1);
+            if (_this._audio) {
+                _this._audio.play(0, 1);
             }
         };
         return Button;
@@ -181,12 +180,12 @@ var __extends =
     });
     Object.defineProperty(Button.prototype, 'sound', {
         get: function() {
-            return this.audio && this.audio.source;
+            return this._audio && this._audio.source;
         },
         set: function(val) {
-            var audio = RES.getRes(val);
-            if (audio) {
-                this.audio = audio;
+            var _audio = RES.getRes(val);
+            if (_audio) {
+                this._audio = _audio;
             } else {
                 ns.warn('Button sound:', val, 'resource not found!');
             }
@@ -207,6 +206,7 @@ var __extends =
         configurable: true
     });
     ns.Button = Button;
+    egret.registerClass(Button, 'cm.Button');
     var Label = (function(_super) {
         __extends(Label, _super);
         function Label() {
@@ -232,12 +232,12 @@ var __extends =
     Label.quiet = false;
     Object.defineProperty(Label.prototype, 'sound', {
         get: function() {
-            return this.audio && this.audio.source;
+            return this._audio && this._audio.source;
         },
         set: function(val) {
-            var audio = RES.getRes(val);
-            if (audio) {
-                this.audio = audio;
+            var _audio = RES.getRes(val);
+            if (_audio) {
+                this._audio = _audio;
             } else {
                 ns.warn('Label sound:', val, 'resource not found!');
             }
@@ -276,12 +276,12 @@ var __extends =
             var delta = this._goal - this._value;
             this._step = this.steper(delta);
             egret.startTick(this.update, this);
-            if (Label.quiet || this.quiet || !this.audio) return;
+            if (Label.quiet || this.quiet || !this._audio) return;
             var dur = delta / (this._step * this._rate);
             if (dur < 0.3) {
                 dur = 0.3;
             }
-            var hander = this.audio.play();
+            var hander = this._audio.play();
             setTimeout(function() {
                 hander.stop();
             }, dur * 1000);
@@ -309,6 +309,7 @@ var __extends =
         return false;
     };
     ns.Label = Label;
+    egret.registerClass(Label, 'cm.Label');
 })(window.cm || (window.cm = {}));
 (function(ns) {
     var Stack = (function(_super) {
@@ -445,6 +446,8 @@ var __extends =
         }
     };
     ns.Stack = Stack;
+    egret.registerClass(Stack, 'cm.Stack');
+
     var Page = (function(_super) {
         __extends(Page, _super);
         function Page() {
@@ -457,6 +460,7 @@ var __extends =
     Page.prototype.willHide = function() {};
     Page.prototype.didHide = function() {};
     Stack.Page = Page;
+    egret.registerClass(Page, 'cm.Stack.Page');
 })(window.cm || (window.cm = {}));
 (function(ns) {
     var Popup = (function(_super) {
@@ -703,8 +707,8 @@ var __extends =
         }
     };
     Popup.prototype.genModal = function(meta) {
-        if (!meta) {
-            ns.warn('Modal meta class can not be empty!');
+        if (typeof meta !== 'function') {
+            ns.warn('Modal meta class not available!');
             return;
         }
         if (!meta.NAME) {
@@ -713,14 +717,20 @@ var __extends =
         }
         var name = meta.NAME;
         if (this.showed[name]) return;
-        var modal = new meta();
-        this.showed[name] = modal;
-        modal.edge = 0;
-        modal.pop = this;
-        this.addChild(modal);
+        var modal;
+        try {
+            modal = new meta();
+            this.showed[name] = modal;
+            modal.edge = 0;
+            modal.pop = this;
+            this.addChild(modal);
+        } catch (error) {
+            ns.warn('gen Modal instance error!');
+        }
         return modal;
     };
     ns.Popup = Popup;
+    egret.registerClass(Popup, 'cm.Popup');
     var Modal = (function(_super) {
         __extends(Modal, _super);
         function Modal() {
@@ -765,6 +775,8 @@ var __extends =
         this.pop && this.pop.dismiss(this.constructor, finish);
     };
     Popup.Modal = Modal;
+    egret.registerClass(Modal, 'cm.Popup.Modal');
+
     var Wait = (function(_super) {
         __extends(Wait, _super);
         function Wait() {
@@ -788,8 +800,9 @@ var __extends =
         return Wait;
     })(Modal);
     Wait.NAME = 'WAIT';
-
     Popup.Wait = Wait;
+    egret.registerClass(Wait, 'cm.Popup.Wait');
+
     var Alert = (function(_super) {
         __extends(Alert, _super);
         function Alert() {
@@ -799,7 +812,6 @@ var __extends =
         }
         return Alert;
     })(Modal);
-    Alert.NAME = 'ALERT';
     Alert.prototype.onCreate = function(opts) {
         var title = opts.title,
             msg = opts.msg,
@@ -839,7 +851,10 @@ var __extends =
             };
         }
     };
+    Alert.NAME = 'ALERT';
     Popup.Alert = Alert;
+    egret.registerClass(Alert, 'cm.Popup.Alert');
+
     var Remind = (function(_super) {
         __extends(Remind, _super);
         function Remind() {
@@ -858,6 +873,7 @@ var __extends =
         this.onhide = opts && opts.onhide;
     };
     Popup.Remind = Remind;
+    egret.registerClass(Remind, 'cm.Popup.Remind');
 })(window.cm || (window.cm = {}));
 (function(ns) {
     var ListView = (function(_super) {
@@ -866,7 +882,7 @@ var __extends =
             var _this = _super.call(this) || this;
             _this._bounces = true;
             _this._disabled = false;
-            _this._vertical = true;
+            _this._vertical = false;
             _this._pageable = false;
             _this._velocity = 0;
             _this._friction = 5;
@@ -875,7 +891,6 @@ var __extends =
             _this._maxThrowSpeed = 20;
             _this._changeThreshold = 0.4;
             _this._scrollThreshold = 5;
-
             _this._canscroll = false;
             _this._tweening = false;
             _this._touchMoved = false;
@@ -952,7 +967,7 @@ var __extends =
                     } else if (value == 'H') {
                         this._vertical = false;
                     } else {
-                        ns.warn('Illegal value for direction!');
+                        throw new Error('Illegal value for direction!');
                     }
                 } else {
                     ns.warn('Can not change direction when scroling!');
@@ -991,7 +1006,7 @@ var __extends =
         Object.defineProperty(ListView.prototype, 'pageSize', {
             get: function() {
                 if (this._pageSize > 0) {
-                    return _pageSize;
+                    return this._pageSize;
                 }
                 if (this._vertical) {
                     return (this.$layout && this.$layout.$typicalHeight) || 0;
@@ -1380,7 +1395,7 @@ var __extends =
             eui.UIEvent.dispatchUIEvent(this, eui.UIEvent.CHANGE_END);
         };
         ListView.prototype.onChanging = function() {
-            this.dispatchEventWith(egret.Event.CHANGE);
+            this.dispatchEventWith(egret.Event.CHANGING);
         };
         ListView.prototype.doChangePage = function(index) {
             if (index != this._pageIndex) {
@@ -1391,4 +1406,5 @@ var __extends =
         return ListView;
     })(eui.DataGroup);
     ns.ListView = ListView;
+    egret.registerClass(ListView, 'cm.ListView');
 })(window.cm || (window.cm = {}));

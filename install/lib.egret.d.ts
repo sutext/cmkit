@@ -4,9 +4,11 @@ declare namespace egret {
     interface DisplayObject {
         /**
          * @description set the UIComponent scale fastly
-         * @notice '10,10' means scaleX,scaleY
+         * @example
+         * this.scale = '0.1' //this.scaleX=0.1,this.scaleY=0.1
+         * this.scale = '0.1,0.2'//this.scaleX=0.1,this.scaleY=0.2
          */
-        scale: number | string;
+        scale: string;
         readonly setRect: (x: number, y: number, width: number, height: number) => void;
         readonly setSize: (width: number, height: number) => void;
     }
@@ -15,23 +17,29 @@ declare namespace eui {
     interface Component {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
     }
     interface Group {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
     }
     interface Image {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
         /**
          * @description auto resize image size and keep perfect
          * @warn if this.texture is empty this method will not work.
@@ -55,23 +63,29 @@ declare namespace eui {
     interface Label {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
     }
     interface EditableText {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
     }
     interface BitmapLabel {
         /**
          * @description set the UIComponent margin fastly
-         * @notice '10,10,20,20' means left,right,top,bottom
+         * @example
+         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
          */
-        edge: number | string;
+        edge: string;
     }
 }
 declare namespace cm {
@@ -269,8 +283,8 @@ declare namespace cm {
         public pageSize: number;
         /** The current pageIndex set this value will change scroll offset. */
         public pageIndex: number;
-        /** scroll direction H:horizontal V:vertical  @default 'V' */
-        public direction: 'H' | 'V';
+        /** scroll direction @param H horizontal @param V vertical  @default 'H' */
+        public direction: string;
         /** The max speed that you can throw @unit px/ms @default 20 */
         public maxThrowSpeed: number;
         /** The min offset for start scroll and ent throw @default 5 */
