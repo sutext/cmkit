@@ -1327,16 +1327,16 @@ var __extends =
             } else {
                 index = this._pageIndex;
             }
+            var maxidx = Math.floor(max / pageSize);
             if (index < 0) {
                 index = 0;
             }
-            var param = {};
-            var pos = index * pageSize;
-            if (pos > max) {
-                pos = max;
+            if (index > maxidx) {
+                index = maxidx;
             }
-            param[key] = pos;
-            this.startAnimation(param, fastMove ? Math.abs(pos - current) / 3 : 500, egret.Ease.sineOut);
+            var param = {};
+            param[key] = index * pageSize;
+            this.startAnimation(param, fastMove ? Math.abs(param[key] - current) / 3 : 500, egret.Ease.sineOut);
             this.doChangePage(index);
         };
         ListView.prototype.dispatchBubbleEvent = function(event) {
