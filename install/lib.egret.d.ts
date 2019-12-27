@@ -264,13 +264,14 @@ declare namespace cm {
 declare namespace cm {
     /**
      * @description A scrollable list view impl
-     * @event egret.Event.CHANGE trigger when pageIndex change
-     * @notice egret.Event.CHANGE only dispatch by user interface. and event.data=pageIndex .
+     * @event cm.ListView.CHANGE_PAGE trigger when pageIndex change
+     * @notice cm.ListView.CHANGE_PAGE only dispatch by user interface. and event.data=pageIndex .
      * @event egret.Event.CHANGING trigger when ListView scroling
      * @event eui.UIEvent.CHANGE_START trigger when ListView scroll start
      * @event eui.UIEvent.CHANGE_END  trigger when ListView scroll stop
      */
     class ListView extends eui.List {
+        public static readonly CHANGE_PAGE: string;
         /** bounces or not @default true */
         public bounces: boolean;
         /** ListView disabled means disable scroll or not @default false */

@@ -62,6 +62,26 @@
         enumerable: true,
         configurable: true
     });
+    Number.prototype.kmgtify = function(max) {
+        if (max === void 0) {
+            max = 3;
+        }
+        if (max !== 3 && max !== 4 && max !== 5 && max !== 6) {
+            throw new Error('maxlen must be intger between 3 and 6');
+        }
+        if (this < Math.pow(10, max)) {
+            return this.comma();
+        } else if (this < Math.pow(10, max + 3)) {
+            return (this / 1000).comma() + 'K';
+        } else if (this < Math.pow(10, max + 6)) {
+            return (this / 1000000).comma() + 'M';
+        } else if (this < Math.pow(10, max + 9)) {
+            return (this / 1000000000).comma() + 'G';
+        } else if (this < Math.pow(10, max + 12)) {
+            return (this / 1000000000000).comma() + 'T';
+        }
+        return this.comma();
+    };
     String.prototype.fixlen = function(len) {
         if (typeof len !== 'number' || len < 1) {
             len = 2;

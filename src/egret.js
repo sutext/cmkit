@@ -1419,11 +1419,12 @@ var __extends =
         ListView.prototype.doChangePage = function(index) {
             if (index != this._pageIndex) {
                 this._pageIndex = index;
-                this.dispatchEventWith(egret.Event.CHANGE, false, index);
+                this.dispatchEventWith(ListView.CHANGE_PAGE, false, index);
             }
         };
         return ListView;
     })(eui.List);
+    ListView.CHANGE_PAGE = 'LISTVIEW_CHANGE_PAGE';
     ns.ListView = ListView;
     egret.registerClass(ListView, 'cm.ListView');
 })(window.cm || (window.cm = {}));

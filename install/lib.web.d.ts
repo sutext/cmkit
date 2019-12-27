@@ -58,9 +58,26 @@ interface Number {
      */
     readonly fixlen: (len?: number) => string;
     /**
-     * @description get index symbol of int number @example 23 -> 23rd @returns 'rd'
+     * @description get index symbol of int number
+     * @example
+     * console.log((23).symidx);//rd
      */
     readonly symidx: 'st' | 'nd' | 'rd' | 'th';
+    /**
+     * @description Trun the number to kilo million billion trillion
+     * @param maxbit The max bit width affter format. @default 3
+     * @example
+     * console.log((1000000).kmgtify(3));//1M
+     * console.log((1000000).kmgtify(4));//1000K
+     * console.log((1000000).kmgtify(5));//1000K
+     * console.log((1000000).kmgtify(6));//1000K
+     * console.log((10000000).kmgtify(3));//10M
+     * console.log((10000000).kmgtify(4));//10M
+     * console.log((10000000).kmgtify(5));//10000K
+     * console.log((1000000000).kmgtify(3));//1G
+     * console.log((999999999999999).kmgtify(3));//999T
+     */
+    readonly kmgtify: (maxbit?: 3 | 4 | 5 | 6) => string;
 }
 interface Array<T> {
     /**
