@@ -891,6 +891,7 @@ var __extends =
             _this._maxThrowSpeed = 20;
             _this._changeThreshold = 0.4;
             _this._scrollThreshold = 5;
+            _this._allowAutoSelect = true;
             _this._canscroll = false;
             _this._tweening = false;
             _this._touchMoved = false;
@@ -1081,6 +1082,16 @@ var __extends =
                     throw new Error('scrollThreshold must be between 1 and 100');
                 }
                 this._scrollThreshold = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'allowAutoSelect', {
+            get: function() {
+                return this._allowAutoSelect;
+            },
+            set: function(value) {
+                this._allowAutoSelect = !!value;
             },
             enumerable: true,
             configurable: true
@@ -1369,14 +1380,22 @@ var __extends =
             this.removeEventListener(egret.TouchEvent.TOUCH_CANCEL, this.onTouchCancel, this);
             this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
         };
-        ListView.prototype.commitProperties = function(event) {
-            var dataProviderChanged = this.$dataProviderChanged;
-            _super.prototype.commitProperties.call(this);
-            if (this._pageable && dataProviderChanged) {
+        ListView.prototype.onCollectionChange = function(event) {
+            _super.prototype.onCollectionChange.call(this, event);
+            if (this._pageable && this.$dataProviderChanged) {
                 this.doChangePage(0);
             }
         };
-
+        ListView.prototype.rendererAdded = function(renderer, index, item) {
+            if (this._allowAutoSelect) {
+                _super.prototype.rendererAdded.call(this, renderer, index, item);
+            }
+        };
+        ListView.prototype.onRendererTouchEnd = function(event) {
+            if (this._allowAutoSelect) {
+                _super.prototype.onRendererTouchEnd.call(this, event);
+            }
+        };
         ListView.prototype.startAnimation = function(param, duration, func) {
             this.stopAnimation();
             this._tweening = true;
@@ -1404,7 +1423,7 @@ var __extends =
             }
         };
         return ListView;
-    })(eui.DataGroup);
+    })(eui.List);
     ns.ListView = ListView;
     egret.registerClass(ListView, 'cm.ListView');
 })(window.cm || (window.cm = {}));

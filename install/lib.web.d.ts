@@ -30,23 +30,25 @@ interface Date {
 }
 interface Number {
     /**
-     * @example trun 1.3411111 to 1.35 when precision=2
+     * @example Trun 1.3411111 to 1.35 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly ceil: (precision?: number) => number;
     /**
-     * @example trun 1.34567 to 1.34 when precision=2
+     * @example Trun 1.34567 to 1.34 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly floor: (precision?: number) => number;
     /**
-     * @example trun 1.34567 to 1.35 when precision=2
+     * @example Trun 1.34567 to 1.35 when precision=2
      * @param precision the permision must be nonnegative number otherwise use @default 0
      */
     readonly round: (precision?: number) => number;
     /**
-     * @description insert comma symbol to the integer part
-     * @example 23123.1234.comma -> '23,123.1234'
+     * @description Insert comma symbol to the integer part
+     * @notice The fractional part of the number will be ignore.
+     * @example
+     * console.log((23123.1234).comma); // '23,123'
      */
     readonly comma: () => string;
     /**

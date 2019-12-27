@@ -41,9 +41,6 @@
             }
             result = head + result;
         }
-        if (strary.length > 1) {
-            result = result + '.' + (strary[1] || '0');
-        }
         return result;
     };
     Object.defineProperty(Number.prototype, 'symidx', {

@@ -270,7 +270,7 @@ declare namespace cm {
      * @event eui.UIEvent.CHANGE_START trigger when ListView scroll start
      * @event eui.UIEvent.CHANGE_END  trigger when ListView scroll stop
      */
-    class ListView extends eui.DataGroup {
+    class ListView extends eui.List {
         /** bounces or not @default true */
         public bounces: boolean;
         /** ListView disabled means disable scroll or not @default false */
@@ -291,6 +291,8 @@ declare namespace cm {
         public scrollThreshold: number;
         /** The percent value of page  change threshold @default 0.4 */
         public changeThreshold: number;
+        /** Allow auto set selectedItem when touch end on renderItem @default true */
+        public allowAutoSelect: boolean;
         /** the ListView is moving or animating */
         public readonly scroling: boolean;
         /**
