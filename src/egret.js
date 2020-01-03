@@ -18,41 +18,39 @@ var __extends =
         this.width = width;
         this.height = height;
     };
-    function EdgeDesc() {
-        this.get = function() {
-            return this._edge || '';
-        };
-        this.set = function(edge) {
-            if (this._edge == edge) return;
-            var values = this.$UIComponent;
-            if (typeof edge === 'number') {
-                values[0] = values[1] = values[2] = values[3] = edge;
-            } else if (typeof edge === 'string') {
-                var strs = edge.split(',');
-                if (strs.length === 1) {
-                    values[0] = values[1] = values[2] = values[3] = Number(strs[0]);
-                } else if (strs.length === 4) {
-                    strs.forEach(function(str, idx) {
-                        values[idx] = Number(str);
-                    });
-                } else {
-                    throw new Error('edge must be number or string like 10,10,10,10 ');
-                }
+    egret.DisplayObject.prototype.setEdge = function(edge) {
+        var values = this.$UIComponent;
+        if (!values) {
+            throw new Error("setEdge only available on eui.UIComponent's implementation");
+        }
+        if (typeof edge === 'number') {
+            values[0] = values[1] = values[2] = values[3] = edge;
+        } else if (typeof edge === 'string') {
+            var strs = edge.split(',');
+            if (strs.length === 1) {
+                values[0] = values[1] = values[2] = values[3] = Number(strs[0]);
+            } else if (strs.length === 4) {
+                strs.forEach(function(str, idx) {
+                    values[idx] = Number(str);
+                });
             } else {
                 throw new Error('edge must be number or string like 10,10,10,10 ');
             }
-            this._edge = edge.toString();
-            this.invalidateParentLayout();
-        };
-        this.enumerable = true;
-        this.configurable = true;
-    }
-    Object.defineProperty(eui.Group.prototype, 'edge', new EdgeDesc());
-    Object.defineProperty(eui.Image.prototype, 'edge', new EdgeDesc());
-    Object.defineProperty(eui.Label.prototype, 'edge', new EdgeDesc());
-    Object.defineProperty(eui.Component.prototype, 'edge', new EdgeDesc());
-    Object.defineProperty(eui.BitmapLabel.prototype, 'edge', new EdgeDesc());
-    Object.defineProperty(eui.EditableText.prototype, 'edge', new EdgeDesc());
+        } else {
+            throw new Error('edge must be number or string like 10,10,10,10 ');
+        }
+        this.invalidateParentLayout();
+    };
+    egret.DisplayObject.prototype.setScale = function(x, y) {
+        if (typeof x !== 'number') {
+            throw new Error('scaleX must be number');
+        }
+        if (typeof y !== 'number') {
+            y = x;
+        }
+        this.scaleX = x;
+        this.scaleY = y;
+    };
     eui.Image.prototype.adjust = function() {
         if (!this.texture || arguments.length === 0) return;
         var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };
@@ -695,7 +693,7 @@ var __extends =
         try {
             modal = new meta();
             this.showed[name] = modal;
-            modal.edge = 0;
+            modal.setEdge(0);
             modal.pop = this;
             this.addChild(modal);
         } catch (error) {
@@ -724,7 +722,7 @@ var __extends =
             this.background.fillColor = 0x000000;
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
-            this.background.edge = 0;
+            this.background.setEdge(0);
             var _this = this;
             this.background.addEventListener(
                 egret.TouchEvent.TOUCH_TAP,

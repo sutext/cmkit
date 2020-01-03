@@ -4,35 +4,29 @@ declare namespace egret {
     interface DisplayObject {
         readonly setRect: (x: number, y: number, width: number, height: number) => void;
         readonly setSize: (width: number, height: number) => void;
+        /**
+         * @description set the eui.UIComponent margin fastly
+         * @warn this method only available on eui.UIComponent's implementation
+         * @example
+         * this.setEdge('10,15,20,25')// this.left=10,this.right=15,this.top=20,this.bottom=25;
+         * this.setEdge(10);//this.left=this.right=this.top=this.bottom=10;
+         * this.setEdge('10');//this.left=this.right=this.top=this.bottom=10;
+         * this.setEdge('10,10');//throw error!
+         */
+        readonly setEdge: (edge: number | string) => void;
+        /**
+         * @description set scale fastly
+         * @param xOrBoth scaleX or scaleX=scaleY
+         * @param y scaleY
+         * @example
+         * this.setScale(0.5);//this.scaleX=this.scaleY=0.5;
+         * this.setScale(0.3,0.4);//this.scaleX=0.3;this.scaleY=0.4;
+         */
+        readonly setScale: (xOrBoth: number, y?: number) => void;
     }
 }
 declare namespace eui {
-    interface Component {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
-    }
-    interface Group {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
-    }
     interface Image {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
         /**
          * @description auto resize image size and keep perfect
          * @warn if this.texture is empty this method will not work.
@@ -52,33 +46,6 @@ declare namespace eui {
          * ```
          */
         readonly adjust: (widthOrBothOrOnly: number | { width?: number; height?: number }, height?: number) => void;
-    }
-    interface Label {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
-    }
-    interface EditableText {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
-    }
-    interface BitmapLabel {
-        /**
-         * @description set the UIComponent margin fastly
-         * @example
-         * this.edge = '10,15,20,25';// this.left=10,this.right=15,this.top=20,this.bottom=25;
-         * this.edge = '10';//this.left=this.right=this.top=this.bottom=10;
-         */
-        edge: string;
     }
 }
 declare namespace cm {
