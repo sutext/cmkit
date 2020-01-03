@@ -18,38 +18,12 @@ var __extends =
         this.width = width;
         this.height = height;
     };
-    Object.defineProperty(egret.DisplayObject.prototype, 'scale', {
-        get: function() {
-            return this._$scale || '';
-        },
-        set: function(scale) {
-            if (this._$scale == scale) return;
-            if (typeof scale === 'number') {
-                this.scaleX = this.scaleY = scale;
-            } else if (typeof scale === 'string') {
-                var strs = scale.split(',');
-                if (strs.length === 1) {
-                    this.scaleX = this.scaleY = Number(strs[0]);
-                } else if (strs.length === 2) {
-                    this.scaleX = Number(strs[0]);
-                    this.scaleY = Number(strs[1]);
-                } else {
-                    throw new Error('scale must be number or string like 0.5,0.7');
-                }
-            } else {
-                throw new Error('scale must be number or string like 0.5,0.7');
-            }
-            this._$scale = scale.toString();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    var desc = {
-        get: function() {
-            return this._$edge || '';
-        },
-        set: function(edge) {
-            if (this._$edge == edge) return;
+    function EdgeDesc() {
+        this.get = function() {
+            return this._edge || '';
+        };
+        this.set = function(edge) {
+            if (this._edge == edge) return;
             var values = this.$UIComponent;
             if (typeof edge === 'number') {
                 values[0] = values[1] = values[2] = values[3] = edge;
@@ -67,18 +41,18 @@ var __extends =
             } else {
                 throw new Error('edge must be number or string like 10,10,10,10 ');
             }
-            this._$edge = edge.toString();
+            this._edge = edge.toString();
             this.invalidateParentLayout();
-        },
-        enumerable: true,
-        configurable: true
-    };
-    Object.defineProperty(eui.Group.prototype, 'edge', desc);
-    Object.defineProperty(eui.Image.prototype, 'edge', desc);
-    Object.defineProperty(eui.Label.prototype, 'edge', desc);
-    Object.defineProperty(eui.Component.prototype, 'edge', desc);
-    Object.defineProperty(eui.BitmapLabel.prototype, 'edge', desc);
-    Object.defineProperty(eui.EditableText.prototype, 'edge', desc);
+        };
+        this.enumerable = true;
+        this.configurable = true;
+    }
+    Object.defineProperty(eui.Group.prototype, 'edge', new EdgeDesc());
+    Object.defineProperty(eui.Image.prototype, 'edge', new EdgeDesc());
+    Object.defineProperty(eui.Label.prototype, 'edge', new EdgeDesc());
+    Object.defineProperty(eui.Component.prototype, 'edge', new EdgeDesc());
+    Object.defineProperty(eui.BitmapLabel.prototype, 'edge', new EdgeDesc());
+    Object.defineProperty(eui.EditableText.prototype, 'edge', new EdgeDesc());
     eui.Image.prototype.adjust = function() {
         if (!this.texture || arguments.length === 0) return;
         var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };

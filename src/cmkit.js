@@ -259,7 +259,7 @@
         var type = typeof value;
         switch (type) {
             case 'string':
-                return /^\d+$/.test(value);
+                return /^[-+]?\d+$/.test(value);
             case 'number':
                 return Number.isInteger(value);
             default:
@@ -270,7 +270,7 @@
         var type = typeof value;
         switch (type) {
             case 'string':
-                return /^\d+(\.\d+)?$/.test(value);
+                return /^[-+]?\d+(\.\d+)?$/.test(value);
             case 'number':
                 return true;
             default:
@@ -282,7 +282,7 @@
         ns.apihost = host;
         ns.debug = !!debug;
     };
-    ns.debug = false;
+    ns.debug = true;
     Object.defineProperty(ns, 'isslim', {
         get: function() {
             var size = window.screen;

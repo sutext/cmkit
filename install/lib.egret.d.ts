@@ -2,13 +2,6 @@
 
 declare namespace egret {
     interface DisplayObject {
-        /**
-         * @description set the UIComponent scale fastly
-         * @example
-         * this.scale = '0.1' //this.scaleX=0.1,this.scaleY=0.1
-         * this.scale = '0.1,0.2'//this.scaleX=0.1,this.scaleY=0.2
-         */
-        scale: string;
         readonly setRect: (x: number, y: number, width: number, height: number) => void;
         readonly setSize: (width: number, height: number) => void;
     }
