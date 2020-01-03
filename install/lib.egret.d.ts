@@ -2,8 +2,8 @@
 
 declare namespace egret {
     interface DisplayObject {
-        readonly setRect: (x: number, y: number, width: number, height: number) => void;
-        readonly setSize: (width: number, height: number) => void;
+        /** the edge store propery use for exml */
+        readonly edge: string;
         /**
          * @description set the eui.UIComponent margin fastly
          * @warn this method only available on eui.UIComponent's implementation
@@ -14,6 +14,9 @@ declare namespace egret {
          * this.setEdge('10,10');//throw error!
          */
         readonly setEdge: (edge: number | string) => void;
+        readonly setRect: (x: number, y: number, width: number, height: number) => void;
+        readonly setSize: (width: number, height: number) => void;
+
         /**
          * @description set scale fastly
          * @param xOrBoth scaleX or scaleX=scaleY

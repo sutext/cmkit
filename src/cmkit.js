@@ -250,7 +250,7 @@
             case 'string':
                 return value.length !== 0;
             case 'number':
-                return true;
+                return !isNaN(value);
             default:
                 return false;
         }
@@ -272,7 +272,7 @@
             case 'string':
                 return /^[-+]?\d+(\.\d+)?$/.test(value);
             case 'number':
-                return true;
+                return !isNaN(value);
             default:
                 return false;
         }

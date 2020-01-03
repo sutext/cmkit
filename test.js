@@ -3,6 +3,7 @@ global.WebSocket = function() {};
 require('./src/cmkit');
 var okint = window.cm.okint;
 var oknum = window.cm.oknum;
+console.log(Number(okint));
 console.log(okint('10'));
 console.log(okint('3213.11'));
 console.log(parseInt('-10.42423423a'));

@@ -18,20 +18,30 @@ var __extends =
         this.width = width;
         this.height = height;
     };
+    Object.defineProperty(egret.DisplayObject.prototype, 'edge', {
+        get: function() {
+            return this._$edge || '';
+        },
+        set: function(val) {
+            this.setEdge(val);
+        },
+        enumerable: true,
+        configurable: true
+    });
     egret.DisplayObject.prototype.setEdge = function(edge) {
         var values = this.$UIComponent;
         if (!values) {
             throw new Error("setEdge only available on eui.UIComponent's implementation");
         }
-        if (typeof edge === 'number') {
-            values[0] = values[1] = values[2] = values[3] = edge;
+        if (cm.oknum(edge)) {
+            values[0] = values[1] = values[2] = values[3] = +edge;
         } else if (typeof edge === 'string') {
             var strs = edge.split(',');
-            if (strs.length === 1) {
-                values[0] = values[1] = values[2] = values[3] = Number(strs[0]);
-            } else if (strs.length === 4) {
+            if (strs.length === 4) {
                 strs.forEach(function(str, idx) {
-                    values[idx] = Number(str);
+                    if (cm.oknum(str)) {
+                        values[idx] = +str;
+                    }
                 });
             } else {
                 throw new Error('edge must be number or string like 10,10,10,10 ');
@@ -39,6 +49,7 @@ var __extends =
         } else {
             throw new Error('edge must be number or string like 10,10,10,10 ');
         }
+        this._$edge = edge.toString();
         this.invalidateParentLayout();
     };
     egret.DisplayObject.prototype.setScale = function(x, y) {
