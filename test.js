@@ -16,3 +16,4 @@ console.log((10000000).kmgtify(4)); //10M
 console.log((10000000).kmgtify(5)); //10,000K
 console.log((999999999999999).kmgtify(6)); //1G
 console.log((-999999999999999).toString(16));
+console.log(new Date().format('yyY MMM ddd hhh mmm sss'));

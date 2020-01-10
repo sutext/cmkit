@@ -138,7 +138,7 @@ declare namespace cm {
          * @param finish the finishcall back @default undefined
          */
         public readonly pop: (deltaOrFinish?: number | (() => void), finish?: () => void) => void;
-        public readonly push: (page: Stack.Page, props?: any, finish?: () => void) => void;
+        public readonly push: <P>(page: Stack.Page<P>, props?: P, finish?: () => void) => void;
         public readonly reload: (root: Stack.Page) => void;
         /** @description remove and destroy a page node from the stack */
         public readonly remove: (page: Stack.Page) => void;
@@ -208,6 +208,9 @@ declare namespace cm {
         class Remind extends Modal {
             public title: eui.Label;
             public message: eui.Label;
+        }
+        class Wait extends Modal {
+            public timeout: number; /** @default 20s */
         }
         type Action =
             | {

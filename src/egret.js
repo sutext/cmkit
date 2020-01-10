@@ -766,6 +766,7 @@ var __extends =
             _super && _super.apply(this, arguments);
             this.zIndex = 1001;
             this.hostComponentKey = 'cm.Wait';
+            this.timeout = 20;
         }
         Wait.prototype.createChildren = function() {
             _super.prototype.createChildren.call(this);
@@ -775,7 +776,7 @@ var __extends =
                 egret.Tween.get(this.animator, { loop: true }).to({ rotation: 360 }, 2200);
                 setTimeout(function() {
                     _this.background.touchEnabled = true;
-                }, (_this.keepTime || 20) * 1000);
+                }, _this.timeout * 1000);
             } else {
                 ns.warn('The part animator must be provide!');
             }
