@@ -870,6 +870,7 @@ var __extends =
             _this._pageable = false;
             _this._velocity = 0;
             _this._friction = 5;
+            _this._easeTime = 500;
             _this._pageSize = 0;
             _this._pageIndex = 0;
             _this._maxThrowSpeed = 20;
@@ -883,6 +884,7 @@ var __extends =
             _this._touchStart = 0;
             _this._touchPoint = 0;
             _this._touchTime = 0;
+            _this.easeFunc = egret.Ease.sineOut;
             return _this;
         }
         ListView.prototype.createChildren = function() {
@@ -923,6 +925,20 @@ var __extends =
                     return;
                 }
                 this._bounces = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ListView.prototype, 'easeTime', {
+            get: function() {
+                return this._easeTime;
+            },
+            set: function(value) {
+                var num = +value;
+                if (num <= 0) {
+                    throw new Error('easeTime must greater than 0');
+                }
+                this._easeTime = num;
             },
             enumerable: true,
             configurable: true
@@ -1112,7 +1128,7 @@ var __extends =
                 var param = {};
                 param[key] = pos;
                 eui.UIEvent.dispatchUIEvent(eui.UIEvent.CHANGE_START);
-                this.startAnimation(param, time, egret.Ease.sineOut);
+                this.startAnimation(param, time, this.easeFunc);
             }
         };
         ListView.prototype.getParamInfo = function() {
@@ -1320,7 +1336,7 @@ var __extends =
             }
             var param = {};
             param[key] = index * pageSize;
-            this.startAnimation(param, fastMove ? Math.abs(param[key] - current) / 3 : 500, egret.Ease.sineOut);
+            this.startAnimation(param, fastMove ? Math.abs(param[key] - current) / 3 : this._easeTime, this.easeFunc);
             this.doChangePage(index);
         };
         ListView.prototype.dispatchBubbleEvent = function(event) {

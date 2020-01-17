@@ -244,11 +244,15 @@ declare namespace cm {
         public disabled: boolean;
         /** The accelerated speed when scroll throw  @unit px/ms/s @default 5*/
         public friction: number;
+        /** The ease duration when pageable auto scroll @default 500 @unit ms */
+        public easeTime: number;
+        /** The ease time function when pageable auto scroll or manual @scrollToOffset @default egret.Ease.sineOut  */
+        public easeFunc: (t: number) => number;
         /** Enable page scroll and pageIndex @default false*/
         public pageable: boolean;
-        /** The size per page @default typical  */
+        /** The size per page @default 'typicalSize of layout'  */
         public pageSize: number;
-        /** The current pageIndex set this value will change scroll offset. */
+        /** The current pageIndex. @notice Set this value will change scroll offset. */
         public pageIndex: number;
         /** scroll direction @param H horizontal @param V vertical  @default 'H' */
         public direction: string;
