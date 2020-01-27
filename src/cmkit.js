@@ -392,7 +392,7 @@ var __extends =
                 }
                 var headers = (upload.opts && upload.opts.headers) || _this.headers;
                 headers['Content-Type'] = upload.type;
-                var options = Object.assign({ headers: headers }, upload.opts);
+                var options = Object.assign({ headers: headers }, _this.options, upload.opts);
                 var values = Network.post(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function(resolve, reject) {
                     values[0]
@@ -429,7 +429,7 @@ var __extends =
             };
             this.anytask = function(path, data, opts) {
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
+                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function(resolve, reject) {
                     values[0]
@@ -451,7 +451,7 @@ var __extends =
             };
             this.objtask = function(meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
+                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function(resolve, reject) {
                     values[0]
@@ -475,7 +475,7 @@ var __extends =
             };
             this.arytask = function(meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
+                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function(resolve, reject) {
                     values[0]
@@ -503,7 +503,7 @@ var __extends =
             };
             this.maptask = function(meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, opts);
+                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function(resolve, reject) {
                     values[0]
@@ -669,7 +669,7 @@ var __extends =
                     }
                 }
                 xhr.open('GET', url, true);
-                xhr.timeout = (opts && opts.timeout) || 20000;
+                xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
                 var headers = (opts && opts.headers) || {};
                 for (var key in headers) {
@@ -703,7 +703,7 @@ var __extends =
                     }
                 };
                 xhr.open('POST', url, true);
-                xhr.timeout = (opts && opts.timeout) || 20000;
+                xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 var headers = (opts && opts.headers) || {};

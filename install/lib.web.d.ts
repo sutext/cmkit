@@ -226,6 +226,19 @@ declare namespace cm {
     }
     abstract class Network {
         /**
+         * @description global network options setting. it can be override by request options
+         * @example
+         * protected get options(): any {
+         *     return {
+         *        mapkey: 'id',
+         *        timeout: 10000,
+         *        restype:'text',
+         *        loading: true
+         *     }
+         * }
+         */
+        protected readonly options?: Pick<Network.Options, 'mapkey' | 'loading' | 'restype' | 'timeout'>;
+        /**
          * @description the global http headers. every request will include this headers
          * @override you shoud overwrite this property and provide you custom headers
          * @example
@@ -300,7 +313,7 @@ declare namespace cm {
             readonly name: string;
             readonly data: Blob;
             readonly type: string;
-            readonly opts?: Pick<Options, 'headers' | 'parser' | 'timeout' | 'loading'>;
+            readonly opts?: Omit<Options, 'method'>;
             readonly params?: Record<string, any>;
         }
         interface Request<T> {
@@ -319,7 +332,7 @@ declare namespace cm {
             readonly mapkey?: 'id' | string;
             /** @description use for override global headers */
             readonly headers?: Record<string, string>;
-            /** @default 10000 */
+            /** @default 0 wait forever */
             readonly timeout?: number;
             /**
              * @description You must provide your loading UI in before or after hock. otherwith it does't work!
