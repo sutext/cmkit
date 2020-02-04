@@ -700,17 +700,16 @@ var __extends =
         }
         var name = meta.NAME;
         if (this.showed[name]) return;
-        var modal;
         try {
-            modal = new meta();
+            var modal = new meta();
             this.showed[name] = modal;
             modal.setEdge(0);
             modal.pop = this;
             this.addChild(modal);
+            return modal;
         } catch (error) {
-            ns.warn('gen Modal instance error!');
+            ns.warn('gen Modal instance error:', error);
         }
-        return modal;
     };
     ns.Popup = Popup;
     egret.registerClass(Popup, 'cm.Popup');
