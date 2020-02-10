@@ -193,7 +193,7 @@ declare namespace cm {
     }
     class Modal extends cc.Component {
         /**@description insert by present opts.onhide */
-        protected onhide?: () => void;
+        protected onhide?: Function;
         /**背景半透明按钮点击回调，若blurquit为true则onblur方法自动关联dismiss方法，否则为undefined */
         protected onblur?: () => void;
         /**@default this.onhide=opts&&opts.onhide 如果重写此需要考虑是否调用super */
@@ -215,12 +215,12 @@ declare namespace cm {
         interface Options {
             readonly title?: string;
             readonly cancel?: Action;
-            readonly onhide?: () => void;
+            readonly onhide?: Function;
             readonly confirm?: Action;
         }
     }
     namespace pop {
-        const present: (prefeb: string | cc.Prefab, opts?: { onhide?: () => void; [key: string]: any }) => void;
+        const present: (prefeb: string | cc.Prefab, opts?: { onhide?: Function; [key: string]: any }) => void;
         const dismiss: (name?: string, finish?: () => void) => void;
         const remind: (msg: string, title?: string, duration?: number) => void;
         const alert: (msg: string, opts?: Alert.Options) => void;

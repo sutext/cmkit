@@ -59,7 +59,7 @@ declare namespace cm {
     class Button extends eui.Button {
         /** 全局按钮点击音效，声音文件的资源名称 @default 'btn_tap_mp3' */
         public static sound: string;
-        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
+        /** 是否开启所有按钮的静音模式 ，静音模式下所有的cm.Button 将不再有音效 */
         public static quiet: boolean;
         /** 按钮填充色 */
         public fill: number;
@@ -92,7 +92,7 @@ declare namespace cm {
     }
     /** 实现eui.Label的滚动数字效果，和滚动音效 */
     class Label extends eui.Label {
-        /** 是否开启所有按钮 的静音模式 ，静音模式下所有的cm.Label 将不再有音效 */
+        /** 是否开启所有Label的静音模式 ，静音模式下所有的cm.Label 将不再有音效 */
         public static quiet: boolean;
         /** 滚动音效  资源KEY*/
         public sound: string;
@@ -160,7 +160,7 @@ declare namespace cm {
     class Popup extends eui.UILayer {
         protected errmsg: string; /** defalut error mesaage @default 'System Error!'' */
         protected opacity: number; /** The background fillAlpha @default 0.4 */
-        public readonly present: (meta: typeof Popup.Modal, opts?: { onhide?: () => void; [key: string]: any }) => void;
+        public readonly present: (meta: typeof Popup.Modal, opts?: { onhide?: Function; [key: string]: any }) => void;
         public readonly dismiss: (meta?: typeof Popup.Modal, finish?: () => void) => void;
         public readonly remind: (msg: string, title?: string, duration?: number) => void;
         public readonly alert: (msg: string, opts?: Popup.Options) => void;
@@ -186,7 +186,7 @@ declare namespace cm {
             /** @description fade-in-out background only or fade-in-out all */
             protected fadeback: boolean;
             /**@description insert by present opts.onhide */
-            protected onhide?: () => void;
+            protected onhide?: Function;
             /**@description The click action fom dimming blur @default this.dismiss .set null for disable auto dismiss*/
             protected onblur?: () => void;
             /**@default this.onhide=opts&&opts.onhide If you overwride this method. You must consider call super or not */
@@ -222,7 +222,7 @@ declare namespace cm {
         interface Options {
             readonly title?: string;
             readonly cancel?: Action;
-            readonly onhide?: () => void;
+            readonly onhide?: Function;
             readonly confirm?: Action;
         }
     }
