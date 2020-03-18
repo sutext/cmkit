@@ -780,6 +780,9 @@ var __extends =
                 ns.warn('The part animator must be provide!');
             }
         };
+        Wait.prototype.onCreate = function(opts) {
+            this.message && (this.message.text = (opts && opts.msg) || '');
+        };
         return Wait;
     })(Modal);
     Wait.NAME = 'WAIT';
@@ -805,6 +808,7 @@ var __extends =
         this.message && (this.message.text = msg || '');
         this.title && (this.title.text = title || '');
         var onconfirm;
+        var _this = this;
         if (typeof confirm === 'function') {
             onconfirm = confirm;
         } else if (typeof confirm === 'string') {

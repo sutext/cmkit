@@ -211,6 +211,7 @@ declare namespace cm {
         }
         class Wait extends Modal {
             public timeout: number; /** @default 20s */
+            public message: eui.List;
         }
         type Action =
             | {
