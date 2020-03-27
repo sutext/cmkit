@@ -435,13 +435,19 @@ var __extends =
         __extends(Page, _super);
         function Page() {
             _super && _super.apply(this, arguments);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
         }
         return Page;
     })(eui.Component);
+    Page.prototype._onRemove = function() {
+        this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
+        this.onDestroy();
+    };
     Page.prototype.willShow = function() {};
     Page.prototype.didShow = function() {};
     Page.prototype.willHide = function() {};
     Page.prototype.didHide = function() {};
+    Page.prototype.onDestroy = function() {};
     Stack.Page = Page;
     egret.registerClass(Page, 'cm.Stack.Page');
 })(window.cm || (window.cm = {}));

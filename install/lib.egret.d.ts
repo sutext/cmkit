@@ -149,6 +149,7 @@ declare namespace cm {
             public readonly stack: Stack;
             /** push options */
             protected props?: P;
+            protected onDestroy(): void;
             protected willShow(): void;
             protected willHide(): void;
             protected didShow(): void;
