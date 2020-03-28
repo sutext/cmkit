@@ -485,7 +485,7 @@ var __extends =
                 top.didShow();
             });
     };
-    Stack.prototype.remove = function(page) {
+    Stack.prototype.delete = function(page) {
         if (this.pageStack.delete(page) >= 0) {
             this.removeChild(page);
         }

@@ -190,8 +190,8 @@ declare namespace cm {
         public readonly pop: (deltaOrFinish?: number | (() => void), finish?: () => void) => void;
         public readonly push: <P>(page: Stack.Page<P>, props?: P, finish?: () => void) => void;
         public readonly reload: (root: Stack.Page) => void;
-        /** @description remove and destroy a page node from the stack */
-        public readonly remove: (page: Stack.Page) => void;
+        /** @description delete and destroy a page node from the stack */
+        public readonly delete: (page: Stack.Page) => void;
     }
     namespace Stack {
         /** @description the base class of Stack Page */
