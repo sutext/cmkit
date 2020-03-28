@@ -65,6 +65,25 @@ declare namespace eui {
          */
         readonly setURL: (src: string, placeholder?: egret.Texture | string) => Promise<Image>;
     }
+    interface Button {
+        /**
+         * @description set buton icon with url
+         * @param src the image src it can be a url or blob data
+         * @param placeholder the placeholder image or image key
+         * @returns the button itself
+         * @example
+         * ```
+         * const button = new eui.Button()
+         * button.setIcon('https://yourdomain.com/xxx.png','defualt_avatar_png').then(btn=>{
+         *      console.log(btn.icon)
+         * })
+         * ```
+         */
+        readonly setIcon: (src: string, placeholder?: egret.Texture | string) => Promise<Button>;
+    }
+}
+declare namespace cm {
+    const loadtxe: (url: string) => Promise<egret.Texture>;
 }
 declare namespace cm {
     /**
@@ -104,6 +123,20 @@ declare namespace cm {
         public labelDisplay: eui.Label;
         /** 点击回调事件 */
         public onclick: () => void;
+        /**
+         * @description set buton image with url
+         * @param src the image src it can be a url or blob data
+         * @param placeholder the placeholder image or image key
+         * @returns the button itself
+         * @example
+         * ```
+         * const button = new eui.Button()
+         * button.setIcon('https://yourdomain.com/xxx.png','defualt_avatar_png').then(btn=>{
+         *      console.log(btn.image)
+         * })
+         * ```
+         */
+        readonly setImage: (src: string, placeholder?: egret.Texture | string) => Promise<Button>;
     }
     /** 实现eui.Label的滚动数字效果，和滚动音效 */
     class Label extends eui.Label {

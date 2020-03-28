@@ -83,28 +83,51 @@ var __extends =
         this.width = texsize.width * scale;
         this.height = texsize.height * scale;
     };
+})();
+(function(ns) {
+    ns.loadtxe = function(url) {
+        if (!url) {
+            return Promise.reject(new Error('loadtxe:url cannot be empty'));
+        }
+        return new Promise(function(resolve, reject) {
+            var loader = new egret.ImageLoader();
+            var onload = function() {
+                var texture = new egret.Texture();
+                texture.bitmapData = loader.data;
+                resolve(texture);
+            };
+            var onerror = function() {
+                reject(new Error('load image url:' + url + ' Failed!'));
+            };
+            loader.once(egret.Event.COMPLETE, onload, loader);
+            loader.once(egret.IOErrorEvent.IO_ERROR, onerror, loader);
+            loader.load(url);
+        });
+    };
     eui.Image.prototype.setURL = function(src, placeholder) {
         if (placeholder) {
             this.source = placeholder;
         }
-        return new Promise(function(resolve, reject) {
-            var imgLoader = new egret.ImageLoader();
-            var _this = this;
-            var onload = function() {
-                var texture = new egret.Texture();
-                texture.bitmapData = imgLoader.data;
-                _this.texture = texture;
-                resolve(_this);
-            };
-            var onerror = function() {
-                reject(new Error('load image url:' + src + ' Failed!'));
-            };
-            imgLoader.once(egret.Event.COMPLETE, onload, this);
-            imgLoader.once(egret.IOErrorEvent.IO_ERROR, onerror, this);
-            imgLoader.load(src);
+        var _this = this;
+        return ns.loadtxe(src).then(function(txe) {
+            _this.source = txe;
+            return _this;
         });
     };
-})();
+    eui.Button.prototype.setIcon = function(src, placeholder) {
+        if (!this.iconDisplay) {
+            return Promise.reject(new Error('the iconDisplay not found'));
+        }
+        if (placeholder) {
+            this.icon = placeholder;
+        }
+        var _this = this;
+        return ns.loadtxe(src).then(function(txe) {
+            _this.icon = txe;
+            return _this;
+        });
+    };
+})(window.cm || (window.cm = {}));
 (function(ns) {
     var Button = (function(_super) {
         __extends(Button, _super);
@@ -138,6 +161,19 @@ var __extends =
             if (_this._audio) {
                 _this._audio.play(0, 1);
             }
+        };
+        Button.prototype.setImage = function(src, placeholder) {
+            if (!this.imageDisplay) {
+                return Promise.reject(new Error('the imageDisplay not found'));
+            }
+            if (placeholder) {
+                this.image = placeholder;
+            }
+            var _this = this;
+            return ns.loadtxe(src).then(function(txe) {
+                _this.image = txe;
+                return _this;
+            });
         };
         return Button;
     })(eui.Button);
