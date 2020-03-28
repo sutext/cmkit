@@ -26,6 +26,8 @@ declare namespace egret {
          * this.setScale(0.3,0.4);//this.scaleX=0.3;this.scaleY=0.4;
          */
         readonly setScale: (xOrBoth: number, y?: number) => void;
+        /** remove itself from parent if exist */
+        readonly remove: () => void;
     }
 }
 declare namespace eui {

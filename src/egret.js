@@ -18,6 +18,11 @@ var __extends =
         this.width = width;
         this.height = height;
     };
+    egret.DisplayObject.prototype.remove = function() {
+        if (this.parent) {
+            this.parent.removeChild(this);
+        }
+    };
     Object.defineProperty(egret.DisplayObject.prototype, 'edge', {
         get: function() {
             return this._$edge || '';
