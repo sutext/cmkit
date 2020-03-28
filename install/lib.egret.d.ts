@@ -49,6 +49,21 @@ declare namespace eui {
          * ```
          */
         readonly adjust: (widthOrBothOrOnly: number | { width?: number; height?: number }, height?: number) => void;
+        /**
+         * @description set image with url
+         * @param src the image src it can be a url or blob data
+         * @param placeholder the placeholder image or image key
+         * @returns the eui Image itself
+         * @example
+         * ```
+         * const image = new eui.Image()
+         * image.setURL('https://yourdomain.com/xxx.png','defualt_avatar_png').then(img=>{
+         *      console.log(img.texture)
+         *      img.adjust(100)//adjust if need
+         * })
+         * ```
+         */
+        readonly setURL: (src: string, placeholder?: egret.Texture | string) => Promise<Image>;
     }
 }
 declare namespace cm {

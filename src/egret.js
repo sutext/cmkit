@@ -83,6 +83,27 @@ var __extends =
         this.width = texsize.width * scale;
         this.height = texsize.height * scale;
     };
+    eui.Image.prototype.setURL = function(src, placeholder) {
+        if (placeholder) {
+            this.source = placeholder;
+        }
+        return new Promise(function(resolve, reject) {
+            var imgLoader = new egret.ImageLoader();
+            var _this = this;
+            var onload = function() {
+                var texture = new egret.Texture();
+                texture.bitmapData = imgLoader.data;
+                _this.texture = texture;
+                resolve(_this);
+            };
+            var onerror = function() {
+                reject(new Error('load image url:' + src + ' Failed!'));
+            };
+            imgLoader.once(egret.Event.COMPLETE, onload, this);
+            imgLoader.once(egret.IOErrorEvent.IO_ERROR, onerror, this);
+            imgLoader.load(src);
+        });
+    };
 })();
 (function(ns) {
     var Button = (function(_super) {

@@ -313,7 +313,7 @@ declare namespace cm {
             readonly name: string;
             readonly data: Blob;
             readonly type: string;
-            readonly opts?: Omit<Options, 'method'>;
+            readonly opts?: Options;
             readonly params?: Record<string, any>;
         }
         interface Request<T> {
