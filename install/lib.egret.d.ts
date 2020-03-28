@@ -31,6 +31,16 @@ declare namespace egret {
     }
 }
 declare namespace eui {
+    interface Component {
+        /**
+         * @description Hook method for removed from stage
+         * @description This method will be call affter component has been remove from stage.
+         * @description You can do your clear work hear.
+         * @warn You shoud never call this method directly
+         * @warn This method is undefined before you provide your implemention
+         */
+        onRemoved(): void;
+    }
     interface Image {
         /**
          * @description auto resize image size and keep perfect
@@ -199,7 +209,6 @@ declare namespace cm {
             public readonly stack: Stack;
             /** push options */
             protected props?: P;
-            protected onDestroy(): void;
             protected willShow(): void;
             protected willHide(): void;
             protected didShow(): void;

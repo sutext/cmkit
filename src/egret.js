@@ -67,27 +67,6 @@ var __extends =
         this.scaleX = x;
         this.scaleY = y;
     };
-    eui.Image.prototype.adjust = function() {
-        if (!this.texture || arguments.length === 0) return;
-        var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };
-        if (!texsize.width || !texsize.height) return;
-        var sizeOrBoth = arguments[0];
-        var width = sizeOrBoth;
-        var height = sizeOrBoth;
-        if (typeof sizeOrBoth === 'object') {
-            width = sizeOrBoth.width;
-            height = sizeOrBoth.height;
-        } else if (typeof arguments[1] === 'number') {
-            height = arguments[1];
-        }
-        var scaleX = typeof width === 'number' && width / texsize.width;
-        var scaleY = typeof height === 'number' && height / texsize.height;
-        var scale = scaleX || scaleY;
-        if (!scale) return;
-        scale = (scaleX && scaleY && Math.min(scaleX, scaleY)) || scale;
-        this.width = texsize.width * scale;
-        this.height = texsize.height * scale;
-    };
 })();
 (function(ns) {
     ns.loadtxe = function(url) {
@@ -108,6 +87,33 @@ var __extends =
             loader.once(egret.IOErrorEvent.IO_ERROR, onerror, loader);
             loader.load(url);
         });
+    };
+    eui.Component.prototype.$onRemoveFromStage = function() {
+        egret.DisplayObjectContainer.prototype.$onRemoveFromStage.call(this);
+        if (typeof this.onRemoved === 'function') {
+            this.onRemoved();
+        }
+    };
+    eui.Image.prototype.adjust = function() {
+        if (!this.texture || arguments.length === 0) return;
+        var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };
+        if (!texsize.width || !texsize.height) return;
+        var sizeOrBoth = arguments[0];
+        var width = sizeOrBoth;
+        var height = sizeOrBoth;
+        if (typeof sizeOrBoth === 'object') {
+            width = sizeOrBoth.width;
+            height = sizeOrBoth.height;
+        } else if (typeof arguments[1] === 'number') {
+            height = arguments[1];
+        }
+        var scaleX = typeof width === 'number' && width / texsize.width;
+        var scaleY = typeof height === 'number' && height / texsize.height;
+        var scale = scaleX || scaleY;
+        if (!scale) return;
+        scale = (scaleX && scaleY && Math.min(scaleX, scaleY)) || scale;
+        this.width = texsize.width * scale;
+        this.height = texsize.height * scale;
     };
     eui.Image.prototype.setURL = function(src, placeholder) {
         if (placeholder) {
@@ -497,19 +503,13 @@ var __extends =
         __extends(Page, _super);
         function Page() {
             _super && _super.apply(this, arguments);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
         }
         return Page;
     })(eui.Component);
-    Page.prototype._onRemove = function() {
-        this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this._onRemove, this);
-        this.onDestroy();
-    };
     Page.prototype.willShow = function() {};
     Page.prototype.didShow = function() {};
     Page.prototype.willHide = function() {};
     Page.prototype.didHide = function() {};
-    Page.prototype.onDestroy = function() {};
     Stack.Page = Page;
     egret.registerClass(Page, 'cm.Stack.Page');
 })(window.cm || (window.cm = {}));
