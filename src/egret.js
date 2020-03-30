@@ -405,6 +405,7 @@ var __extends =
         if (!root instanceof Stack.Page) {
             throw new Error('Root class must be subclass of cm.Stack.Page!');
         }
+        this.touchChildren = false;
         this.removeChildren();
         this.pageStack = [];
         root.stack = this;
@@ -413,15 +414,19 @@ var __extends =
         this.addChild(root);
         this._root = root;
         root.willShow();
+        var _this = this;
         egret.Tween.get(root)
             .to({ alpha: 1 }, 150)
             .call(function() {
                 root.didShow();
+                _this.touchChildren = true;
             });
     };
     Stack.prototype.push = function(page, props, finish) {
         if (!this._root) throw new Error('You must set root page using Stack.reload(root)');
         if (!page) throw new Error('stack push: page must be provide');
+        this.touchChildren = false;
+        var _this = this;
         var top = this.top;
         var width = this.width;
         page.stack = this;
@@ -436,21 +441,22 @@ var __extends =
             .call(function() {
                 top.visible = false;
                 top.didHide();
-                ns.call(finish);
             });
         page.visible = true;
         page.willShow();
         egret.Tween.get(page)
-            .to({ x: 0 }, 250, egret.Ease.sineInOut)
+            .to({ x: 0 }, 255, egret.Ease.sineInOut)
             .call(function() {
                 page.didShow();
                 ns.call(finish);
+                _this.touchChildren = true;
             });
     };
     Stack.prototype.pop = function() {
         var _this = this;
         var length = this.pageStack.length;
         if (length <= 0) return;
+        this.touchChildren = false;
         var delta = arguments[0];
         var finish;
         if (typeof delta === 'number') {
@@ -476,12 +482,13 @@ var __extends =
         var top = this.top;
         ani.willHide();
         egret.Tween.get(ani)
-            .to({ x: width }, 250, egret.Ease.sineInOut)
+            .to({ x: width }, 255, egret.Ease.sineInOut)
             .call(function() {
                 ani.visible = false;
                 ani.didHide();
                 _this.removeChild(ani);
                 ns.call(finish);
+                _this.touchChildren = true;
             });
         top.visible = true;
         top.willShow();

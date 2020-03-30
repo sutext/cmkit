@@ -35,7 +35,7 @@ declare namespace eui {
         /**
          * @description Hook method for removed from stage
          * @description This method will be call affter component has been remove from stage.
-         * @description You can do your clear work hear.
+         * @description You can do your clear work here.
          * @warn You shoud never call this method directly
          * @warn This method is undefined before you provide your implemention
          */
@@ -208,7 +208,7 @@ declare namespace cm {
         abstract class Page<P = any> extends eui.Component {
             public readonly stack: Stack;
             /** push options */
-            protected props?: P;
+            protected readonly props?: Readonly<P>;
             protected willShow(): void;
             protected willHide(): void;
             protected didShow(): void;
