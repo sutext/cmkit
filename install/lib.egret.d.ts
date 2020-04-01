@@ -220,12 +220,12 @@ declare namespace cm {
     class Popup extends eui.UILayer {
         protected errmsg: string; /** defalut error mesaage @default 'System Error!'' */
         protected opacity: number; /** The background fillAlpha @default 0.4 */
-        public readonly present: (meta: typeof Popup.Modal, opts?: { onhide?: Function; [key: string]: any }) => void;
+        public readonly present: (meta: typeof Popup.Modal, opts?: { skin?: eui.Skin | string; onhide?: Function; [key: string]: any }) => void;
         public readonly dismiss: (meta?: typeof Popup.Modal, finish?: () => void) => void;
-        public readonly remind: (msg: string, title?: string, duration?: number) => void;
+        public readonly remind: (msg: string, opts?: { skin?: eui.Skin | string; title?: string; duration?: number }) => void;
         public readonly alert: (msg: string, opts?: Popup.Options) => void;
         public readonly error: (error: any) => void; /** remind error.message or Popver.errmsg */
-        public readonly wait: (msg?: string) => void;
+        public readonly wait: (msg?: string, skin?: eui.Skin | string) => void;
         public readonly idle: () => void;
     }
     namespace Popup {
@@ -285,6 +285,7 @@ declare namespace cm {
             readonly cancel?: Action;
             readonly onhide?: Function;
             readonly confirm?: Action;
+            readonly skin: eui.Skin | string;
         }
     }
 }

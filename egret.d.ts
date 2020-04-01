@@ -11,5 +11,6 @@ declare namespace eui {
     class Group {}
     class List {}
     class DataGroup {}
+    class Skin {}
     interface IViewport {}
 }

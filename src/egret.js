@@ -539,15 +539,17 @@ var __extends =
     Popup.prototype.present = function(meta, opts) {
         this.add({ type: 'present', meta: meta, opts: opts });
     };
-    Popup.prototype.remind = function(msg, title, duration) {
+    Popup.prototype.remind = function(msg, opts) {
         if (!this.Remind) {
             ns.warn('the Remind class must be set!');
             return;
         }
-        if (!duration) {
-            duration = 2;
+        opts = opts || {};
+        if (!opts.duration) {
+            opts.duration = 2;
         }
-        this.add({ type: 'remind', title: title, msg: msg, duration: duration });
+        opts.msg = msg;
+        this.add({ type: 'remind', opts: opts });
     };
     Popup.prototype.dismiss = function(meta, finish) {
         if (meta) {
@@ -569,12 +571,12 @@ var __extends =
         opts.msg = msg;
         this.add({ type: 'present', meta: this.Alert, opts: opts });
     };
-    Popup.prototype.wait = function(msg) {
+    Popup.prototype.wait = function(msg, skin) {
         if (!this.Wait) {
             ns.warn('the Wait class must be set!');
             return;
         }
-        this.add({ type: 'wait', msg: msg });
+        this.add({ type: 'wait', opts: { msg: msg, skin: skin } });
     };
     Popup.prototype.idle = function() {
         if (!this.Wait) {
@@ -600,10 +602,7 @@ var __extends =
             name = _a.name,
             meta = _a.meta,
             finish = _a.finish,
-            opts = _a.opts,
-            title = _a.title,
-            msg = _a.msg,
-            duration = _a.duration;
+            opts = _a.opts;
         switch (type) {
             case 'clear':
                 this._clear(finish);
@@ -615,25 +614,27 @@ var __extends =
                 this._present(meta, opts);
                 break;
             case 'wait':
-                this._wait(msg);
+                this._wait(opts);
                 break;
             case 'idle':
                 this._idle();
                 break;
             case 'remind':
-                this._remind(title, msg, duration);
+                this._remind(opts);
                 break;
         }
     };
-    Popup.prototype._remind = function(title, msg, duration) {
+    Popup.prototype._remind = function(opts) {
         var _this = this;
-        var modal = this.genModal(this.Remind);
+        var modal = this.genModal(this.Remind, opts.skin);
         if (!modal) {
             this.current = null;
             this.next();
             return;
         }
-        var opts = { title: title, msg: msg };
+        var duration = opts.duration;
+        delete opts.skin;
+        delete opts.duration;
         modal.onCreate(opts);
         modal.alpha = 0;
         egret.Tween.get(modal)
@@ -652,12 +653,13 @@ var __extends =
     };
     Popup.prototype._present = function(meta, opts) {
         var _this = this;
-        var modal = this.genModal(meta);
+        var modal = this.genModal(meta, opts.skin);
         if (!modal) {
             this.current = null;
             this.next();
             return;
         }
+        delete opts.skin;
         modal.onCreate(opts);
         function func() {
             modal.onPresent(opts);
@@ -741,10 +743,10 @@ var __extends =
                 _this.next();
             });
     };
-    Popup.prototype._wait = function(msg) {
-        var modal = this.genModal(this.Wait);
+    Popup.prototype._wait = function(opts) {
+        var modal = this.genModal(this.Wait, opts.skin);
         if (modal) {
-            modal.onCreate({ msg: msg });
+            modal.onCreate({ msg: opts.msg });
         }
         this.current = null;
         this.next();
@@ -764,7 +766,7 @@ var __extends =
             this.removeChild(modal);
         }
     };
-    Popup.prototype.genModal = function(meta) {
+    Popup.prototype.genModal = function(meta, skin) {
         if (typeof meta !== 'function') {
             ns.warn('Modal meta class not available!');
             return;
@@ -777,6 +779,9 @@ var __extends =
         if (this.showed[name]) return;
         try {
             var modal = new meta();
+            if (skin) {
+                modal.skin = skin;
+            }
             this.showed[name] = modal;
             modal.setEdge(0);
             modal.pop = this;
