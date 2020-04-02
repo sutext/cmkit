@@ -645,7 +645,7 @@ var __extends =
             .wait(duration * 1000)
             .to({ alpha: 0 }, 250)
             .call(function() {
-                _this.delete(this.Remind);
+                _this.delete(_this.Remind);
                 _this.current = null;
                 _this.next();
             });
@@ -893,8 +893,8 @@ var __extends =
             cancel = opts.cancel,
             onhide = opts.onhide;
         this.onhide = onhide;
-        this.message && (this.message.text = msg || '');
-        this.title && (this.title.text = title || '');
+        msg && this.message && (this.message.text = msg);
+        title && this.title && (this.title.text = title);
         var onconfirm;
         var _this = this;
         if (typeof confirm === 'function') {
@@ -943,8 +943,8 @@ var __extends =
     Remind.prototype.onCreate = function(opts) {
         var title = opts.title;
         var msg = opts.msg;
-        this.message && (this.message.text = msg || '');
-        this.title && (this.title.text = title || '');
+        msg && this.message && (this.message.text = msg);
+        title && this.title && (this.title.text = title);
         this.onhide = opts && opts.onhide;
     };
     Popup.Remind = Remind;
