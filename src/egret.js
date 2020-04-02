@@ -537,7 +537,7 @@ var __extends =
         return Popup;
     })(eui.UILayer);
     Popup.prototype.present = function(meta, opts) {
-        this.add({ type: 'present', meta: meta, opts: opts });
+        this.add({ type: 'present', meta: meta, opts: opts || {} });
     };
     Popup.prototype.remind = function(msg, opts) {
         if (!this.Remind) {
@@ -571,12 +571,12 @@ var __extends =
         opts.msg = msg;
         this.add({ type: 'present', meta: this.Alert, opts: opts });
     };
-    Popup.prototype.wait = function(msg, skin) {
+    Popup.prototype.wait = function(msg, skinName) {
         if (!this.Wait) {
             ns.warn('the Wait class must be set!');
             return;
         }
-        this.add({ type: 'wait', opts: { msg: msg, skin: skin } });
+        this.add({ type: 'wait', opts: { msg: msg, skinName: skinName } });
     };
     Popup.prototype.idle = function() {
         if (!this.Wait) {
@@ -626,14 +626,14 @@ var __extends =
     };
     Popup.prototype._remind = function(opts) {
         var _this = this;
-        var modal = this.genModal(this.Remind, opts.skin);
+        var modal = this.genModal(this.Remind, opts.skinName);
         if (!modal) {
             this.current = null;
             this.next();
             return;
         }
         var duration = opts.duration;
-        delete opts.skin;
+        delete opts.skinName;
         delete opts.duration;
         modal.onCreate(opts);
         modal.alpha = 0;
@@ -653,13 +653,13 @@ var __extends =
     };
     Popup.prototype._present = function(meta, opts) {
         var _this = this;
-        var modal = this.genModal(meta, opts.skin);
+        var modal = this.genModal(meta, opts.skinName);
         if (!modal) {
             this.current = null;
             this.next();
             return;
         }
-        delete opts.skin;
+        delete opts.skinName;
         modal.onCreate(opts);
         function func() {
             modal.onPresent(opts);
@@ -744,7 +744,7 @@ var __extends =
             });
     };
     Popup.prototype._wait = function(opts) {
-        var modal = this.genModal(this.Wait, opts.skin);
+        var modal = this.genModal(this.Wait, opts.skinName);
         if (modal) {
             modal.onCreate({ msg: opts.msg });
         }
@@ -766,7 +766,7 @@ var __extends =
             this.removeChild(modal);
         }
     };
-    Popup.prototype.genModal = function(meta, skin) {
+    Popup.prototype.genModal = function(meta, skinName) {
         if (typeof meta !== 'function') {
             ns.warn('Modal meta class not available!');
             return;
@@ -779,8 +779,8 @@ var __extends =
         if (this.showed[name]) return;
         try {
             var modal = new meta();
-            if (skin) {
-                modal.skin = skin;
+            if (skinName) {
+                modal.skinName = skinName;
             }
             this.showed[name] = modal;
             modal.setEdge(0);
@@ -797,14 +797,11 @@ var __extends =
         __extends(Modal, _super);
         function Modal() {
             _super && _super.apply(this, arguments);
-            var _this = this;
             this.animator = null;
             this.content = null;
             this.opacity = -1;
+            this._masktap = false;
             this.touchEnabled = true;
-            this.onblur = function() {
-                _this.dismiss();
-            };
         }
         Modal.prototype.createChildren = function() {
             _super.prototype.createChildren.call(this);
@@ -813,25 +810,36 @@ var __extends =
             this.background.fillAlpha = 1;
             this.background.alpha = 0;
             this.background.setEdge(0);
-            var _this = this;
-            this.background.addEventListener(
-                egret.TouchEvent.TOUCH_TAP,
-                function() {
-                    _this.onblur();
-                },
-                this
-            );
+            this.background.touchEnabled = this._masktap;
+            this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTapMask, this);
             this.addChildAt(this.background, 0);
         };
+
         return Modal;
     })(eui.Component);
     Modal.NAME = 'COMMON';
+    Object.defineProperty(Modal.prototype, 'masktap', {
+        get: function() {
+            return this._masktap;
+        },
+        set: function(val) {
+            this._masktap = !!val;
+            if (this.background) {
+                this.background.touchEnabled = !!val;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Modal.prototype.onCreate = function(opts) {
         this.onhide = opts && opts.onhide;
     };
     Modal.prototype.onPresent = function(opts) {};
     Modal.prototype.onDismiss = function() {
         ns.call(this.onhide);
+    };
+    Modal.prototype.onTapMask = function() {
+        this.dismiss();
     };
     Modal.prototype.dismiss = function(finish) {
         this.pop && this.pop.dismiss(this.constructor, finish);

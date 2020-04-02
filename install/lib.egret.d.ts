@@ -217,15 +217,16 @@ declare namespace cm {
     }
 }
 declare namespace cm {
+    type SkinName = typeof eui.Skin | string;
     class Popup extends eui.UILayer {
         protected errmsg: string; /** defalut error mesaage @default 'System Error!'' */
         protected opacity: number; /** The background fillAlpha @default 0.4 */
-        public readonly present: (meta: typeof Popup.Modal, opts?: { skin?: eui.Skin | string; onhide?: Function; [key: string]: any }) => void;
+        public readonly present: (meta: typeof Popup.Modal, opts?: { skinName?: SkinName; onhide?: Function; [key: string]: any }) => void;
         public readonly dismiss: (meta?: typeof Popup.Modal, finish?: () => void) => void;
-        public readonly remind: (msg: string, opts?: { skin?: eui.Skin | string; title?: string; duration?: number }) => void;
+        public readonly remind: (msg: string, opts?: { skinName?: SkinName; title?: string; duration?: number }) => void;
         public readonly alert: (msg: string, opts?: Popup.Options) => void;
         public readonly error: (error: any) => void; /** remind error.message or Popver.errmsg */
-        public readonly wait: (msg?: string, skin?: eui.Skin | string) => void;
+        public readonly wait: (msg?: string, skinName?: SkinName) => void;
         public readonly idle: () => void;
     }
     namespace Popup {
@@ -241,20 +242,22 @@ declare namespace cm {
             protected static NAME: string;
             /** @default -1 use parent opacity */
             protected opacity: number;
+            /** @description can mask tap or not. @default false */
+            protected masktap: boolean;
             /** @description use for special animation @example bounce in Popup.present and rotate in Popup.wait */
             protected animator: eui.Group;
             /** @description fade-in-out background only or fade-in-out all */
             protected fadeback: boolean;
-            /**@description insert by present opts.onhide */
+            /** @description insert by present opts.onhide */
             protected onhide?: Function;
-            /**@description The click action fom dimming blur @default this.dismiss .set null for disable auto dismiss*/
-            protected onblur?: () => void;
-            /**@default this.onhide=opts&&opts.onhide If you overwride this method. You must consider call super or not */
+            /** @default this.onhide=opts&&opts.onhide If you overwride this method. You must consider call super or not */
             protected onCreate(opts?: any): void;
-            /**@default empty */
+            /** @default empty */
             protected onPresent(opts?: any): void;
-            /**@default cm.call(this.onhide) If you overwride this method. You must consider call super or not */
+            /** @default cm.call(this.onhide) If you overwride this method. You must consider call super or not */
             protected onDismiss(): void;
+            /** @description mask tap callback @default this.dismiss() */
+            protected onTapMask(): void;
             protected readonly dismiss: (finish?: () => void) => void;
         }
         class Alert extends Modal {
@@ -285,7 +288,7 @@ declare namespace cm {
             readonly cancel?: Action;
             readonly onhide?: Function;
             readonly confirm?: Action;
-            readonly skin: eui.Skin | string;
+            readonly skinName?: SkinName;
         }
     }
 }
