@@ -900,9 +900,9 @@ var __extends =
         if (typeof confirm === 'function') {
             onconfirm = confirm;
         } else if (typeof confirm === 'string') {
-            this.confirmText && confirm && (this.confirmText.text = confirm);
+            this.confirm.label = confirm;
         } else if (typeof confirm === 'object') {
-            this.confirmText && confirm.title && (this.confirmText.text = confirm.title);
+            confirm.title && (this.confirm.label = confirm.title);
             onconfirm = confirm.block;
         }
         this.confirm.onclick = function() {
@@ -916,9 +916,9 @@ var __extends =
             if (typeof cancel === 'function') {
                 oncancel = cancel;
             } else if (typeof cancel === 'string') {
-                this.cancelText && (this.cancelText.string = cancel);
+                this.cancel.label = cancel;
             } else if (typeof cancel === 'object') {
-                this.cancelText && cancel.title && (this.cancelText.string = cancel.title);
+                cancel.title && (this.cancel.label = cancel.title);
                 oncancel = cancel.block;
             }
             this.cancel.onclick = function() {
