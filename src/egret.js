@@ -908,10 +908,10 @@ var __extends =
         this.confirm.onclick = function() {
             return _this.dismiss(onconfirm);
         };
+        this.currentState = 'only';
         if (!cancel) return;
         if (this.cancel) {
-            this.cancel.visible = true;
-            this.confirm.width = this.cancel.width;
+            this.currentState = 'double';
             var oncancel;
             if (typeof cancel === 'function') {
                 oncancel = cancel;

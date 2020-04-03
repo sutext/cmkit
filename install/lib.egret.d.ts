@@ -283,6 +283,7 @@ declare namespace cm {
               }
             | string
             | (() => void);
+        /** @description If cancel not provide currentState=only otherwith currentState=double */
         interface Options {
             readonly title?: string;
             readonly cancel?: Action;
