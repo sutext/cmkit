@@ -1,39 +1,39 @@
 var __extends =
     (this && this.__extends) ||
-    function(t, e) {
+    function (t, e) {
         for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
         function r() {
             this.constructor = t;
         }
         (r.prototype = e.prototype), (t.prototype = new r());
     };
-(function() {
-    egret.DisplayObject.prototype.setRect = function(x, y, width, height) {
+(function () {
+    egret.DisplayObject.prototype.setRect = function (x, y, width, height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
     };
-    egret.DisplayObject.prototype.setSize = function(width, height) {
+    egret.DisplayObject.prototype.setSize = function (width, height) {
         this.width = width;
         this.height = height;
     };
-    egret.DisplayObject.prototype.remove = function() {
+    egret.DisplayObject.prototype.remove = function () {
         if (this.parent) {
             this.parent.removeChild(this);
         }
     };
     Object.defineProperty(egret.DisplayObject.prototype, 'edge', {
-        get: function() {
+        get: function () {
             return this._$edge || '';
         },
-        set: function(val) {
+        set: function (val) {
             this.setEdge(val);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    egret.DisplayObject.prototype.setEdge = function(edge) {
+    egret.DisplayObject.prototype.setEdge = function (edge) {
         var values = this.$UIComponent;
         if (!values) {
             throw new Error("setEdge only available on eui.UIComponent's implementation");
@@ -43,7 +43,7 @@ var __extends =
         } else if (typeof edge === 'string') {
             var strs = edge.split(',');
             if (strs.length === 4) {
-                strs.forEach(function(str, idx) {
+                strs.forEach(function (str, idx) {
                     if (cm.oknum(str)) {
                         values[idx] = +str;
                     }
@@ -57,7 +57,7 @@ var __extends =
         this._$edge = edge.toString();
         this.invalidateParentLayout();
     };
-    egret.DisplayObject.prototype.setScale = function(x, y) {
+    egret.DisplayObject.prototype.setScale = function (x, y) {
         if (typeof x !== 'number') {
             throw new Error('scaleX must be number');
         }
@@ -68,19 +68,19 @@ var __extends =
         this.scaleY = y;
     };
 })();
-(function(ns) {
-    ns.loadtxe = function(url) {
+(function (ns) {
+    ns.loadtxe = function (url) {
         if (!url) {
             return Promise.reject(new Error('loadtxe:url cannot be empty'));
         }
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var loader = new egret.ImageLoader();
-            var onload = function() {
+            var onload = function () {
                 var texture = new egret.Texture();
                 texture.bitmapData = loader.data;
                 resolve(texture);
             };
-            var onerror = function() {
+            var onerror = function () {
                 reject(new Error('load image url:' + url + ' Failed!'));
             };
             loader.once(egret.Event.COMPLETE, onload, loader);
@@ -88,13 +88,13 @@ var __extends =
             loader.load(url);
         });
     };
-    eui.Component.prototype.$onRemoveFromStage = function() {
+    eui.Component.prototype.$onRemoveFromStage = function () {
         egret.DisplayObjectContainer.prototype.$onRemoveFromStage.call(this);
         if (typeof this.onRemoved === 'function') {
             this.onRemoved();
         }
     };
-    eui.Image.prototype.adjust = function() {
+    eui.Image.prototype.adjust = function () {
         if (!this.texture || arguments.length === 0) return;
         var texsize = { width: this.texture.textureWidth, height: this.texture.textureHeight };
         if (!texsize.width || !texsize.height) return;
@@ -115,17 +115,17 @@ var __extends =
         this.width = texsize.width * scale;
         this.height = texsize.height * scale;
     };
-    eui.Image.prototype.setURL = function(src, placeholder) {
+    eui.Image.prototype.setURL = function (src, placeholder) {
         if (placeholder) {
             this.source = placeholder;
         }
         var _this = this;
-        return ns.loadtxe(src).then(function(txe) {
+        return ns.loadtxe(src).then(function (txe) {
             _this.source = txe;
             return _this;
         });
     };
-    eui.Button.prototype.setIcon = function(src, placeholder) {
+    eui.Button.prototype.setIcon = function (src, placeholder) {
         if (!this.iconDisplay) {
             return Promise.reject(new Error('the iconDisplay not found'));
         }
@@ -133,14 +133,14 @@ var __extends =
             this.icon = placeholder;
         }
         var _this = this;
-        return ns.loadtxe(src).then(function(txe) {
+        return ns.loadtxe(src).then(function (txe) {
             _this.icon = txe;
             return _this;
         });
     };
 })(window.cm || (window.cm = {}));
-(function(ns) {
-    var Button = (function(_super) {
+(function (ns) {
+    var Button = (function (_super) {
         __extends(Button, _super);
         function Button() {
             _super && _super.apply(this, arguments);
@@ -150,7 +150,7 @@ var __extends =
             this.hostComponentKey = 'cm.Button';
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onClicked, this);
         }
-        Button.prototype.partAdded = function(partName, instance) {
+        Button.prototype.partAdded = function (partName, instance) {
             _super.prototype.partAdded.call(this, partName, instance);
             if (instance === this.titleDisplay) {
                 this.titleDisplay.text = this._title;
@@ -160,11 +160,11 @@ var __extends =
                 this.fillDisplay.fillColor = this._fill;
             }
         };
-        Button.prototype.onClicked = function() {
+        Button.prototype.onClicked = function () {
             if (this.__suspend) return;
             var _this = this;
             _this.__suspend = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 _this.__suspend = false;
             }, _this._delay);
             ns.call(_this.onclick);
@@ -173,7 +173,7 @@ var __extends =
                 _this._audio.play(0, 1);
             }
         };
-        Button.prototype.setImage = function(src, placeholder) {
+        Button.prototype.setImage = function (src, placeholder) {
             if (!this.imageDisplay) {
                 return Promise.reject(new Error('the imageDisplay not found'));
             }
@@ -181,7 +181,7 @@ var __extends =
                 this.image = placeholder;
             }
             var _this = this;
-            return ns.loadtxe(src).then(function(txe) {
+            return ns.loadtxe(src).then(function (txe) {
                 _this.image = txe;
                 return _this;
             });
@@ -191,49 +191,49 @@ var __extends =
     Button.quiet = false;
     Button.sound = 'btn_tap_mp3';
     Object.defineProperty(Button.prototype, 'fill', {
-        get: function() {
+        get: function () {
             return this._fill;
         },
-        set: function(val) {
+        set: function (val) {
             this._fill = val;
             if (this.fillDisplay) {
                 this.fillDisplay.fillColor = val;
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Button.prototype, 'title', {
-        get: function() {
+        get: function () {
             return this._title;
         },
-        set: function(val) {
+        set: function (val) {
             this._title = val;
             if (this.titleDisplay) {
                 this.titleDisplay.text = val;
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Button.prototype, 'image', {
-        get: function() {
+        get: function () {
             return this._image;
         },
-        set: function(val) {
+        set: function (val) {
             this._image = val;
             if (this.imageDisplay) {
                 this.imageDisplay.source = val;
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Button.prototype, 'sound', {
-        get: function() {
+        get: function () {
             return this._audio && this._audio.source;
         },
-        set: function(val) {
+        set: function (val) {
             var _audio = RES.getRes(val);
             if (_audio) {
                 this._audio = _audio;
@@ -242,23 +242,23 @@ var __extends =
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Button.prototype, 'delay', {
-        get: function() {
+        get: function () {
             return this._delay;
         },
-        set: function(val) {
+        set: function (val) {
             if (val < 0) val = 0;
             if (val > 10000) val = 10000;
             this._delay = val;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     ns.Button = Button;
     egret.registerClass(Button, 'cm.Button');
-    var Label = (function(_super) {
+    var Label = (function (_super) {
         __extends(Label, _super);
         function Label() {
             _super && _super.apply(this, arguments);
@@ -268,10 +268,10 @@ var __extends =
             this._goal = 0;
             this._stack = [];
             this._rate = 60;
-            this.formater = function(value) {
+            this.formater = function (value) {
                 return value.round().comma();
             };
-            this.steper = function(delta) {
+            this.steper = function (delta) {
                 if (delta < _this._rate) {
                     return 1;
                 }
@@ -282,10 +282,10 @@ var __extends =
     })(eui.Label);
     Label.quiet = false;
     Object.defineProperty(Label.prototype, 'sound', {
-        get: function() {
+        get: function () {
             return this._audio && this._audio.source;
         },
-        set: function(val) {
+        set: function (val) {
             var _audio = RES.getRes(val);
             if (_audio) {
                 this._audio = _audio;
@@ -294,13 +294,13 @@ var __extends =
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Label.prototype, 'digit', {
-        get: function() {
+        get: function () {
             return this._goal;
         },
-        set: function(val) {
+        set: function (val) {
             if (typeof val === 'number') {
                 this._stack.push(val);
                 this.next();
@@ -309,9 +309,9 @@ var __extends =
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Label.prototype.next = function() {
+    Label.prototype.next = function () {
         if (this._step) return;
         if (this._stack.length === 0) return;
         var goal = this._stack.shift();
@@ -333,18 +333,18 @@ var __extends =
                 dur = 0.3;
             }
             var hander = this._audio.play();
-            setTimeout(function() {
+            setTimeout(function () {
                 hander.stop();
             }, dur * 1000);
         }
     };
-    Label.prototype.setText = function(val) {
+    Label.prototype.setText = function (val) {
         if (this._value !== val) {
             this._value = val;
             this.text = this.formater(val);
         }
     };
-    Label.prototype.update = function(dt) {
+    Label.prototype.update = function (dt) {
         if (this._step > 0 && this._goal > this._value) {
             var value = this._value + this._step;
             if (value > this._goal) {
@@ -362,18 +362,18 @@ var __extends =
     ns.Label = Label;
     egret.registerClass(Label, 'cm.Label');
 })(window.cm || (window.cm = {}));
-(function(ns) {
-    var Stack = (function(_super) {
+(function (ns) {
+    var Stack = (function (_super) {
         __extends(Stack, _super);
         function Stack() {
             _super && _super.apply(this, arguments);
         }
-        Stack.prototype.onResize = function() {
+        Stack.prototype.onResize = function () {
             _super.prototype.onResize.call(this);
             if (!this._root) return;
             var _this = this;
             this._root.setRect(0, 0, this.width, this.height);
-            this.pageStack.forEach(function(page) {
+            this.pageStack.forEach(function (page) {
                 page.setRect(0, 0, _this.width, _this.height);
             });
         };
@@ -381,27 +381,27 @@ var __extends =
     })(eui.UILayer);
 
     Object.defineProperty(Stack.prototype, 'root', {
-        get: function() {
+        get: function () {
             return this._root;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Stack.prototype, 'top', {
-        get: function() {
+        get: function () {
             return this.pageStack.last || this._root;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Stack.prototype, 'count', {
-        get: function() {
+        get: function () {
             return this.pageStack.length;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Stack.prototype.reload = function(root) {
+    Stack.prototype.reload = function (root) {
         if (!root instanceof Stack.Page) {
             throw new Error('Root class must be subclass of cm.Stack.Page!');
         }
@@ -417,12 +417,12 @@ var __extends =
         var _this = this;
         egret.Tween.get(root)
             .to({ alpha: 1 }, 150)
-            .call(function() {
+            .call(function () {
                 root.didShow();
                 _this.touchChildren = true;
             });
     };
-    Stack.prototype.push = function(page, props, finish) {
+    Stack.prototype.push = function (page, props, finish) {
         if (!this._root) throw new Error('You must set root page using Stack.reload(root)');
         if (!page) throw new Error('stack push: page must be provide');
         this.touchChildren = false;
@@ -438,7 +438,7 @@ var __extends =
         top.willHide();
         egret.Tween.get(top)
             .to({ x: -width / 3 }, 250, egret.Ease.sineInOut)
-            .call(function() {
+            .call(function () {
                 top.visible = false;
                 top.didHide();
             });
@@ -446,13 +446,13 @@ var __extends =
         page.willShow();
         egret.Tween.get(page)
             .to({ x: 0 }, 255, egret.Ease.sineInOut)
-            .call(function() {
+            .call(function () {
                 page.didShow();
                 ns.call(finish);
                 _this.touchChildren = true;
             });
     };
-    Stack.prototype.pop = function() {
+    Stack.prototype.pop = function () {
         var _this = this;
         var length = this.pageStack.length;
         if (length <= 0) return;
@@ -483,7 +483,7 @@ var __extends =
         ani.willHide();
         egret.Tween.get(ani)
             .to({ x: width }, 255, egret.Ease.sineInOut)
-            .call(function() {
+            .call(function () {
                 ani.visible = false;
                 ani.didHide();
                 _this.removeChild(ani);
@@ -494,11 +494,11 @@ var __extends =
         top.willShow();
         egret.Tween.get(top)
             .to({ x: 0 }, 250, egret.Ease.sineInOut)
-            .call(function() {
+            .call(function () {
                 top.didShow();
             });
     };
-    Stack.prototype.delete = function(page) {
+    Stack.prototype.delete = function (page) {
         if (this.pageStack.delete(page) >= 0) {
             this.removeChild(page);
         }
@@ -506,22 +506,22 @@ var __extends =
     ns.Stack = Stack;
     egret.registerClass(Stack, 'cm.Stack');
 
-    var Page = (function(_super) {
+    var Page = (function (_super) {
         __extends(Page, _super);
         function Page() {
             _super && _super.apply(this, arguments);
         }
         return Page;
     })(eui.Component);
-    Page.prototype.willShow = function() {};
-    Page.prototype.didShow = function() {};
-    Page.prototype.willHide = function() {};
-    Page.prototype.didHide = function() {};
+    Page.prototype.willShow = function () {};
+    Page.prototype.didShow = function () {};
+    Page.prototype.willHide = function () {};
+    Page.prototype.didHide = function () {};
     Stack.Page = Page;
     egret.registerClass(Page, 'cm.Stack.Page');
 })(window.cm || (window.cm = {}));
-(function(ns) {
-    var Popup = (function(_super) {
+(function (ns) {
+    var Popup = (function (_super) {
         __extends(Popup, _super);
         function Popup() {
             _super && _super.apply(this, arguments);
@@ -536,10 +536,10 @@ var __extends =
         }
         return Popup;
     })(eui.UILayer);
-    Popup.prototype.present = function(meta, opts) {
+    Popup.prototype.present = function (meta, opts) {
         this.add({ type: 'present', meta: meta, opts: opts || {} });
     };
-    Popup.prototype.remind = function(msg, opts) {
+    Popup.prototype.remind = function (msg, opts) {
         if (!this.Remind) {
             ns.warn('the Remind class must be set!');
             return;
@@ -551,7 +551,7 @@ var __extends =
         opts.msg = msg;
         this.add({ type: 'remind', opts: opts });
     };
-    Popup.prototype.dismiss = function(meta, finish) {
+    Popup.prototype.dismiss = function (meta, finish) {
         if (meta) {
             if (typeof meta === 'function' && meta.NAME) {
                 this.add({ type: 'dismiss', name: meta.NAME, finish: finish });
@@ -562,7 +562,7 @@ var __extends =
             this.add({ type: 'clear', finish: finish });
         }
     };
-    Popup.prototype.alert = function(msg, opts) {
+    Popup.prototype.alert = function (msg, opts) {
         if (!this.Alert) {
             ns.warn('the Alert class must be set!');
             return;
@@ -571,29 +571,29 @@ var __extends =
         opts.msg = msg;
         this.add({ type: 'present', meta: this.Alert, opts: opts });
     };
-    Popup.prototype.wait = function(msg, skinName) {
+    Popup.prototype.wait = function (msg, skinName) {
         if (!this.Wait) {
             ns.warn('the Wait class must be set!');
             return;
         }
         this.add({ type: 'wait', opts: { msg: msg, skinName: skinName } });
     };
-    Popup.prototype.idle = function() {
+    Popup.prototype.idle = function () {
         if (!this.Wait) {
             ns.warn('the Wait class must be set!');
             return;
         }
         this.add({ type: 'idle' });
     };
-    Popup.prototype.error = function(e) {
+    Popup.prototype.error = function (e) {
         this.remind((e && e.message) || this.errmsg);
     };
 
-    Popup.prototype.add = function(op) {
+    Popup.prototype.add = function (op) {
         this.opqueue.push(op);
         this.next();
     };
-    Popup.prototype.next = function() {
+    Popup.prototype.next = function () {
         if (this.current) return;
         this.current = this.opqueue.shift();
         if (!this.current) return;
@@ -624,7 +624,7 @@ var __extends =
                 break;
         }
     };
-    Popup.prototype._remind = function(opts) {
+    Popup.prototype._remind = function (opts) {
         var _this = this;
         var modal = this.genModal(this.Remind, opts.skinName);
         if (!modal) {
@@ -639,19 +639,19 @@ var __extends =
         modal.alpha = 0;
         egret.Tween.get(modal)
             .to({ alpha: 1 }, 250)
-            .call(function() {
+            .call(function () {
                 modal.onPresent(opts);
             })
             .wait(duration * 1000)
             .to({ alpha: 0 }, 250)
-            .call(function() {
+            .call(function () {
                 _this.delete(_this.Remind);
                 _this.current = null;
                 _this.next();
             });
         return modal;
     };
-    Popup.prototype._present = function(meta, opts) {
+    Popup.prototype._present = function (meta, opts) {
         var _this = this;
         var modal = this.genModal(meta, opts.skinName);
         if (!modal) {
@@ -678,21 +678,17 @@ var __extends =
                 .to({ scaleX: 1, scaleY: 1 }, 300, egret.Ease.elasticInOut)
                 .call(func);
         } else if (modal.fadeback) {
-            egret.Tween.get(modal.background)
-                .to({ alpha: opacity }, 250)
-                .call(func);
+            egret.Tween.get(modal.background).to({ alpha: opacity }, 250).call(func);
         } else {
             if (opacity > 0) {
                 modal.background.alpha = opacity;
             }
             modal.alpha = 0;
-            egret.Tween.get(modal)
-                .to({ alpha: 1 }, 250)
-                .call(func);
+            egret.Tween.get(modal).to({ alpha: 1 }, 250).call(func);
         }
         return modal;
     };
-    Popup.prototype._dismiss = function(name, finish) {
+    Popup.prototype._dismiss = function (name, finish) {
         var _this = this;
         var modal = name && this.showed[name];
         if (!modal) {
@@ -710,16 +706,12 @@ var __extends =
             _this.next();
         }
         if (modal.fadeback) {
-            egret.Tween.get(modal.background)
-                .to({ alpha: 0 }, 250)
-                .call(func);
+            egret.Tween.get(modal.background).to({ alpha: 0 }, 250).call(func);
         } else {
-            egret.Tween.get(modal)
-                .to({ alpha: 0 }, 250)
-                .call(func);
+            egret.Tween.get(modal).to({ alpha: 0 }, 250).call(func);
         }
     };
-    Popup.prototype._clear = function(finish) {
+    Popup.prototype._clear = function (finish) {
         var _this = this;
         var showed = this.showed;
         if (!showed) {
@@ -731,7 +723,7 @@ var __extends =
         this.showed = {};
         egret.Tween.get(this)
             .to({ alpha: 0 }, 250)
-            .call(function() {
+            .call(function () {
                 for (var key in showed) {
                     var ele = showed[key];
                     ele.onDismiss();
@@ -743,7 +735,7 @@ var __extends =
                 _this.next();
             });
     };
-    Popup.prototype._wait = function(opts) {
+    Popup.prototype._wait = function (opts) {
         var modal = this.genModal(this.Wait, opts.skinName);
         if (modal) {
             modal.onCreate({ msg: opts.msg });
@@ -752,12 +744,12 @@ var __extends =
         this.next();
         return modal;
     };
-    Popup.prototype._idle = function() {
+    Popup.prototype._idle = function () {
         this.delete(this.Wait);
         this.current = null;
         this.next();
     };
-    Popup.prototype.delete = function(meta) {
+    Popup.prototype.delete = function (meta) {
         var name = meta && meta.NAME;
         var modal = name && this.showed[name];
         if (modal) {
@@ -766,7 +758,7 @@ var __extends =
             this.removeChild(modal);
         }
     };
-    Popup.prototype.genModal = function(meta, skinName) {
+    Popup.prototype.genModal = function (meta, skinName) {
         if (typeof meta !== 'function') {
             ns.warn('Modal meta class not available!');
             return;
@@ -793,7 +785,7 @@ var __extends =
     };
     ns.Popup = Popup;
     egret.registerClass(Popup, 'cm.Popup');
-    var Modal = (function(_super) {
+    var Modal = (function (_super) {
         __extends(Modal, _super);
         function Modal() {
             _super && _super.apply(this, arguments);
@@ -803,7 +795,7 @@ var __extends =
             this._masktap = false;
             this.touchEnabled = true;
         }
-        Modal.prototype.createChildren = function() {
+        Modal.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
             this.background = new eui.Rect();
             this.background.fillColor = 0x000000;
@@ -814,40 +806,48 @@ var __extends =
             this.background.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTapMask, this);
             this.addChildAt(this.background, 0);
         };
-
+        Modal.prototype.partAdded = function (partName, instance) {
+            _super.prototype.partAdded.call(this, partName, instance);
+            if (instance === this.closer) {
+                var _this = this;
+                this.closer.onclick = function () {
+                    _this.dismiss();
+                };
+            }
+        };
         return Modal;
     })(eui.Component);
     Modal.NAME = 'COMMON';
     Object.defineProperty(Modal.prototype, 'masktap', {
-        get: function() {
+        get: function () {
             return this._masktap;
         },
-        set: function(val) {
+        set: function (val) {
             this._masktap = !!val;
             if (this.background) {
                 this.background.touchEnabled = !!val;
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Modal.prototype.onCreate = function(opts) {
+    Modal.prototype.onCreate = function (opts) {
         this.onhide = opts && opts.onhide;
     };
-    Modal.prototype.onPresent = function(opts) {};
-    Modal.prototype.onDismiss = function() {
+    Modal.prototype.onPresent = function (opts) {};
+    Modal.prototype.onDismiss = function () {
         ns.call(this.onhide);
     };
-    Modal.prototype.onTapMask = function() {
+    Modal.prototype.onTapMask = function () {
         this.dismiss();
     };
-    Modal.prototype.dismiss = function(finish) {
+    Modal.prototype.dismiss = function (finish) {
         this.pop && this.pop.dismiss(this.constructor, finish);
     };
     Popup.Modal = Modal;
     egret.registerClass(Modal, 'cm.Popup.Modal');
 
-    var Wait = (function(_super) {
+    var Wait = (function (_super) {
         __extends(Wait, _super);
         function Wait() {
             _super && _super.apply(this, arguments);
@@ -855,20 +855,20 @@ var __extends =
             this.hostComponentKey = 'cm.Wait';
             this.timeout = 20;
         }
-        Wait.prototype.createChildren = function() {
+        Wait.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
             var _this = this;
             this.background.touchEnabled = false;
             if (this.animator) {
                 egret.Tween.get(this.animator, { loop: true }).to({ rotation: 360 }, 2200);
-                setTimeout(function() {
+                setTimeout(function () {
                     _this.background.touchEnabled = true;
                 }, _this.timeout * 1000);
             } else {
                 ns.warn('The part animator must be provide!');
             }
         };
-        Wait.prototype.onCreate = function(opts) {
+        Wait.prototype.onCreate = function (opts) {
             this.message && (this.message.text = (opts && opts.msg) || '');
         };
         return Wait;
@@ -877,7 +877,7 @@ var __extends =
     Popup.Wait = Wait;
     egret.registerClass(Wait, 'cm.Popup.Wait');
 
-    var Alert = (function(_super) {
+    var Alert = (function (_super) {
         __extends(Alert, _super);
         function Alert() {
             _super && _super.apply(this, arguments);
@@ -886,7 +886,7 @@ var __extends =
         }
         return Alert;
     })(Modal);
-    Alert.prototype.onCreate = function(opts) {
+    Alert.prototype.onCreate = function (opts) {
         var title = opts.title,
             msg = opts.msg,
             confirm = opts.confirm,
@@ -905,7 +905,7 @@ var __extends =
             confirm.title && (this.confirm.label = confirm.title);
             onconfirm = confirm.block;
         }
-        this.confirm.onclick = function() {
+        this.confirm.onclick = function () {
             return _this.dismiss(onconfirm);
         };
         this.currentState = 'only';
@@ -921,7 +921,7 @@ var __extends =
                 cancel.title && (this.cancel.label = cancel.title);
                 oncancel = cancel.block;
             }
-            this.cancel.onclick = function() {
+            this.cancel.onclick = function () {
                 return _this.dismiss(oncancel);
             };
         }
@@ -930,7 +930,7 @@ var __extends =
     Popup.Alert = Alert;
     egret.registerClass(Alert, 'cm.Popup.Alert');
 
-    var Remind = (function(_super) {
+    var Remind = (function (_super) {
         __extends(Remind, _super);
         function Remind() {
             _super && _super.apply(this, arguments);
@@ -940,7 +940,7 @@ var __extends =
         return Remind;
     })(Modal);
     Remind.NAME = 'REMIND';
-    Remind.prototype.onCreate = function(opts) {
+    Remind.prototype.onCreate = function (opts) {
         var title = opts.title;
         var msg = opts.msg;
         msg && this.message && (this.message.text = msg);
@@ -950,8 +950,8 @@ var __extends =
     Popup.Remind = Remind;
     egret.registerClass(Remind, 'cm.Popup.Remind');
 })(window.cm || (window.cm = {}));
-(function(ns) {
-    var ListView = (function(_super) {
+(function (ns) {
+    var ListView = (function (_super) {
         __extends(ListView, _super);
         function ListView() {
             var _this = _super.call(this) || this;
@@ -978,7 +978,7 @@ var __extends =
             _this.easeFunc = egret.Ease.sineOut;
             return _this;
         }
-        ListView.prototype.createChildren = function() {
+        ListView.prototype.createChildren = function () {
             if (!this.$layout) {
                 if (this._vertical) {
                     var layout = new eui.VerticalLayout();
@@ -1000,17 +1000,17 @@ var __extends =
             this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapCapture, this, true);
         };
         Object.defineProperty(ListView.prototype, 'scroling', {
-            get: function() {
+            get: function () {
                 return this._touchMoved || this._tweening;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'bounces', {
-            get: function() {
+            get: function () {
                 return this._bounces;
             },
-            set: function(value) {
+            set: function (value) {
                 if (this._touchMoved) {
                     ns.warn('Can not change property bounces when scroling!');
                     return;
@@ -1018,13 +1018,13 @@ var __extends =
                 this._bounces = !!value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'easeTime', {
-            get: function() {
+            get: function () {
                 return this._easeTime;
             },
-            set: function(value) {
+            set: function (value) {
                 var num = +value;
                 if (num <= 0) {
                     throw new Error('easeTime must greater than 0');
@@ -1032,13 +1032,13 @@ var __extends =
                 this._easeTime = num;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'pageable', {
-            get: function() {
+            get: function () {
                 return this._pageable;
             },
-            set: function(value) {
+            set: function (value) {
                 if (this._touchMoved) {
                     ns.warn('Can not change property pageable when scroling!');
                     return;
@@ -1046,13 +1046,13 @@ var __extends =
                 this._pageable = !!value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'direction', {
-            get: function() {
+            get: function () {
                 return this._vertical ? 'V' : 'H';
             },
-            set: function(value) {
+            set: function (value) {
                 if (!this._touchMoved) {
                     if (value == 'V') {
                         this._vertical = true;
@@ -1066,13 +1066,13 @@ var __extends =
                 }
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'disabled', {
-            get: function() {
+            get: function () {
                 return this._disabled;
             },
-            set: function(value) {
+            set: function (value) {
                 value = !!value;
                 if (value !== this._disabled) {
                     this._disabled = value;
@@ -1080,23 +1080,23 @@ var __extends =
                 }
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'friction', {
-            get: function() {
+            get: function () {
                 return this._friction;
             },
-            set: function(value) {
+            set: function (value) {
                 if (value < 1) {
                     throw new Error('friction must be  greater than 1');
                 }
                 this._friction = value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'pageSize', {
-            get: function() {
+            get: function () {
                 if (this._pageSize > 0) {
                     return this._pageSize;
                 }
@@ -1106,7 +1106,7 @@ var __extends =
                     return (this.$layout && this.$layout.$typicalWidth) || 0;
                 }
             },
-            set: function(value) {
+            set: function (value) {
                 if (value > 0) {
                     this._pageSize = value;
                 } else {
@@ -1114,13 +1114,13 @@ var __extends =
                 }
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'pageIndex', {
-            get: function() {
+            get: function () {
                 return this._pageIndex;
             },
-            set: function(index) {
+            set: function (index) {
                 if (!this._pageable) {
                     throw Error('Cannot set page index when not pageable!');
                 }
@@ -1136,71 +1136,71 @@ var __extends =
                 }
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'maxThrowSpeed', {
-            get: function() {
+            get: function () {
                 return this._maxThrowSpeed;
             },
-            set: function(value) {
+            set: function (value) {
                 if (value < 4) {
                     throw new Error('friction must be  greater than 1');
                 }
                 this._maxThrowSpeed = value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'changeThreshold', {
-            get: function() {
+            get: function () {
                 return this._changeThreshold;
             },
-            set: function(value) {
+            set: function (value) {
                 if (value < 0 || value > 1) {
                     throw new Error('changeThreshold must be between 0 and 1');
                 }
                 this._changeThreshold = value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'scrollThreshold', {
-            get: function() {
+            get: function () {
                 return this._scrollThreshold;
             },
-            set: function(value) {
+            set: function (value) {
                 if (value < 1 || value > 100) {
                     throw new Error('scrollThreshold must be between 1 and 100');
                 }
                 this._scrollThreshold = value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(ListView.prototype, 'allowAutoSelect', {
-            get: function() {
+            get: function () {
                 return this._allowAutoSelect;
             },
-            set: function(value) {
+            set: function (value) {
                 this._allowAutoSelect = !!value;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
-        ListView.prototype.scrollToHead = function(time) {
+        ListView.prototype.scrollToHead = function (time) {
             this.scrollToOffset(0, time);
         };
-        ListView.prototype.scrollToTail = function(time) {
+        ListView.prototype.scrollToTail = function (time) {
             var info = this.getParamInfo();
             this.scrollToOffset(info.max, time);
         };
-        ListView.prototype.scrollToIndex = function(index, time) {
+        ListView.prototype.scrollToIndex = function (index, time) {
             var size = this.pageSize;
             if (size > 0) {
                 this.scrollToOffset(index * size, time);
             }
         };
-        ListView.prototype.scrollToOffset = function(offset, time) {
+        ListView.prototype.scrollToOffset = function (offset, time) {
             if (typeof time !== 'number' || time < 0) {
                 time = 0;
             }
@@ -1222,7 +1222,7 @@ var __extends =
                 this.startAnimation(param, time, this.easeFunc);
             }
         };
-        ListView.prototype.getParamInfo = function() {
+        ListView.prototype.getParamInfo = function () {
             var max, key;
             var uivalues = this.$UIComponent;
             if (this._vertical) {
@@ -1234,14 +1234,14 @@ var __extends =
             }
             return { max: Math.max(0, max), key: key };
         };
-        ListView.prototype.onTouchBeginCapture = function(event) {
+        ListView.prototype.onTouchBeginCapture = function (event) {
             if (!this.$stage) return;
             this._touchCancel = false;
             if (this.checkScrollAble()) {
                 this.onTouchBegin(event);
             }
         };
-        ListView.prototype.onTouchEndCapture = function(event) {
+        ListView.prototype.onTouchEndCapture = function (event) {
             if (this._touchCancel) {
                 event.$bubbles = false;
                 this.dispatchBubbleEvent(event);
@@ -1249,7 +1249,7 @@ var __extends =
                 event.stopPropagation();
             }
         };
-        ListView.prototype.onTouchTapCapture = function(event) {
+        ListView.prototype.onTouchTapCapture = function (event) {
             if (this._touchCancel) {
                 event.$bubbles = false;
                 this.dispatchBubbleEvent(event);
@@ -1257,7 +1257,7 @@ var __extends =
                 event.stopPropagation();
             }
         };
-        ListView.prototype.checkScrollAble = function() {
+        ListView.prototype.checkScrollAble = function () {
             var uiValues = this.$UIComponent;
             if (this._vertical) {
                 this._canscroll = !this._disabled && this.contentHeight > uiValues[11];
@@ -1266,7 +1266,7 @@ var __extends =
             }
             return this._canscroll;
         };
-        ListView.prototype.onTouchBegin = function(event) {
+        ListView.prototype.onTouchBegin = function (event) {
             if (event.isDefaultPrevented()) {
                 return;
             }
@@ -1289,7 +1289,7 @@ var __extends =
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
             this.tempStage = stage;
         };
-        ListView.prototype.onTouchMove = function(event) {
+        ListView.prototype.onTouchMove = function (event) {
             if (event.isDefaultPrevented()) {
                 return;
             }
@@ -1322,7 +1322,7 @@ var __extends =
                 this.update(event.$stageX);
             }
         };
-        ListView.prototype.update = function(touchPoint) {
+        ListView.prototype.update = function (touchPoint) {
             var info = this.getParamInfo();
             var key = info.key;
             var max = info.max;
@@ -1348,12 +1348,12 @@ var __extends =
             }
             this[key] = pos;
         };
-        ListView.prototype.onTouchCancel = function(event) {
+        ListView.prototype.onTouchCancel = function (event) {
             if (!this._touchMoved) {
                 this.onRemoveListeners();
             }
         };
-        ListView.prototype.onTouchEnd = function(event) {
+        ListView.prototype.onTouchEnd = function (event) {
             if (this._touchMoved) {
                 this._touchMoved = false;
                 this.onRemoveListeners();
@@ -1364,7 +1364,7 @@ var __extends =
                 }
             }
         };
-        ListView.prototype.doThrow = function() {
+        ListView.prototype.doThrow = function () {
             var info = this.getParamInfo();
             var max = info.max;
             var key = info.key;
@@ -1397,7 +1397,7 @@ var __extends =
             this.startAnimation(param, t, ease);
         };
 
-        ListView.prototype.doPaging = function(event) {
+        ListView.prototype.doPaging = function (event) {
             var info = this.getParamInfo();
             var max = info.max;
             var key = info.key;
@@ -1430,7 +1430,7 @@ var __extends =
             this.startAnimation(param, fastMove ? Math.abs(param[key] - current) / 3 : this._easeTime, this.easeFunc);
             this.doChangePage(index);
         };
-        ListView.prototype.dispatchBubbleEvent = function(event) {
+        ListView.prototype.dispatchBubbleEvent = function (event) {
             var evt = egret.Event.create(egret.TouchEvent, event.type, event.bubbles, event.cancelable);
             evt.$initTo(event.$stageX, event.$stageY, event.touchPointID);
             var target = this.downTarget;
@@ -1445,7 +1445,7 @@ var __extends =
             egret.Event.release(evt);
         };
 
-        ListView.prototype.dispatchCancelEvent = function(event) {
+        ListView.prototype.dispatchCancelEvent = function (event) {
             var cancelEvent = egret.Event.create(egret.TouchEvent, egret.TouchEvent.TOUCH_CANCEL, event.bubbles, event.cancelable);
             cancelEvent.$initTo(event.$stageX, event.$stageY, event.touchPointID);
             var target = this.downTarget;
@@ -1463,7 +1463,7 @@ var __extends =
             egret.Event.release(cancelEvent);
         };
 
-        ListView.prototype.onRemoveListeners = function() {
+        ListView.prototype.onRemoveListeners = function () {
             var stage = this.tempStage || this.$stage;
             stage.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this, true);
             stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
@@ -1471,43 +1471,41 @@ var __extends =
             this.removeEventListener(egret.TouchEvent.TOUCH_CANCEL, this.onTouchCancel, this);
             this.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveListeners, this);
         };
-        ListView.prototype.onCollectionChange = function(event) {
+        ListView.prototype.onCollectionChange = function (event) {
             _super.prototype.onCollectionChange.call(this, event);
             if (this._pageable && this.$dataProviderChanged) {
                 this.doChangePage(0);
             }
         };
-        ListView.prototype.rendererAdded = function(renderer, index, item) {
+        ListView.prototype.rendererAdded = function (renderer, index, item) {
             if (this._allowAutoSelect) {
                 _super.prototype.rendererAdded.call(this, renderer, index, item);
             }
         };
-        ListView.prototype.onRendererTouchEnd = function(event) {
+        ListView.prototype.onRendererTouchEnd = function (event) {
             if (this._allowAutoSelect) {
                 _super.prototype.onRendererTouchEnd.call(this, event);
             }
         };
-        ListView.prototype.startAnimation = function(param, duration, func) {
+        ListView.prototype.startAnimation = function (param, duration, func) {
             this.stopAnimation();
             this._tweening = true;
-            egret.Tween.get(this, { onChange: this.onChanging, onChangeObj: this })
-                .to(param, duration, func)
-                .call(this.onChangeEnd);
+            egret.Tween.get(this, { onChange: this.onChanging, onChangeObj: this }).to(param, duration, func).call(this.onChangeEnd);
         };
-        ListView.prototype.stopAnimation = function() {
+        ListView.prototype.stopAnimation = function () {
             if (this._tweening) {
                 egret.Tween.removeTweens(this);
                 this.onChangeEnd();
             }
         };
-        ListView.prototype.onChangeEnd = function() {
+        ListView.prototype.onChangeEnd = function () {
             this._tweening = false;
             eui.UIEvent.dispatchUIEvent(this, eui.UIEvent.CHANGE_END);
         };
-        ListView.prototype.onChanging = function() {
+        ListView.prototype.onChanging = function () {
             this.dispatchEventWith(egret.Event.CHANGING);
         };
-        ListView.prototype.doChangePage = function(index) {
+        ListView.prototype.doChangePage = function (index) {
             if (index != this._pageIndex) {
                 this._pageIndex = index;
                 this.dispatchEventWith(ListView.CHANGE_PAGE, false, index);

@@ -250,6 +250,8 @@ declare namespace cm {
             protected fadeback: boolean;
             /** @description insert by present opts.onhide */
             protected onhide?: Function;
+            /** @description Auto close modal using skinPart, you can only assign this button using exml */
+            protected readonly closer: Button;
             /** @default this.onhide=opts&&opts.onhide If you overwride this method. You must consider call super or not */
             protected onCreate(opts?: any): void;
             /** @default empty */
