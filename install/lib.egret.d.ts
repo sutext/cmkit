@@ -275,7 +275,6 @@ declare namespace cm {
             public message: eui.Label;
         }
         class Wait extends Modal {
-            public timeout: number; /** @default 20s */
             public message: eui.List;
         }
         type Action =
@@ -291,6 +290,8 @@ declare namespace cm {
             readonly cancel?: Action;
             readonly onhide?: Function;
             readonly confirm?: Action;
+            /** @description affter time out you can cancel wating . if none or minus keep forever. */
+            readonly timeout?: number;
             readonly skinName?: SkinName;
         }
     }

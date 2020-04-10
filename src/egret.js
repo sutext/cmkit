@@ -853,23 +853,25 @@ var __extends =
             _super && _super.apply(this, arguments);
             this.zIndex = 1001;
             this.hostComponentKey = 'cm.Wait';
-            this.timeout = 20;
         }
         Wait.prototype.createChildren = function () {
             _super.prototype.createChildren.call(this);
-            var _this = this;
+
             this.background.touchEnabled = false;
             if (this.animator) {
                 egret.Tween.get(this.animator, { loop: true }).to({ rotation: 360 }, 2200);
-                setTimeout(function () {
-                    _this.background.touchEnabled = true;
-                }, _this.timeout * 1000);
             } else {
                 ns.warn('The part animator must be provide!');
             }
         };
         Wait.prototype.onCreate = function (opts) {
             this.message && (this.message.text = (opts && opts.msg) || '');
+            var _this = this;
+            if (opts && typeof opts.timeout === 'number' && opts.timeout > 0) {
+                setTimeout(function () {
+                    _this.background.touchEnabled = true;
+                }, opts.timeout * 1000);
+            }
         };
         return Wait;
     })(Modal);
