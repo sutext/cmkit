@@ -65,7 +65,7 @@ interface Number {
     readonly symidx: 'st' | 'nd' | 'rd' | 'th';
     /**
      * @description Trun the number to kilo million billion trillion
-     * @param maxbit The max bit width affter format. @default 3
+     * @param max The max length affter format. @default 3
      * @example
      * console.log((1000000).kmgtify(3));//1M
      * console.log((1000000).kmgtify(4));//1000K
@@ -77,8 +77,9 @@ interface Number {
      * console.log((1000000000).kmgtify(3));//1G
      * console.log((999999999999999).kmgtify(3));//999T
      */
-    readonly kmgtify: (maxbit?: 3 | 4 | 5 | 6) => string;
+    readonly kmgtify: (max?: 3 | 4 | 5 | 6) => string;
 }
+
 interface Array<T> {
     /**
      * @description get the last element from the stack
@@ -169,6 +170,16 @@ declare namespace cm {
     const apihost: string;
     /** @description judge the device‘s screen ratio is greater than 16/9 if true maybe iphoneX */
     const isslim: boolean;
+    /**
+     * @description global config Number.kmgtify formater
+     * @default value.comma()+symbol
+     * @param value the new number part
+     * @param symbol the symbol flag e.g K M G T
+     * @example
+     * cm.kmgtfmt = value=>(value.toFixed(2)+symbol)
+     * console.log((10000).kmgtify())//10.00K
+     */
+    let kmgtfmt: (value: number, symbol: '' | 'K' | 'M' | 'G' | 'T') => string;
 }
 declare namespace cm {
     abstract class Emitter<E extends string = string> {

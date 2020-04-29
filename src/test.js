@@ -3,11 +3,11 @@ global.WebSocket = {};
 require('../web/index');
 var emter = window.cm.notice;
 var center = { name: 'hellow emiter' };
-emter.once('test1', center, function(test1) {
+emter.once('test1', center, function (test1) {
     console.log('once this arg=', this);
     console.log(test1);
 });
-emter.on('test1', center, function(test1) {
+emter.on('test1', center, function (test1) {
     console.log('this arg=', this);
     console.log(test1);
 });

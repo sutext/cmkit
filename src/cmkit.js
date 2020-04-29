@@ -1,33 +1,33 @@
-(function() {
+(function (ns) {
     'use strict';
-    Number.prototype.fixlen = function(len) {
+    Number.prototype.fixlen = function (len) {
         if (typeof len !== 'number' || len < 1) {
             len = 2;
         }
         return (Array(len).join('0') + this).slice(-len);
     };
-    Number.prototype.round = function(len) {
+    Number.prototype.round = function (len) {
         if (typeof len !== 'number' || len < 0) {
             len = 0;
         }
         var pow = Math.pow(10, len);
         return Math.round(this * pow) / pow;
     };
-    Number.prototype.floor = function(len) {
+    Number.prototype.floor = function (len) {
         if (typeof len !== 'number' || len < 0) {
             len = 0;
         }
         var pow = Math.pow(10, len);
         return Math.floor(this * pow) / pow;
     };
-    Number.prototype.ceil = function(len) {
+    Number.prototype.ceil = function (len) {
         if (typeof len !== 'number' || len < 0) {
             len = 0;
         }
         var pow = Math.pow(10, len);
         return Math.ceil(this * pow) / pow;
     };
-    Number.prototype.comma = function() {
+    Number.prototype.comma = function () {
         var str = this.toString();
         var strary = str.split('.');
         var head = strary[0];
@@ -44,7 +44,7 @@
         return result;
     };
     Object.defineProperty(Number.prototype, 'symidx', {
-        get: function() {
+        get: function () {
             if (this > 3 && this <= 20) {
                 return 'th';
             }
@@ -60,9 +60,9 @@
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Number.prototype.kmgtify = function(max) {
+    Number.prototype.kmgtify = function (max) {
         if (max === void 0) {
             max = 3;
         }
@@ -70,25 +70,26 @@
             throw new Error('maxlen must be intger between 3 and 6');
         }
         if (this < Math.pow(10, max)) {
-            return this.comma();
+            return ns.kmgtfmt(this, '');
         } else if (this < Math.pow(10, max + 3)) {
-            return (this / 1000).comma() + 'K';
+            return ns.kmgtfmt(this / 1000, 'K');
         } else if (this < Math.pow(10, max + 6)) {
-            return (this / 1000000).comma() + 'M';
+            return ns.kmgtfmt(this / 1000000, 'M');
         } else if (this < Math.pow(10, max + 9)) {
-            return (this / 1000000000).comma() + 'G';
+            return ns.kmgtfmt(this / 1000000000, 'G');
         } else if (this < Math.pow(10, max + 12)) {
-            return (this / 1000000000000).comma() + 'T';
+            return ns.kmgtfmt(this / 1000000000000, 'T');
         }
-        return this.comma();
+        return cm.kmgtfmt(this, '');
     };
-    String.prototype.fixlen = function(len) {
+
+    String.prototype.fixlen = function (len) {
         if (typeof len !== 'number' || len < 1) {
             len = 2;
         }
         return (Array(len).join('0') + this).slice(-len);
     };
-    String.prototype.parsed = function() {
+    String.prototype.parsed = function () {
         var result = {};
         if (this.length == 0) return result;
         var strs = this.split('?');
@@ -110,54 +111,54 @@
         return result;
     };
     Object.defineProperty(Array.prototype, 'first', {
-        get: function() {
+        get: function () {
             if (this.length > 0) {
                 return this[0];
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Array.prototype, 'last', {
-        get: function() {
+        get: function () {
             if (this.length > 0) {
                 return this[this.length - 1];
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Array.prototype, 'ranidx', {
-        get: function() {
+        get: function () {
             if (this.length === 0) return -1;
             return Math.floor(Math.random() * this.length);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Array.prototype, 'random', {
-        get: function() {
+        get: function () {
             return this[this.ranidx];
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Array.prototype.insert = function(obj, index) {
+    Array.prototype.insert = function (obj, index) {
         if (typeof index !== 'number') return;
         if (index < 0 || index > this.length) return;
         this.splice(index, 0, obj);
     };
-    Array.prototype.append = function(ary) {
+    Array.prototype.append = function (ary) {
         return this.push.apply(this, ary);
     };
-    Array.prototype.remove = function(index) {
+    Array.prototype.remove = function (index) {
         if (typeof index !== 'number') return undefined;
         if (index < 0 || index >= this.length) return undefined;
         return this.splice(index, 1)[0];
     };
-    Array.prototype.delete = function(item) {
+    Array.prototype.delete = function (item) {
         if (this.length === 0) return -1;
-        var idx = this.findIndex(function(ele) {
+        var idx = this.findIndex(function (ele) {
             return ele === item;
         });
         if (idx >= 0) {
@@ -165,20 +166,20 @@
         }
         return idx;
     };
-    Array.prototype.contains = function(item) {
+    Array.prototype.contains = function (item) {
         if (this.length === 0) return false;
-        var idx = this.findIndex(function(ele) {
+        var idx = this.findIndex(function (ele) {
             return ele === item;
         });
         return idx >= 0;
     };
-    Date.prototype.format = function(fmt) {
+    Date.prototype.format = function (fmt) {
         var o = {
             MM: this.getMonth() + 1, //月份
             dd: this.getDate(), //日
             hh: this.getHours(), //小时
             mm: this.getMinutes(), //分
-            ss: this.getSeconds() //秒
+            ss: this.getSeconds(), //秒
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
         for (var k in o)
@@ -187,49 +188,49 @@
         return fmt;
     };
     Object.defineProperty(Date.prototype, 'hhmmss', {
-        get: function() {
+        get: function () {
             var h = this.getUTCHours();
             var m = this.getUTCMinutes();
             var s = this.getUTCSeconds();
             return h.fixlen(2) + ':' + m.fixlen(2) + ':' + s.fixlen(2);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Date.prototype, 'hhmm', {
-        get: function() {
+        get: function () {
             var h = this.getUTCHours();
             var m = this.getUTCMinutes();
             return h.fixlen(2) + ':' + m.fixlen(2);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Date.prototype, 'mmss', {
-        get: function() {
+        get: function () {
             var h = this.getUTCMinutes();
             var m = this.getUTCSeconds();
             return h.fixlen(2) + ':' + m.fixlen(2);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-})();
+})((window.cm = window.cm || {}));
 
 //---------------------uitls----------------------
-(function(ns) {
+(function (ns) {
     'use strict';
-    ns.log = function() {
+    ns.log = function () {
         if (ns.debug) {
             console.log.apply(console, arguments);
         }
     };
-    ns.warn = function() {
+    ns.warn = function () {
         if (ns.debug) {
             console.warn.apply(console, arguments);
         }
     };
-    ns.call = function() {
+    ns.call = function () {
         var argc = arguments.length;
         if (argc <= 0) return;
         var func = arguments[0];
@@ -244,7 +245,7 @@
             func.apply(null, args);
         }
     };
-    ns.okstr = function(value) {
+    ns.okstr = function (value) {
         var type = typeof value;
         switch (type) {
             case 'string':
@@ -255,7 +256,7 @@
                 return false;
         }
     };
-    ns.okint = function(value) {
+    ns.okint = function (value) {
         var type = typeof value;
         switch (type) {
             case 'string':
@@ -266,7 +267,7 @@
                 return false;
         }
     };
-    ns.oknum = function(value) {
+    ns.oknum = function (value) {
         var type = typeof value;
         switch (type) {
             case 'string':
@@ -278,25 +279,28 @@
         }
     };
 
-    ns.config = function(host, debug) {
+    ns.config = function (host, debug) {
         ns.apihost = host;
         ns.debug = !!debug;
     };
     ns.debug = true;
     Object.defineProperty(ns, 'isslim', {
-        get: function() {
+        get: function () {
             var size = window.screen;
             var max = Math.max(size.width, size.height);
             var min = Math.min(size.width, size.height);
             return max / min > 1.78;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
+    ns.kmgtfmt = function (value, symbol) {
+        return value.comma() + symbol;
+    };
 })((window.cm = window.cm || {}));
 var __extends =
     (this && this.__extends) ||
-    function(t, e) {
+    function (t, e) {
         for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
         function r() {
             this.constructor = t;
@@ -304,21 +308,21 @@ var __extends =
         (r.prototype = e.prototype), (t.prototype = new r());
     };
 //--------------------Network Socket Storage ----------------
-(function(ns) {
-    var Emitter = (function() {
+(function (ns) {
+    var Emitter = (function () {
         function Emitter() {
             var _this = this;
             _this.observers = {};
-            _this.on = function(evt, target, callback, once) {
+            _this.on = function (evt, target, callback, once) {
                 var list = _this.observers[evt] || (_this.observers[evt] = []);
-                var idx = list.findIndex(function(ele) {
+                var idx = list.findIndex(function (ele) {
                     return ele.target === target && ele.once === !!once;
                 });
                 if (idx === -1) {
                     list.push({ callback: callback, target: target, once: !!once });
                 }
             };
-            _this.off = function(evt, target) {
+            _this.off = function (evt, target) {
                 if (typeof evt === 'string') {
                     if (target) {
                         _this.removeByTarget(_this.observers[evt], target);
@@ -331,10 +335,10 @@ var __extends =
                     }
                 }
             };
-            _this.once = function(event, target, callback) {
+            _this.once = function (event, target, callback) {
                 _this.on(event, target, callback, true);
             };
-            _this.emit = function(event) {
+            _this.emit = function (event) {
                 if (typeof event !== 'string') return;
                 var list = _this.observers[event];
                 if (!Array.isArray(list)) return;
@@ -352,11 +356,11 @@ var __extends =
                     }
                 }
             };
-            _this.offall = function() {
+            _this.offall = function () {
                 _this.observers = {};
             };
         }
-        Emitter.prototype.removeByTarget = function(list, target) {
+        Emitter.prototype.removeByTarget = function (list, target) {
             if (Array.isArray(list)) {
                 for (var i = list.length - 1; i >= 0; i--) {
                     if (list[i].target === target) {
@@ -368,7 +372,7 @@ var __extends =
         return Emitter;
     })();
     ns.Emitter = Emitter;
-    var NoticeCenter = (function(_super) {
+    var NoticeCenter = (function (_super) {
         __extends(NoticeCenter, _super);
         function NoticeCenter() {
             return (_super !== null && _super.apply(this, arguments)) || this;
@@ -378,10 +382,10 @@ var __extends =
     ns.NoticeCenter = NoticeCenter;
     ns.notice = new NoticeCenter();
 
-    ns.Network = (function() {
+    ns.Network = (function () {
         function Network() {
             var _this = this;
-            this.upload = function(path, upload) {
+            this.upload = function (path, upload) {
                 if (!_this.before(path, upload.opts)) return;
                 var data = new FormData();
                 data.append(upload.name, upload.data);
@@ -394,128 +398,128 @@ var __extends =
                 headers['Content-Type'] = upload.type;
                 var options = Object.assign({ headers: headers }, _this.options, upload.opts);
                 var values = Network.post(_this.url(path), _this.params(data), options);
-                var promiss = new Promise(function(resolve, reject) {
+                var promiss = new Promise(function (resolve, reject) {
                     values[0]
-                        .then(function(json) {
+                        .then(function (json) {
                             var parser = (options && options.parser) || _this.resolve.bind(_this);
                             var value = parser(json);
                             return value;
                         })
-                        .then(function(obj) {
+                        .then(function (obj) {
                             resolve(obj);
                             _this.after(path, obj);
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             reject(e);
                             _this.after(path, e);
                         });
                 });
                 return new Network.UploadTask(promiss, values[1]);
             };
-            this.anyreq = function(req) {
+            this.anyreq = function (req) {
                 return _this.anytask(req.path, req.data, req.opts);
             };
-            this.objreq = function(req) {
+            this.objreq = function (req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of objreq must be a Constructor');
                 return _this.objtask(req.meta, req.path, req.data, req.opts);
             };
-            this.aryreq = function(req) {
+            this.aryreq = function (req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of aryreq must be a Constructor');
                 return _this.arytask(req.meta, req.path, req.data, req.opts);
             };
-            this.mapreq = function(req) {
+            this.mapreq = function (req) {
                 if (typeof req.meta !== 'function') throw new Error('the meta of mapreq must be a Constructor');
                 return _this.maptask(req.meta, req.path, req.data, req.opts);
             };
-            this.anytask = function(path, data, opts) {
+            this.anytask = function (path, data, opts) {
                 if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = new Promise(function(resolve, reject) {
+                var promiss = new Promise(function (resolve, reject) {
                     values[0]
-                        .then(function(json) {
+                        .then(function (json) {
                             var parser = (options && options.parser) || _this.resolve.bind(_this);
                             var value = parser(json);
                             return value;
                         })
-                        .then(function(obj) {
+                        .then(function (obj) {
                             resolve(obj);
                             _this.after(path, obj);
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             reject(e);
                             _this.after(path, e);
                         });
                 });
                 return new Network.DataTask(promiss, values[1]);
             };
-            this.objtask = function(meta, path, data, opts) {
+            this.objtask = function (meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = new Promise(function(resolve, reject) {
+                var promiss = new Promise(function (resolve, reject) {
                     values[0]
-                        .then(function(json) {
+                        .then(function (json) {
                             var parser = (options && options.parser) || _this.resolve.bind(_this);
                             return parser(json);
                         })
-                        .then(function(value) {
+                        .then(function (value) {
                             return new meta(value);
                         })
-                        .then(function(obj) {
+                        .then(function (obj) {
                             resolve(obj);
                             _this.after(path, obj);
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             reject(e);
                             _this.after(path, e);
                         });
                 });
                 return new Network.DataTask(promiss, values[1]);
             };
-            this.arytask = function(meta, path, data, opts) {
+            this.arytask = function (meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = new Promise(function(resolve, reject) {
+                var promiss = new Promise(function (resolve, reject) {
                     values[0]
-                        .then(function(json) {
+                        .then(function (json) {
                             var parser = (options && options.parser) || _this.resolve.bind(_this);
                             return parser(json);
                         })
-                        .then(function(value) {
+                        .then(function (value) {
                             return Array.isArray(value)
-                                ? value.map(function(ele) {
+                                ? value.map(function (ele) {
                                       return new meta(ele);
                                   })
                                 : [];
                         })
-                        .then(function(ary) {
+                        .then(function (ary) {
                             resolve(ary);
                             _this.after(path, ary);
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             reject(e);
                             _this.after(path, e);
                         });
                 });
                 return new Network.DataTask(promiss, values[1]);
             };
-            this.maptask = function(meta, path, data, opts) {
+            this.maptask = function (meta, path, data, opts) {
                 if (!_this.before(path, opts)) return;
                 var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
-                var promiss = new Promise(function(resolve, reject) {
+                var promiss = new Promise(function (resolve, reject) {
                     values[0]
-                        .then(function(json) {
+                        .then(function (json) {
                             var parser = (options && options.parser) || _this.resolve.bind(_this);
                             return parser(json);
                         })
-                        .then(function(value) {
+                        .then(function (value) {
                             var result = {};
                             var mapkey = (opts && opts.mapkey) || 'id';
                             if (Array.isArray(value)) {
-                                value.forEach(function(ele) {
+                                value.forEach(function (ele) {
                                     var obj = new meta(ele);
                                     var keyvalue = obj[mapkey];
                                     if (keyvalue) {
@@ -538,11 +542,11 @@ var __extends =
                             }
                             return result;
                         })
-                        .then(function(map) {
+                        .then(function (map) {
                             resolve(map);
                             _this.after(path, map);
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             reject(e);
                             _this.after(path, e);
                         });
@@ -551,82 +555,82 @@ var __extends =
             };
         }
         Object.defineProperty(Network.prototype, 'headers', {
-            get: function() {
+            get: function () {
                 return {};
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(Network.prototype, 'method', {
-            get: function() {
+            get: function () {
                 return 'POST';
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
-        Network.prototype.url = function(path) {
+        Network.prototype.url = function (path) {
             throw new Error('Network.url(path:string) must be implement');
         };
-        Network.prototype.resolve = function(json) {
+        Network.prototype.resolve = function (json) {
             throw new Error('Network.resolve must be implement');
         };
-        Network.prototype.params = function(data) {
+        Network.prototype.params = function (data) {
             return data;
         };
-        Network.prototype.before = function() {
+        Network.prototype.before = function () {
             return true;
         };
-        Network.prototype.after = function() {};
+        Network.prototype.after = function () {};
         return Network;
     })();
-    (function(Network) {
-        var Error = /** @class */ (function() {
+    (function (Network) {
+        var Error = /** @class */ (function () {
             function Error(type, status, message) {
                 this.type = type;
                 this.status = status;
                 this.message = message;
             }
-            Error.abort = function(status) {
+            Error.abort = function (status) {
                 return new Error('abort', status, 'The request has been abort!');
             };
-            Error.timeout = function(status) {
+            Error.timeout = function (status) {
                 return new Error('timeout', status, 'Request timeout!');
             };
-            Error.service = function(status) {
+            Error.service = function (status) {
                 return new Error('service', status, '[' + status + ']:' + 'The service unavailable!');
             };
             return Error;
         })();
         Network.Error = Error;
-        var DataTask = /** @class */ (function() {
+        var DataTask = /** @class */ (function () {
             function DataTask(promiss, handler) {
                 this.promiss = promiss;
                 this.handler = handler;
                 this[Symbol.toStringTag] = 'Promise';
                 var _this = this;
-                this.then = function(onfulfilled, onrejected) {
+                this.then = function (onfulfilled, onrejected) {
                     return _this.promiss.then(onfulfilled, onrejected);
                 };
-                this.catch = function(onrejected) {
+                this.catch = function (onrejected) {
                     return _this.promiss.catch(onrejected);
                 };
-                this.abort = function() {
+                this.abort = function () {
                     if (this.handler.readyState < 4) {
                         _this.handler.abort();
                     }
                 };
-                this.onProgress = function(func) {
+                this.onProgress = function (func) {
                     _this.handler.onprogress = func;
                 };
             }
             return DataTask;
         })();
         Network.DataTask = DataTask;
-        var UploadTask = /** @class */ (function(_super) {
+        var UploadTask = /** @class */ (function (_super) {
             __extends(UploadTask, _super);
             function UploadTask() {
                 var _this = (_super !== null && _super.apply(this, arguments)) || this;
-                _this.onProgress = function(func) {
+                _this.onProgress = function (func) {
                     _this.handler.upload.onprogress = func;
                 };
                 return _this;
@@ -634,24 +638,24 @@ var __extends =
             return UploadTask;
         })(DataTask);
         Network.UploadTask = UploadTask;
-        Network.http = function(url, data, opts) {
+        Network.http = function (url, data, opts) {
             return (opts && opts.method) === 'POST' ? Network.post(url, data, opts) : Network.get(url, data, opts);
         };
-        Network.get = function(url, data, opts) {
+        Network.get = function (url, data, opts) {
             var handler;
-            var promiss = new Promise(function(resolve, reject) {
+            var promiss = new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 handler = xhr;
-                xhr.onabort = function() {
+                xhr.onabort = function () {
                     return reject(Network.Error.abort(xhr.status));
                 };
-                xhr.ontimeout = function() {
+                xhr.ontimeout = function () {
                     return reject(Network.Error.timeout(xhr.status));
                 };
-                xhr.onerror = function() {
+                xhr.onerror = function () {
                     return reject(Network.Error.service(xhr.status));
                 };
-                xhr.onloadend = function() {
+                xhr.onloadend = function () {
                     ns.log('\nrequest:url=', url, '\nrequest:data=', data, '\nresponse=', xhr.response);
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
                         resolve(xhr.responseType === 'json' ? xhr.response : xhr.responseText);
@@ -680,21 +684,21 @@ var __extends =
             return [promiss, handler];
         };
         var _reqidx = 0;
-        Network.post = function(url, data, opts) {
+        Network.post = function (url, data, opts) {
             var handler;
-            var promiss = new Promise(function(resolve, reject) {
+            var promiss = new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 handler = xhr;
-                xhr.onabort = function() {
+                xhr.onabort = function () {
                     return reject(Network.Error.abort(xhr.status));
                 };
-                xhr.ontimeout = function() {
+                xhr.ontimeout = function () {
                     return reject(Network.Error.timeout(xhr.status));
                 };
-                xhr.onerror = function() {
+                xhr.onerror = function () {
                     return reject(Network.Error.service(xhr.status));
                 };
-                xhr.onloadend = function() {
+                xhr.onloadend = function () {
                     ns.log('\nrequest:url=', url, '\nrequest:data=', data, '\nresponse=', xhr.response);
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
                         resolve(xhr.responseType === 'json' ? xhr.response : xhr.responseText);
@@ -718,7 +722,7 @@ var __extends =
         };
     })(ns.Network);
 
-    ns.Socket = (function() {
+    ns.Socket = (function () {
         function Socket(builder, protocols) {
             var _this = this;
             this._retrying = false;
@@ -727,7 +731,7 @@ var __extends =
             this.buildurl = builder;
             this.protocols = protocols;
             this.retry = new Socket.Retry(this.onRetryCallback.bind(this), this.onRetryFailed.bind(this));
-            this.open = function() {
+            this.open = function () {
                 if (_this.readyState === Socket.CONNECTING || _this.readyState === Socket.OPEN || typeof _this.buildurl !== 'function') {
                     return;
                 }
@@ -744,32 +748,32 @@ var __extends =
                 _this.ws.onopen = _this.onOpenCallback.bind(_this);
                 _this.ws.binaryType = _this.binaryType;
             };
-            this.close = function(code, reason) {
+            this.close = function (code, reason) {
                 if (!_this.ws) return;
                 if (_this.ws.readyState === Socket.CLOSED || _this.ws.readyState === Socket.CLOSING) return;
                 _this.ws.close(code, reason);
             };
-            this.send = function(data) {
+            this.send = function (data) {
                 _this.ws && _this.ws.send(data);
             };
         }
-        Socket.prototype.onRetryCallback = function() {
+        Socket.prototype.onRetryCallback = function () {
             this.open();
             this._retrying = true;
         };
-        Socket.prototype.onRetryFailed = function(e) {
+        Socket.prototype.onRetryFailed = function (e) {
             this._retrying = false;
             if (typeof this.onclose === 'function') {
                 this.onclose(e, 'retry');
             }
         };
-        Socket.prototype.onOpenCallback = function(e) {
+        Socket.prototype.onOpenCallback = function (e) {
             if (typeof this.onopen === 'function') {
                 this.onopen.call(null, e, this._retrying);
             }
             this._retrying = false;
         };
-        Socket.prototype.onCloseCallback = function(e) {
+        Socket.prototype.onCloseCallback = function (e) {
             if (this.retryable && e.code < 3000) {
                 this.retry.attempt(e);
             } else if (typeof this.onclose === 'function') {
@@ -781,71 +785,71 @@ var __extends =
                 this.onclose(e, reason);
             }
         };
-        Socket.prototype.onErrorCallback = function() {
+        Socket.prototype.onErrorCallback = function () {
             if (typeof this.onerror === 'function') {
                 this.onerror.apply(null, arguments);
             }
         };
-        Socket.prototype.onMessageCallback = function() {
+        Socket.prototype.onMessageCallback = function () {
             if (typeof this.onmessage === 'function') {
                 this.onmessage.apply(null, arguments);
             }
         };
         Object.defineProperty(Socket.prototype, 'isRetrying', {
-            get: function() {
+            get: function () {
                 return this._retrying;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(Socket.prototype, 'protocol', {
-            get: function() {
+            get: function () {
                 return this.ws && this.ws.protocol;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(Socket.prototype, 'extensions', {
-            get: function() {
+            get: function () {
                 return this.ws && this.ws.extensions;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(Socket.prototype, 'readyState', {
-            get: function() {
+            get: function () {
                 return (this.ws && this.ws.readyState) || WebSocket.CLOSED;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         Object.defineProperty(Socket.prototype, 'bufferedAmount', {
-            get: function() {
+            get: function () {
                 return this.ws && this.ws.bufferedAmount;
             },
             enumerable: true,
-            configurable: true
+            configurable: true,
         });
         return Socket;
     })();
-    (function(Socket) {
+    (function (Socket) {
         Socket.OPEN = WebSocket.OPEN;
         Socket.CLOSED = WebSocket.CLOSED;
         Socket.CLOSING = WebSocket.CLOSING;
         Socket.CONNECTING = WebSocket.CONNECTING;
-        var Retry = /** @class */ (function() {
+        var Retry = /** @class */ (function () {
             function Retry(attempt, failed) {
                 var _this = this;
                 this.delay = 100;
                 this.chance = 8;
                 this.count = 0;
                 this.allow = true;
-                this.reset = function() {
+                this.reset = function () {
                     _this.count = 0;
                 };
-                this.attempt = function(evt) {
+                this.attempt = function (evt) {
                     if (this.allow && _this.count < _this.chance) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             return _this.onAttempt(evt);
                         }, _this.random(_this.count++, _this.delay));
                     } else {
@@ -855,13 +859,13 @@ var __extends =
                 this.onAttempt = attempt;
                 this.onFailed = failed;
             }
-            Retry.prototype.random = function(attempt, delay) {
+            Retry.prototype.random = function (attempt, delay) {
                 return Math.floor((0.5 + Math.random() * 0.5) * Math.pow(2, attempt) * delay);
             };
             return Retry;
         })();
         Socket.Retry = Retry;
-        var Ping = (function() {
+        var Ping = (function () {
             function Ping(socket) {
                 var _this = this;
                 this.allow = true;
@@ -869,29 +873,29 @@ var __extends =
                 this.timeout = null;
                 this.interval = 30;
                 this.socket = socket;
-                this.send = function() {
+                this.send = function () {
                     if (_this.timeout) return;
                     if (_this.socket.readyState !== Socket.OPEN) return;
                     var data = '{"type":"PING"}';
                     _this.socket.send(data);
                     ns.log('Send PING:', data);
-                    _this.timeout = setTimeout(function() {
+                    _this.timeout = setTimeout(function () {
                         ns.log('PING timeout');
                         _this.timeout = null;
                         _this.socket.close(1000, 'ping');
                     }, 3 * 1000);
                 };
-                this.receive = function(msg) {
+                this.receive = function (msg) {
                     ns.log('Received PONG', msg);
                     if (!_this.timeout) return;
                     clearTimeout(_this.timeout);
                     _this.timeout = null;
                 };
-                this.start = function() {
+                this.start = function () {
                     if (!_this.allow || _this.timer) return;
                     _this.timer = setInterval(_this.send.bind(_this), _this.interval * 1000);
                 };
-                this.stop = function() {
+                this.stop = function () {
                     if (!_this.timer) return;
                     clearInterval(_this.timer);
                     _this.timer = null;
@@ -899,11 +903,11 @@ var __extends =
             }
             return Ping;
         })();
-        var Client = /** @class */ (function(_super) {
+        var Client = /** @class */ (function (_super) {
             __extends(Client, _super);
             function Client() {
                 var _this = (_super !== null && _super.apply(this, arguments)) || this;
-                _this.stop = function() {
+                _this.stop = function () {
                     if (_this.socket.readyState === Socket.CLOSED || _this.socket.readyState === Socket.CLOSING) {
                         return;
                     }
@@ -911,7 +915,7 @@ var __extends =
                     _this.socket.close(1000, 'user');
                     _this.ping.stop();
                 };
-                _this.start = function() {
+                _this.start = function () {
                     if (
                         !_this.isLogin ||
                         _this.socket.isRetrying ||
@@ -925,19 +929,19 @@ var __extends =
                     _this.socket.open();
                     _this.ping.start();
                 };
-                _this.socket = new Socket(function() {
+                _this.socket = new Socket(function () {
                     return _this.buildurl();
                 });
                 _this.ping = new Ping(_this.socket);
-                _this.socket.onopen = function(evt, isRetry) {
+                _this.socket.onopen = function (evt, isRetry) {
                     ns.log('Socket Client Opend', evt);
                     _this.onOpened(evt, isRetry);
                 };
-                _this.socket.onerror = function(evt) {
+                _this.socket.onerror = function (evt) {
                     ns.warn('Socket Client Connect Failed！', evt);
                     _this.onError(evt);
                 };
-                _this.socket.onmessage = function(evt) {
+                _this.socket.onmessage = function (evt) {
                     ns.log('Socket Client Received message=', evt);
                     if (typeof evt.data !== 'string') return;
                     var msg = JSON.parse(evt.data);
@@ -947,22 +951,22 @@ var __extends =
                         _this.onMessage(msg);
                     }
                 };
-                _this.socket.onclose = function(evt, reason) {
+                _this.socket.onclose = function (evt, reason) {
                     ns.log('Socket Client  Closed', evt);
                     _this.ping.stop();
                     _this.onClosed(evt, reason);
                 };
             }
-            Client.prototype.onError = function(res) {};
-            Client.prototype.onOpened = function(res, isRetry) {};
-            Client.prototype.onClosed = function(res) {};
-            Client.prototype.onMessage = function(msg) {};
+            Client.prototype.onError = function (res) {};
+            Client.prototype.onOpened = function (res, isRetry) {};
+            Client.prototype.onClosed = function (res) {};
+            Client.prototype.onMessage = function (msg) {};
             Object.defineProperty(Client.prototype, 'isConnected', {
-                get: function() {
+                get: function () {
                     return this.socket.readyState === Socket.OPEN;
                 },
                 enumerable: true,
-                configurable: true
+                configurable: true,
             });
             return Client;
         })(Emitter);
@@ -970,7 +974,7 @@ var __extends =
     })(ns.Socket);
 
     ns.orm = {};
-    (function(orm) {
+    (function (orm) {
         var FIELD_KEY = '__orm_field';
         var CLASS_KEY = '__orm_class';
         var INDEX_KEY = '__orm_index';
@@ -982,12 +986,12 @@ var __extends =
             Object.assign(obj, json);
             var fields = cls[FIELD_KEY];
             if (fields) {
-                var _loop_1 = function(field_1) {
+                var _loop_1 = function (field_1) {
                     var subjson = obj[field_1];
                     if (!subjson) return 'continue';
                     var conf = fields[field_1];
                     if (Array.isArray(subjson)) {
-                        obj[field_1] = subjson.map(function(sb) {
+                        obj[field_1] = subjson.map(function (sb) {
                             return awake(conf.cls, sb);
                         });
                     } else if (conf.map) {
@@ -1034,7 +1038,7 @@ var __extends =
         function removeItem(key) {
             orm._storage.removeItem(key);
         }
-        orm.store = function(clskey, idxkey) {
+        orm.store = function (clskey, idxkey) {
             if (!ns.okstr(clskey)) {
                 throw new Error('The clskey:' + clskey + ' invalid!');
             }
@@ -1045,18 +1049,18 @@ var __extends =
                 throw new Error('The clskey:' + clskey + " already exist!!You can't mark different class with same name!!");
             }
             _stored[clskey] = true;
-            return function(target) {
+            return function (target) {
                 target[CLASS_KEY] = clskey;
                 target[INDEX_KEY] = idxkey;
             };
         };
-        orm.field = function(cls, map) {
-            return function(target, field) {
+        orm.field = function (cls, map) {
+            return function (target, field) {
                 var fields = target.constructor[FIELD_KEY] || (target.constructor[FIELD_KEY] = {});
                 fields[field] = { map: !!map, cls: cls };
             };
         };
-        orm.save = function(model) {
+        orm.save = function (model) {
             if (!model) return;
             var clskey = getClskey(model.constructor);
             var idxkey = getIdxkey(model.constructor);
@@ -1066,17 +1070,17 @@ var __extends =
             setItem(clskey, keys);
             setItem(objkey, model);
         };
-        orm.find = function(cls, id) {
+        orm.find = function (cls, id) {
             var clskey = getClskey(cls);
             var objkey = getObjkey(clskey, id);
             return awake(cls, getItem(objkey));
         };
-        orm.ids = function(cls) {
+        orm.ids = function (cls) {
             var clskey = getClskey(cls);
             var keys = getItem(clskey);
             return keys ? Object.keys(keys) : [];
         };
-        orm.all = function(cls) {
+        orm.all = function (cls) {
             var keys = orm.ids(cls);
             var result = [];
             for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
@@ -1088,10 +1092,10 @@ var __extends =
             }
             return result;
         };
-        orm.count = function(cls) {
+        orm.count = function (cls) {
             return orm.ids(cls).length;
         };
-        orm.clear = function(cls) {
+        orm.clear = function (cls) {
             var clskey = getClskey(cls);
             var keys = getItem(clskey);
             if (keys) {
@@ -1101,7 +1105,7 @@ var __extends =
             }
             removeItem(clskey);
         };
-        orm.remove = function(cls, id) {
+        orm.remove = function (cls, id) {
             var clskey = getClskey(cls);
             var objkey = getObjkey(clskey, id);
             var keys = getItem(clskey);
