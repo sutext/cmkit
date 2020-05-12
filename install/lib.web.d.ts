@@ -78,6 +78,22 @@ interface Number {
      * console.log((999999999999999).kmgtify(3));//999T
      */
     readonly kmgtify: (max?: 3 | 4 | 5 | 6) => string;
+    /**
+     * @description Trun the number to kilo million billion trillion
+     * @param max The max length affter format. @default 3
+     * @example
+     * console.log((1000000).kmgtify(3));//1m
+     * console.log((1000000).kmgtify(4));//1000k
+     * console.log((1000000).kmgtify(5));//1000k
+     * console.log((1000000).kmgtify(6));//1000k
+     * console.log((10000000).kmgtify(3));//10m
+     * console.log((10000000).kmgtify(4));//10m
+     * console.log((10000000).kmgtify(5));//10000k
+     * console.log((1000000000).kmgtify(3));//1b
+     * console.log((999999999999999).kmgtify(3));//999t
+     * console.log((1.23 * Math.pow(10, 26 * 3 * 3 + 13)).kmbtify(3));//12cz
+     */
+    readonly kmbtify: (max?: 3 | 4 | 5 | 6) => string;
 }
 
 interface Array<T> {
@@ -180,6 +196,16 @@ declare namespace cm {
      * console.log((10000).kmgtify())//10.00K
      */
     let kmgtfmt: (value: number, symbol: '' | 'K' | 'M' | 'G' | 'T') => string;
+    /**
+     * @description global config Number.kmbtify formater
+     * @default value.comma()+symbol
+     * @param value the new number part
+     * @param symbol the symbol flag e.g k m b t aa ab ac ad ae ... zz
+     * @example
+     * cm.kmbtfmt = value=>(value.toFixed(2)+symbol)
+     * console.log((10000).kmgtify())//10.00K
+     */
+    let kmbtfmt: (value: number, symbol: string) => string;
 }
 declare namespace cm {
     abstract class Emitter<E extends string = string> {
@@ -318,8 +344,8 @@ declare namespace cm {
         readonly maptask: <T>(meta: IMetaClass<T>, path: string, data?: any, opts?: Network.Options) => Network.DataTask<Record<keyof any, T>>;
     }
     namespace Network {
-        type Method = 'POST' | 'GET';
-        type ErrorType = 'abort' | 'timeout' | 'service' | 'business';
+        type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
+        type ErrorType = 'abort' | 'timeout' | 'service';
         interface Upload {
             readonly name: string;
             readonly data: Blob;
@@ -361,12 +387,13 @@ declare namespace cm {
         }
         class Error {
             readonly type: ErrorType;
+            readonly info?: any; //the error detail info
             readonly status: number;
-            readonly message: string;
+            readonly message?: string; //the error description
             private constructor();
             static readonly abort: (status: number) => Error;
             static readonly timeout: (status: number) => Error;
-            static readonly service: (status: number) => Error;
+            static readonly service: (status: number, info: any) => Error;
         }
         interface DataTask<T> {
             readonly then: <TResult1 = T, TResult2 = never>(
@@ -380,29 +407,6 @@ declare namespace cm {
         interface UploadTask<T> extends DataTask<T> {
             readonly onProgress: (func: (evt: ProgressEvent) => void) => void;
         }
-        /**
-         * @description create http request
-         * @param url absolute url of request
-         * @param data request data
-         * @param opts request options
-         */
-        const http: (url: string, data?: any, opts?: Options) => [Promise<any>, XMLHttpRequest];
-        /**
-         * @description create http request with method 'GET'
-         * @notice @param method in @param opts dos't effect
-         * @param url absolute url of request
-         * @param data request data
-         * @param opts request options
-         */
-        const get: (url: string, data?: any, opts?: Options) => [Promise<any>, XMLHttpRequest];
-        /**
-         * @description create http request with method 'GET'
-         * @notice @param method in @param opts dos't effect
-         * @param url absolute url of request
-         * @param data request data
-         * @param opts request options
-         */
-        const post: (url: string, data?: any, opts?: Options) => [Promise<any>, XMLHttpRequest];
     }
     /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {

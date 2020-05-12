@@ -82,7 +82,38 @@
         }
         return cm.kmgtfmt(this, '');
     };
-
+    Number.prototype.kmbtify = function (max) {
+        if (!Number.isFinite(this) || Number.isNaN(this)) {
+            return this.toString();
+        }
+        if (max === void 0) {
+            max = 3;
+        }
+        if (max !== 3 && max !== 4 && max !== 5 && max !== 6) {
+            throw new Error('maxlen must be intger between 3 and 6');
+        }
+        var pow = Math.floor(Math.log10(this));
+        console.log(pow);
+        if (pow < max) {
+            return ns.kmbtfmt(this, '');
+        }
+        var bit = Math.floor((pow - max) / 3) + 1;
+        switch (bit) {
+            case 1:
+                return ns.kmbtfmt(this / Math.pow(10, bit * 3), 'k');
+            case 2:
+                return ns.kmbtfmt(this / Math.pow(10, bit * 3), 'm');
+            case 3:
+                return ns.kmbtfmt(this / Math.pow(10, bit * 3), 'b');
+            case 4:
+                return ns.kmbtfmt(this / Math.pow(10, bit * 3), 't');
+            default:
+                var point = bit - 5;
+                var b1 = Math.floor(point / 26);
+                var b2 = point % 26;
+                return ns.kmbtfmt(this / Math.pow(10, bit * 3), String.fromCharCode(b1 + 97) + String.fromCharCode(b2 + 97));
+        }
+    };
     String.prototype.fixlen = function (len) {
         if (typeof len !== 'number' || len < 1) {
             len = 2;
@@ -295,6 +326,9 @@
         configurable: true,
     });
     ns.kmgtfmt = function (value, symbol) {
+        return value.comma() + symbol;
+    };
+    ns.kmbtfmt = function (value, symbol) {
         return value.comma() + symbol;
     };
 })((window.cm = window.cm || {}));
@@ -585,10 +619,10 @@ var __extends =
     })();
     (function (Network) {
         var Error = /** @class */ (function () {
-            function Error(type, status, message) {
+            function Error(type, status, info) {
                 this.type = type;
                 this.status = status;
-                this.message = message;
+                this.info = data;
             }
             Error.abort = function (status) {
                 return new Error('abort', status, 'The request has been abort!');
@@ -596,9 +630,16 @@ var __extends =
             Error.timeout = function (status) {
                 return new Error('timeout', status, 'Request timeout!');
             };
-            Error.service = function (status) {
-                return new Error('service', status, '[' + status + ']:' + 'The service unavailable!');
+            Error.service = function (status, info) {
+                return new Error('service', status, info);
             };
+            Object.defineProperty(Error.prototype, 'message', {
+                get: function () {
+                    return this.data && this.data.message;
+                },
+                enumerable: true,
+                configurable: true,
+            });
             return Error;
         })();
         Network.Error = Error;
@@ -652,15 +693,16 @@ var __extends =
                 xhr.ontimeout = function () {
                     return reject(Network.Error.timeout(xhr.status));
                 };
-                xhr.onerror = function () {
-                    return reject(Network.Error.service(xhr.status));
+                xhr.onerror = function (e) {
+                    return reject(Network.Error.service(xhr.status, e));
                 };
                 xhr.onloadend = function () {
                     ns.log('\nrequest:url=', url, '\nrequest:data=', data, '\nresponse=', xhr.response);
+                    var data = xhr.responseType === 'json' ? xhr.response : xhr.responseText;
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
-                        resolve(xhr.responseType === 'json' ? xhr.response : xhr.responseText);
+                        resolve(data);
                     } else {
-                        reject(Error.service(xhr.status));
+                        reject(Error.service(xhr.status, data));
                     }
                 };
                 var params = data || {};
@@ -695,15 +737,16 @@ var __extends =
                 xhr.ontimeout = function () {
                     return reject(Network.Error.timeout(xhr.status));
                 };
-                xhr.onerror = function () {
-                    return reject(Network.Error.service(xhr.status));
+                xhr.onerror = function (e) {
+                    return reject(Network.Error.service(xhr.status, e));
                 };
                 xhr.onloadend = function () {
                     ns.log('\nrequest:url=', url, '\nrequest:data=', data, '\nresponse=', xhr.response);
+                    var data = xhr.responseType === 'json' ? xhr.response : xhr.responseText;
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
-                        resolve(xhr.responseType === 'json' ? xhr.response : xhr.responseText);
+                        resolve(data);
                     } else {
-                        reject(Error.service(xhr.status));
+                        reject(Error.service(xhr.status, data));
                     }
                 };
                 xhr.open('POST', url, true);
