@@ -322,13 +322,21 @@ declare namespace cm {
          * @description global resove relative uri to full url
          * @param path the relative uri
          */
-        protected abstract url(path: string): string;
+        protected url(path: string): string;
         /**
-         * @description the global resp resolver
+         * @description resolve the data
+         * @default retrun json
          * @param json the jsoned respons data
          */
-        protected abstract resolve(json: any): any | Promise<any>;
-        /** ----- network data request methods */
+        protected resolve(json: any): any | Promise<any>;
+        /**
+         * @description transform the service error
+         * @param error the origin network error
+         * @default 'throw the origin error';
+         * @warn You must throw a new error for custom otherwise you can't get error message
+         */
+        protected reject(error: Network.Error | Error): void;
+        /** ----- network data request methods. */
         readonly upload: <T = any>(path: string, upload: Network.Upload) => Network.UploadTask<T>;
         readonly anyreq: <T = any>(req: Network.Request<T>) => Network.DataTask<T>;
         readonly objreq: <T>(req: Network.Request<T>) => Network.DataTask<T>;

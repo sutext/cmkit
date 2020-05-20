@@ -93,7 +93,6 @@
             throw new Error('maxlen must be intger between 3 and 6');
         }
         var pow = Math.floor(Math.log10(this));
-        console.log(pow);
         if (pow < max) {
             return ns.kmbtfmt(this, '');
         }
@@ -481,7 +480,11 @@ var __extends =
                             _this.after(path, obj);
                         })
                         .catch(function (e) {
-                            reject(e);
+                            try {
+                                _this.reject(e);
+                            } catch (error) {
+                                reject(error);
+                            }
                             _this.after(path, e);
                         });
                 });
@@ -501,7 +504,11 @@ var __extends =
                             return new meta(value);
                         })
                         .then(function (obj) {
-                            resolve(obj);
+                            try {
+                                _this.reject(e);
+                            } catch (error) {
+                                reject(error);
+                            }
                             _this.after(path, obj);
                         })
                         .catch(function (e) {
@@ -533,7 +540,11 @@ var __extends =
                             _this.after(path, ary);
                         })
                         .catch(function (e) {
-                            reject(e);
+                            try {
+                                _this.reject(e);
+                            } catch (error) {
+                                reject(error);
+                            }
                             _this.after(path, e);
                         });
                 });
@@ -581,7 +592,11 @@ var __extends =
                             _this.after(path, map);
                         })
                         .catch(function (e) {
-                            reject(e);
+                            try {
+                                _this.reject(e);
+                            } catch (error) {
+                                reject(error);
+                            }
                             _this.after(path, e);
                         });
                 });
@@ -606,7 +621,10 @@ var __extends =
             throw new Error('Network.url(path:string) must be implement');
         };
         Network.prototype.resolve = function (json) {
-            throw new Error('Network.resolve must be implement');
+            return json;
+        };
+        Network.prototype.reject = function (error) {
+            throw error;
         };
         Network.prototype.params = function (data) {
             return data;
