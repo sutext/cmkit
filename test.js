@@ -20,4 +20,6 @@ window.cm.kmbtfmt = function (value, symbol) {
 // console.log((999999999999999).kmgtify(6)); //1G
 // console.log((-100000).kmgtify(3));
 // console.log(new Date().format('yyY MMM ddd hhh mmm sss'));
-console.log((1.23 * Math.pow(10, 26 * 3 * 3 + 13)).kmbtify(3));
+
+console.log(window.cm.Network.encodeQuery({ a: 1, b: 2, c: [4, 5, 'haa'], d: true }));
+console.log(window.cm.Network.encodeQuery(true));

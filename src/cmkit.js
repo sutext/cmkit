@@ -504,15 +504,15 @@ var __extends =
                             return new meta(value);
                         })
                         .then(function (obj) {
+                            resolve(obj);
+                            _this.after(path, obj);
+                        })
+                        .catch(function (e) {
                             try {
                                 _this.reject(e);
                             } catch (error) {
                                 reject(error);
                             }
-                            _this.after(path, obj);
-                        })
-                        .catch(function (e) {
-                            reject(e);
                             _this.after(path, e);
                         });
                 });
@@ -640,7 +640,7 @@ var __extends =
             function Error(type, status, info) {
                 this.type = type;
                 this.status = status;
-                this.info = data;
+                this.info = info;
             }
             Error.abort = function (status) {
                 return new Error('abort', status, 'The request has been abort!');
@@ -653,7 +653,7 @@ var __extends =
             };
             Object.defineProperty(Error.prototype, 'message', {
                 get: function () {
-                    return this.data && this.data.message;
+                    return this.info && this.info.message;
                 },
                 enumerable: true,
                 configurable: true,
@@ -698,8 +698,45 @@ var __extends =
         })(DataTask);
         Network.UploadTask = UploadTask;
         Network.http = function (url, data, opts) {
-            return (opts && opts.method) === 'POST' ? Network.post(url, data, opts) : Network.get(url, data, opts);
+            return (opts && opts.method) === 'GET' ? Network.get(url, data, opts) : Network.post(url, data, opts);
         };
+        function isPlanValue(value) {
+            var type = typeof value;
+            switch (type) {
+                case 'bigint':
+                case 'string':
+                case 'number':
+                case 'boolean':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        function encodeValue(url, key, value) {
+            if (isPlanValue(value)) {
+                url = url + '&' + key + '=' + value;
+            } else if (Array.isArray(value)) {
+                for (var index = 0; index < value.length; index++) {
+                    if (isPlanValue(value[index])) {
+                        url = url + '&' + key + '=' + value[index];
+                    }
+                }
+            }
+            return url;
+        }
+        function encodeParams(params) {
+            if (!params) return '';
+            var keys = Object.keys(params);
+            if (keys.length === 0) return '';
+            var url = encodeValue('', keys[0], params[keys[0]]);
+            for (var index = 1; index < keys.length; index++) {
+                var key = keys[index];
+                var value = params[key];
+                url = encodeValue(url, key, value);
+            }
+            return '?' + url.substring(1);
+        }
+        Network.encodeQuery = encodeParams;
         Network.get = function (url, data, opts) {
             var handler;
             var promiss = new Promise(function (resolve, reject) {
@@ -723,15 +760,7 @@ var __extends =
                         reject(Error.service(xhr.status, data));
                     }
                 };
-                var params = data || {};
-                var keys = Object.keys(params);
-                if (keys.length > 0) {
-                    url = url + '?' + keys[0] + '=' + params[keys[0]];
-                    for (var index = 1; index < keys.length; index++) {
-                        var key = keys[index];
-                        url = url + '&' + key + '=' + params[key];
-                    }
-                }
+                url = url + encodeParams(params);
                 xhr.open('GET', url, true);
                 xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
@@ -767,7 +796,7 @@ var __extends =
                         reject(Error.service(xhr.status, data));
                     }
                 };
-                xhr.open('POST', url, true);
+                xhr.open(opts.method, url, true);
                 xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
                 xhr.setRequestHeader('Content-Type', 'application/json');

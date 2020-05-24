@@ -415,6 +415,15 @@ declare namespace cm {
         interface UploadTask<T> extends DataTask<T> {
             readonly onProgress: (func: (evt: ProgressEvent) => void) => void;
         }
+        /**
+         * @description encode object to query string
+         * @param params must be a plan key value object. the value of key suport plan array.
+         * @warn plan value means string number boolean bigint
+         * @example
+         * const param = { a: 1, b: 2, c: [4, 5, 'haa'], d: true }
+         * console.log(Network.encodeQuery(param)) // ?a=1&b=2&c=4&c=5&c=haa&d=true
+         */
+        const encodeQuery: (params: object) => string;
     }
     /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {
