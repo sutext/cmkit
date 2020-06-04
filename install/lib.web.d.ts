@@ -263,18 +263,37 @@ declare namespace cm {
     }
     abstract class Network {
         /**
-         * @description global network options setting. it can be override by request options
+         * @description define the key of maptask and mapreq
+         * @default 'id'
+         */
+        protected readonly mapkey?: 'id' | string;
+        /**
+         * @description auto show loading or not
+         * @notice You must provide your loading UI in before or after hock. otherwith it does't work!
+         * @see Network.before @see Network.after.
+         * @default false
+         */
+        protected readonly loading?: boolean;
+        /**
+         * @description wait time out settings
+         * @default 0 wait forever
+         */
+        protected readonly timeout?: number;
+        /**
+         * @description the response type for xhr.responseType
+         * @default 'json'
+         */
+        protected readonly restype?: 'json' | 'text';
+        /**
+         * @description the global http request method
+         * @override you shoud override this property and provide you custom headers
+         * @default "POST"
          * @example
-         * protected get options(): any {
-         *     return {
-         *        mapkey: 'id',
-         *        timeout: 10000,
-         *        restype:'text',
-         *        loading: true
-         *     }
+         * protected get method(): any {
+         *     return 'POST'
          * }
          */
-        protected readonly options?: Pick<Network.Options, 'mapkey' | 'loading' | 'restype' | 'timeout'>;
+        protected readonly method: Network.Method;
         /**
          * @description the global http headers. every request will include this headers
          * @override you shoud overwrite this property and provide you custom headers
@@ -282,20 +301,12 @@ declare namespace cm {
          * protected get headers(): any {
          *     return {
          *         token:'yourtoken',
-         *         account:'youraccount'
+         *         userId:'yourUserId'
          *     }
          * }
          */
         protected readonly headers: Record<string, string>;
-        /**
-         * @description the global http request method
-         * @override you shoud override this property and provide you custom headers
-         * @example
-         * protected get method(): any {
-         *     return 'POST'
-         * }
-         */
-        protected readonly method: Network.Method;
+
         /**
          * @description the global request body data reslover
          * @override override point
@@ -357,7 +368,7 @@ declare namespace cm {
         interface Upload {
             readonly name: string;
             readonly data: Blob;
-            readonly type: string;
+            readonly type: string; //content-type
             readonly opts?: Options;
             readonly params?: Record<string, any>;
         }
@@ -380,8 +391,10 @@ declare namespace cm {
             /** @default 0 wait forever */
             readonly timeout?: number;
             /**
-             * @description You must provide your loading UI in before or after hock. otherwith it does't work!
+             * @description auto show loading or not
+             * @notice You must provide your loading UI in before or after hock. otherwith it does't work!
              * @see Network.before @see Network.after.
+             * @default false
              */
             readonly loading?: boolean;
             /**

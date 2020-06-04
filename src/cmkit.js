@@ -419,7 +419,12 @@ var __extends =
         function Network() {
             var _this = this;
             this.upload = function (path, upload) {
-                if (!_this.before(path, upload.opts)) return;
+                var opts = upload.opts || {};
+                opts.headers = Object.assign(_this.headers, opts.headers);
+                opts.headers['Content-Type'] = upload.type;
+                opts.headers.method = 'POST';
+                var options = Object.assign(_this.options, opts);
+                if (!_this.before(path, options)) return;
                 var data = new FormData();
                 data.append(upload.name, upload.data);
                 if (upload.params) {
@@ -427,9 +432,6 @@ var __extends =
                         data.append(upload.params[key], key);
                     }
                 }
-                var headers = (upload.opts && upload.opts.headers) || _this.headers;
-                headers['Content-Type'] = upload.type;
-                var options = Object.assign({ headers: headers }, _this.options, upload.opts);
                 var values = Network.post(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
@@ -465,8 +467,10 @@ var __extends =
                 return _this.maptask(req.meta, req.path, req.data, req.opts);
             };
             this.anytask = function (path, data, opts) {
+                opts = opts || {};
+                opts.headers = Object.assign(_this.headers, opts.headers);
+                var options = Object.assign(_this.options, opts);
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
@@ -491,8 +495,10 @@ var __extends =
                 return new Network.DataTask(promiss, values[1]);
             };
             this.objtask = function (meta, path, data, opts) {
+                opts = opts || {};
+                opts.headers = Object.assign(_this.headers, opts.headers);
+                var options = Object.assign(_this.options, opts);
                 if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
@@ -519,8 +525,10 @@ var __extends =
                 return new Network.DataTask(promiss, values[1]);
             };
             this.arytask = function (meta, path, data, opts) {
-                if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
+                opts = opts || {};
+                opts.headers = Object.assign(_this.headers, opts.headers);
+                var options = Object.assign(_this.options, opts);
+                if (!_this.before(path, options)) return;
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
@@ -551,8 +559,10 @@ var __extends =
                 return new Network.DataTask(promiss, values[1]);
             };
             this.maptask = function (meta, path, data, opts) {
-                if (!_this.before(path, opts)) return;
-                var options = Object.assign({ method: _this.method, headers: _this.headers }, _this.options, opts);
+                opts = opts || {};
+                opts.headers = Object.assign(_this.headers, opts.headers);
+                var options = Object.assign(_this.options, opts);
+                if (!_this.before(path, options)) return;
                 var values = Network.http(_this.url(path), _this.params(data), options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
@@ -603,6 +613,13 @@ var __extends =
                 return new Network.DataTask(promiss, values[1]);
             };
         }
+        Object.defineProperty(Network.prototype, 'options', {
+            get: function () {
+                return { method: this.method, mapkey: this.mapkey, timeout: this.timeout, restype: this.restype, loading: this.loading };
+            },
+            enumerable: true,
+            configurable: true,
+        });
         Object.defineProperty(Network.prototype, 'headers', {
             get: function () {
                 return {};
@@ -760,7 +777,7 @@ var __extends =
                         reject(Error.service(xhr.status, data));
                     }
                 };
-                url = url + encodeParams(params);
+                url = url + encodeParams(data);
                 xhr.open('GET', url, true);
                 xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
