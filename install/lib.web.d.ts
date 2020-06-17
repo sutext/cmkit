@@ -367,8 +367,8 @@ declare namespace cm {
         type ErrorType = 'abort' | 'timeout' | 'service';
         interface Upload {
             readonly name: string;
-            readonly data: Blob;
-            readonly type: string; //content-type
+            readonly data: Blob | File;
+            readonly type?: string; //content-type
             readonly opts?: Options;
             readonly params?: Record<string, any>;
         }

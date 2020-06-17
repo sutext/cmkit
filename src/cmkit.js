@@ -421,18 +421,18 @@ var __extends =
             this.upload = function (path, upload) {
                 var opts = upload.opts || {};
                 opts.headers = Object.assign(_this.headers, opts.headers);
-                opts.headers['Content-Type'] = upload.type;
                 opts.headers.method = 'POST';
                 var options = Object.assign(_this.options, opts);
                 if (!_this.before(path, options)) return;
                 var data = new FormData();
+                var params = _this.params(upload.params);
                 data.append(upload.name, upload.data);
-                if (upload.params) {
-                    for (var key in upload.params) {
-                        data.append(upload.params[key], key);
+                if (params) {
+                    for (var key in params) {
+                        data.append(key, params[key]);
                     }
                 }
-                var values = Network.post(_this.url(path), _this.params(data), options);
+                var values = Network.post(_this.url(path), data, options);
                 var promiss = new Promise(function (resolve, reject) {
                     values[0]
                         .then(function (json) {
@@ -816,14 +816,20 @@ var __extends =
                 xhr.open(opts.method, url, true);
                 xhr.timeout = (opts && opts.timeout) || 0;
                 xhr.responseType = (opts && opts.restype) || 'json';
-                xhr.setRequestHeader('Content-Type', 'application/json');
                 var headers = (opts && opts.headers) || {};
                 for (var key in headers) {
                     xhr.setRequestHeader(key, headers[key]);
                 }
-                var body = data || {};
-                body._reqidx = _reqidx++;
-                xhr.send(JSON.stringify(body));
+                if (data instanceof FormData) {
+                    xhr.send(data);
+                } else {
+                    if (!headers['Content-Type']) {
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                    }
+                    var body = data || {};
+                    body._reqidx = _reqidx++;
+                    xhr.send(JSON.stringify(body));
+                }
             });
             return [promiss, handler];
         };
