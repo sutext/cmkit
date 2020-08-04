@@ -437,7 +437,7 @@ var __extends =
         this.addChild(page);
         top.willHide();
         egret.Tween.get(top)
-            .to({ x: -width / 3 }, 250, egret.Ease.sineInOut)
+            .to({ x: -width }, 250, egret.Ease.sineInOut)
             .call(function () {
                 top.visible = false;
                 top.didHide();
