@@ -1,6 +1,6 @@
 {
     "name": "cmkit",
-    "version": "1.7.11",
+    "version": "1.8.0",
     "description": "common web developer tool box.",
     "main": "index.js",
     "scripts": {

@@ -342,6 +342,34 @@ var __extends =
     };
 //--------------------Network Socket Storage ----------------
 (function (ns) {
+    var I18n = (function () {
+        function I18n(data) {
+            this.data = data;
+        }
+        I18n.prototype.setData = function (data) {
+            this.data = data;
+        };
+        I18n.prototype.localize = function () {
+            if (!this.data) {
+                console.warn('i18n data not found! you mast setData for i18n');
+                return '';
+            }
+            var key = arguments[0];
+            if (!key) return '';
+            var value = this.data[key];
+            if (!value || typeof value !== 'string') return '';
+            if (arguments.length === 1) {
+                return value;
+            }
+            for (var index = 1; index < arguments.length; index++) {
+                value = value.replace('${' + index + '}', arguments[index]);
+            }
+            return value;
+        };
+        return I18n;
+    })();
+    ns.I18n = I18n;
+    ns.i18n = new I18n();
     var Emitter = (function () {
         function Emitter() {
             var _this = this;

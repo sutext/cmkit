@@ -208,6 +208,28 @@ declare namespace cm {
     let kmbtfmt: (value: number, symbol: string) => string;
 }
 declare namespace cm {
+    class I18n<D = any> {
+        private data: D;
+        constructor(data?: D);
+        /**
+         * @description set the metadata for i18n
+         * @param the metadata
+         */
+        public setData: (data: D) => void;
+        /**
+         * @description get localized string from key and arguments
+         * @param key The localize key
+         * @param args The arguments of placeholder
+         * @info The placeholder must be set like ${1} ${2} ${3} ...
+         * @example
+         * ```
+         * cm.i18n.setData({YOUR_KEY:'example for i18n ${1} ${2}'})
+         * cm.i18n.localize('YOUR_KEY','hello','world')
+         * ```
+         */
+        public localize: (key: keyof D, ...args: (string | number)[]) => string;
+    }
+    const i18n: I18n;
     abstract class Emitter<E extends string = string> {
         /**
          * @description register event handler to the emitter on target.

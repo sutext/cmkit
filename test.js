@@ -21,5 +21,24 @@ window.cm.kmbtfmt = function (value, symbol) {
 // console.log((-100000).kmgtify(3));
 // console.log(new Date().format('yyY MMM ddd hhh mmm sss'));
 
-console.log(window.cm.Network.encodeQuery({ a: 1, b: 2, c: [4, 5, 'haa'], d: true }));
-console.log(window.cm.Network.encodeQuery(true));
+// console.log(window.cm.Network.encodeQuery({ a: 1, b: 2, c: [4, 5, 'haa'], d: true }));
+// console.log(window.cm.Network.encodeQuery(true));
+
+// var emter = window.cm.notice;
+// var center = { name: 'hellow emiter' };
+// emter.once('test1', center, function (test1) {
+//     console.log('once this arg=', this);
+//     console.log(test1);
+// });
+// emter.on('test1', center, function (test1) {
+//     console.log('this arg=', this);
+//     console.log(test1);
+// });
+// emter.emit('test1', 'i am msg1', 'i am msg2');
+// emter.emit('test1', 'i am msg1', 'i am msg2');
+// emter.offall();
+// emter.off('test1');
+// console.log(window.cm.Socket.Client);
+var i18n = window.cm.i18n;
+i18n.setData({ YOUR_KEY: 'example for i18n ${1} ${2}' });
+console.log(i18n.localize('YOUR_KEY', 'hello', 'world'));
