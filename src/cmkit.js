@@ -362,7 +362,7 @@ var __extends =
                 return value;
             }
             for (var index = 1; index < arguments.length; index++) {
-                value = value.replace('${' + index + '}', arguments[index]);
+                value = value.replace('{' + (index - 1) + '}', arguments[index]);
             }
             return value;
         };

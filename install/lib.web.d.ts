@@ -220,10 +220,10 @@ declare namespace cm {
          * @description get localized string from key and arguments
          * @param key The localize key
          * @param args The arguments of placeholder
-         * @info The placeholder must be set like ${1} ${2} ${3} ...
+         * @info The placeholder must be set like {0} {1} {2} ...
          * @example
          * ```
-         * cm.i18n.setData({YOUR_KEY:'example for i18n ${1} ${2}'})
+         * cm.i18n.setData({YOUR_KEY:'example for i18n {0} {1}'})
          * cm.i18n.localize('YOUR_KEY','hello','world')
          * ```
          */
