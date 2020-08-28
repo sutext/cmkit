@@ -1,3 +1,36 @@
+Object.assign =
+    Object.assign ||
+    function (t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+if (!Array.prototype.findIndex) {
+    Object.defineProperty(Array.prototype, 'findIndex', {
+        value: function (predicate) {
+            if (this == null) {
+                throw new TypeError('"this" is null or not defined');
+            }
+            var o = Object(this);
+            var len = o.length >>> 0;
+            if (typeof predicate !== 'function') {
+                throw new TypeError('predicate must be a function');
+            }
+            var thisArg = arguments[1];
+            var k = 0;
+            while (k < len) {
+                var kValue = o[k];
+                if (predicate.call(thisArg, kValue, k, o)) {
+                    return k;
+                }
+                k++;
+            }
+            return -1;
+        },
+    });
+}
 (function (ns) {
     'use strict';
     Number.prototype.fixlen = function (len) {
@@ -333,13 +366,27 @@
 })((window.cm = window.cm || {}));
 var __extends =
     (this && this.__extends) ||
-    function (t, e) {
-        for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
-        function r() {
-            this.constructor = t;
-        }
-        (r.prototype = e.prototype), (t.prototype = new r());
-    };
+    (function () {
+        var extendStatics = function (d, b) {
+            extendStatics =
+                Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array &&
+                    function (d, b) {
+                        d.__proto__ = b;
+                    }) ||
+                function (d, b) {
+                    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+                };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() {
+                this.constructor = d;
+            }
+            d.prototype = b === null ? Object.create(b) : ((__.prototype = b.prototype), new __());
+        };
+    })();
 //--------------------Network Socket Storage ----------------
 (function (ns) {
     var I18n = (function () {

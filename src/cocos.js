@@ -1,7 +1,7 @@
-(function(ns) {
+(function (ns) {
     'use strict';
     ns.orm._storage = cc.sys.localStorage;
-    ns.log = function() {
+    ns.log = function () {
         if (ns.debug) {
             var args = arguments;
             if (cc.sys.isNative) {
@@ -14,7 +14,7 @@
             console.log.apply(console, args);
         }
     };
-    ns.warn = function() {
+    ns.warn = function () {
         if (ns.debug) {
             var args = arguments;
             if (cc.sys.isNative) {
@@ -27,31 +27,31 @@
             console.warn.apply(console, args);
         }
     };
-    ns.Game = (function() {
+    ns.Game = (function () {
         function Game() {
             var _this = this;
             cc.game.on(cc.game.EVENT_SHOW, _this.onShow, _this);
             cc.game.on(cc.game.EVENT_HIDE, _this.onHide, _this);
-            this.start = function(scene) {
+            this.start = function (scene) {
                 _this.onInit(scene);
             };
         }
         return Game;
     })();
-    ns.entry = function(apihost, debug) {
+    ns.entry = function (apihost, debug) {
         if (ns.game) {
             throw new Error('There can only be one Game');
         }
         ns.apihost = apihost;
         ns.debug = !!debug;
-        return function(target) {
+        return function (target) {
             ns.game = new target();
         };
     };
-    ns.color = function(hex) {
+    ns.color = function (hex) {
         return cc.Color.WHITE.fromHEX(hex);
     };
-    ns.quiet = function(on) {
+    ns.quiet = function (on) {
         ns.quiet.on = !!on;
         if (ns.quiet.on) {
             cc.audioEngine.stopAll();
@@ -59,34 +59,35 @@
     };
     var __quiet = false;
     Object.defineProperty(ns, 'quiet', {
-        get: function() {
+        get: function () {
             return __quiet;
         },
-        set: function(val) {
+        set: function (val) {
             __quiet = !!val;
             if (__quiet) {
                 cc.audioEngine.stopAll();
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
 })((window.cm = window.cm || {}));
 //--------------------cc extentions----------------
-(function(ns, cc, dragonBones) {
+(function (ns, cc, dragonBones) {
     'use strict';
-    var __play = cc.Audio.prototype.play;
-    cc.Audio.prototype.play = function() {
+    var __Audio = cc.Audio || cc._Audio;
+    var __play = __Audio.prototype.play;
+    __Audio.prototype.play = function () {
         if (!ns.quiet) {
             __play.call(this);
         }
     };
     ///----------cc.Node----------
-    cc.Node.prototype.setBone = function(dir, name) {
+    cc.Node.prototype.setBone = function (dir, name) {
         var _this = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             ns.loadbone(dir, name)
-                .then(function(data) {
+                .then(function (data) {
                     _this.active = false;
                     var display = _this.addComponent(dragonBones.ArmatureDisplay);
                     display.dragonAsset = data[0];
@@ -98,17 +99,17 @@
                 .catch(reject);
         });
     };
-    cc.Node.prototype.setRect = function(x, y, width, height) {
+    cc.Node.prototype.setRect = function (x, y, width, height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
     };
-    cc.Node.prototype.setSize = function(width, height) {
+    cc.Node.prototype.setSize = function (width, height) {
         this.width = width;
         this.height = height;
     };
-    cc.Node.prototype.capture = function() {
+    cc.Node.prototype.capture = function () {
         var camera = this.getComponent(cc.Camera) || this.addComponent(cc.Camera);
         camera.cullingMask = 0xffffffff;
         var texture = new cc.RenderTexture();
@@ -135,7 +136,7 @@
         return canvas.toDataURL('image/png');
     };
     ///----------cc.Texture2D----------
-    cc.Texture2D.prototype.base64 = function(scale) {
+    cc.Texture2D.prototype.base64 = function (scale) {
         var s = 1;
         if (typeof scale === 'number' && scale > 0 && scale < 1) {
             s = scale;
@@ -147,7 +148,7 @@
         ctx.drawImage(this.getHtmlElementObj(), 0, 0);
         return canvas.toDataURL('image/png');
     };
-    cc.Sprite.prototype.setImage = function(url, placeholder, progress) {
+    cc.Sprite.prototype.setImage = function (url, placeholder, progress) {
         if (typeof url !== 'string') {
             if (typeof placeholder === 'string') {
                 return this.setImage(placeholder);
@@ -159,13 +160,13 @@
         if (url.startsWith('http')) {
             return ns
                 .loadtxe(url, progress)
-                .then(function(txe) {
+                .then(function (txe) {
                     if (_this.node) {
                         _this.spriteFrame = new cc.SpriteFrame(txe);
                     }
                     return _this;
                 })
-                .catch(function(e) {
+                .catch(function (e) {
                     if (typeof placeholder === 'string') {
                         return _this.setImage(placeholder);
                     } else {
@@ -175,13 +176,13 @@
         } else {
             return ns
                 .loadres(cc.SpriteFrame, url, progress)
-                .then(function(frame) {
+                .then(function (frame) {
                     if (_this.node) {
                         _this.spriteFrame = frame;
                     }
                     return _this;
                 })
-                .catch(function(e) {
+                .catch(function (e) {
                     if (typeof placeholder === 'string') {
                         return _this.setImage(placeholder);
                     } else {
@@ -190,9 +191,9 @@
                 });
         }
     };
-    cc.Sprite.prototype.setAtlas = function(dir, name, progress) {
+    cc.Sprite.prototype.setAtlas = function (dir, name, progress) {
         var _this = this;
-        return ns.loadres(cc.SpriteAtlas, dir, progress).then(function(atlas) {
+        return ns.loadres(cc.SpriteAtlas, dir, progress).then(function (atlas) {
             var sprite = atlas.getSpriteFrame(name);
             if (_this.node && sprite) {
                 _this.spriteFrame = sprite;
@@ -200,7 +201,7 @@
             return _this;
         });
     };
-    cc.Sprite.prototype.adjust = function() {
+    cc.Sprite.prototype.adjust = function () {
         if (!this.node || !this.spriteFrame || arguments.length === 0) return;
         var rect = this.spriteFrame.getRect();
         if (!rect.width || !rect.height) return;
@@ -222,13 +223,13 @@
         this.node.height = rect.height * scale;
     };
     ///----------dragonBones.ArmatureDisplay----------
-    dragonBones.ArmatureDisplay.prototype.runani = function(name, option) {
+    dragonBones.ArmatureDisplay.prototype.runani = function (name, option) {
         var _this = this;
         var opt = cc.js.mixin({ scale: 1, times: 1 }, option);
         _this.delani();
         _this._state = _this.playAnimation(name, opt.times);
         _this._state.timeScale = opt.scale;
-        _this._completed = function(evt) {
+        _this._completed = function (evt) {
             _this.delani();
             if (typeof opt.completed === 'function') {
                 opt.completed.call(opt.target, evt);
@@ -236,7 +237,7 @@
         };
         _this.addEventListener(dragonBones.EventObject.COMPLETE, _this._completed);
     };
-    dragonBones.ArmatureDisplay.prototype.delani = function() {
+    dragonBones.ArmatureDisplay.prototype.delani = function () {
         if (this._state) {
             this._state.stop();
             delete this._state;
@@ -248,11 +249,11 @@
     };
 })((window.cm = window.cm || {}), window.cc, window.dragonBones);
 //---------------------loaders----------------------
-(function(ns, cc) {
+(function (ns, cc) {
     'use strict';
-    ns.loadres = function(type, url, progress) {
-        return new Promise(function(resolve, reject) {
-            cc.loader.loadRes(url, type, progress, function(err, asset) {
+    ns.loadres = function (type, url, progress) {
+        return new Promise(function (resolve, reject) {
+            cc.loader.loadRes(url, type, progress, function (err, asset) {
                 if (err) {
                     reject(err);
                 } else {
@@ -261,9 +262,9 @@
             });
         });
     };
-    ns.loadress = function(type, urls, progress) {
-        return new Promise(function(resolve, reject) {
-            cc.loader.loadResArray(urls, type, progress, function(err, asset) {
+    ns.loadress = function (type, urls, progress) {
+        return new Promise(function (resolve, reject) {
+            cc.loader.loadResArray(urls, type, progress, function (err, asset) {
                 if (err) {
                     reject(err);
                 } else {
@@ -272,13 +273,13 @@
             });
         });
     };
-    ns.loaddir = function(type, dir, progress) {
-        return new Promise(function(resolve, reject) {
+    ns.loaddir = function (type, dir, progress) {
+        return new Promise(function (resolve, reject) {
             if (!dir) {
                 reject(new Error('dir can not be empty'));
                 return;
             }
-            cc.loader.loadResDir(dir, type, progress, function(err, assets, urls) {
+            cc.loader.loadResDir(dir, type, progress, function (err, assets, urls) {
                 if (err) {
                     reject(err);
                 } else {
@@ -287,23 +288,23 @@
             });
         });
     };
-    ns.loadbone = function(dir, name) {
-        return new Promise(function(resolve, reject) {
+    ns.loadbone = function (dir, name) {
+        return new Promise(function (resolve, reject) {
             if (!(dir && name)) {
                 reject(new Error('dir or name can not be empty'));
                 return;
             }
             Promise.all([
                 ns.loadres(dragonBones.DragonBonesAsset, dir + '/' + name + '_ske'),
-                ns.loadres(dragonBones.DragonBonesAtlasAsset, dir + '/' + name + '_tex')
+                ns.loadres(dragonBones.DragonBonesAtlasAsset, dir + '/' + name + '_tex'),
             ])
                 .then(resolve)
                 .catch(reject);
         });
     };
-    ns.loadtxe = function(url, progress) {
-        return new Promise(function(resolve, reject) {
-            cc.loader.load({ url: url, type: 'jpg' }, progress, function(err, txe) {
+    ns.loadtxe = function (url, progress) {
+        return new Promise(function (resolve, reject) {
+            cc.loader.load({ url: url, type: 'jpg' }, progress, function (err, txe) {
                 if (err) {
                     reject(err);
                 } else {
@@ -314,7 +315,7 @@
     };
 })((window.cm = window.cm || {}), window.cc);
 //--------------------Components ----------------
-(function(ns) {
+(function (ns) {
     // prettier-ignore
     var __generator = (this && this.__generator) || function (thisArg, body) {
         var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
@@ -348,40 +349,40 @@
         extends: cc.Component,
         editor: {
             menu: 'CMKit/Button',
-            requireComponent: cc.Button
+            requireComponent: cc.Button,
         },
         properties: {
             quiet: {
                 default: false,
-                tooltip: '是否开启静音模式'
+                tooltip: '是否开启静音模式',
             },
             sound: {
                 default: null,
                 type: cc.AudioClip,
-                tooltip: '点击音效，如果设置了sound则覆盖cm.Button.sound的全局设置'
+                tooltip: '点击音效，如果设置了sound则覆盖cm.Button.sound的全局设置',
             },
             volume: {
                 default: 1,
                 range: [0, 1, 0.01],
                 slide: true,
-                tooltip: '点击音效的音量，范围0-1'
+                tooltip: '点击音效的音量，范围0-1',
             },
             delayTime: {
                 default: 0.2,
                 range: [0, 5, 0.1],
                 slide: true,
-                tooltip: '再次触发点击事件所需要延迟的时间(单位:s)'
-            }
-        }
+                tooltip: '再次触发点击事件所需要延迟的时间(单位:s)',
+            },
+        },
     }));
     Button.quiet = false;
     Button.sound = 'audios/btn_tap';
-    Button.prototype.onLoad = function() {
+    Button.prototype.onLoad = function () {
         var _this = this;
-        this.ccbtn = this.node.on('click', function() {
+        this.ccbtn = this.node.on('click', function () {
             if (!_this.enabledInHierarchy || _this.__suspend) return;
             _this.__suspend = true;
-            _this.scheduleOnce(function() {
+            _this.scheduleOnce(function () {
                 _this.__suspend = false;
             }, _this.delayTime);
             ns.call(_this.onclick);
@@ -389,25 +390,25 @@
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (ns.okstr(Button.sound)) {
-                cc.loader.loadRes(Button.sound, cc.AudioClip, function(err, asset) {
+                cc.loader.loadRes(Button.sound, cc.AudioClip, function (err, asset) {
                     if (!err) cc.audioEngine.play(asset, false, _this.volume);
                 });
             }
         });
     };
     Object.defineProperty(Button.prototype, 'ccbtn', {
-        get: function() {
+        get: function () {
             if (this._ccbtn) return this._ccbtn;
             this._ccbtn = this.node.getComponent(cc.Button);
             return this._ccbtn;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     var pop = (ns.pop = cc.Class({
         extends: cc.Component,
         name: 'cm.pop',
-        ctor: function() {
+        ctor: function () {
             this.prefebs = {};
             this.showed = {};
             this.opqueue = [];
@@ -415,33 +416,33 @@
         properties: {
             opacity: {
                 default: 204,
-                tooltip: '默认背景透明度'
+                tooltip: '默认背景透明度',
             },
             singleColor: {
                 type: cc.SpriteFrame,
                 default: null,
-                tooltip: '单色精灵，用于设置背景蒙层'
+                tooltip: '单色精灵，用于设置背景蒙层',
             },
             unknownError: {
                 default: 'System Error!',
-                tooltip: '当pop.error传入未知错误时显示此错误信息'
+                tooltip: '当pop.error传入未知错误时显示此错误信息',
             },
-            modals: [cc.Prefab]
+            modals: [cc.Prefab],
         },
         editor: {
-            menu: 'CMKit/pop'
-        }
+            menu: 'CMKit/pop',
+        },
     }));
-    pop.present = function(prefeb, opts) {
+    pop.present = function (prefeb, opts) {
         if (this._self) this._self.add({ type: 'present', prefeb: prefeb, opts: opts });
     };
-    pop.remind = function(msg, title, duration) {
+    pop.remind = function (msg, title, duration) {
         if (!duration) {
             duration = 1;
         }
         if (this._self) this._self.add({ type: 'remind', title: title, msg: msg, duration: duration });
     };
-    pop.dismiss = function(name, finish) {
+    pop.dismiss = function (name, finish) {
         if (!this._self) return;
         if (typeof name === 'string') {
             this._self.add({ type: 'dismiss', name: name, finish: finish });
@@ -449,23 +450,23 @@
             this._self.add({ type: 'clear', finish: finish });
         }
     };
-    pop.alert = function(msg, opts) {
+    pop.alert = function (msg, opts) {
         if (this._self) {
             opts = opts || {};
             opts.msg = msg;
             this._self.add({ type: 'present', prefeb: 'alert', opts: opts });
         }
     };
-    pop.wait = function(msg) {
+    pop.wait = function (msg) {
         if (this._self) this._self.add({ type: 'wait', msg: msg });
     };
-    pop.idle = function() {
+    pop.idle = function () {
         if (this._self) this._self.add({ type: 'idle' });
     };
-    pop.error = function(e) {
+    pop.error = function (e) {
         pop.remind((e && e.message) || this._self.unknownError);
     };
-    pop.prototype.onLoad = function() {
+    pop.prototype.onLoad = function () {
         var _this = this;
         pop._self = this;
         var canvas = cc.find('Canvas');
@@ -475,11 +476,11 @@
             _this.prefebs[prefeb.name] = prefeb;
         }
     };
-    pop.prototype.add = function(op) {
+    pop.prototype.add = function (op) {
         this.opqueue.push(op);
         this.next();
     };
-    pop.prototype.next = function() {
+    pop.prototype.next = function () {
         if (this.current) return;
         this.current = this.opqueue.shift();
         if (!this.current) return;
@@ -513,7 +514,7 @@
                 break;
         }
     };
-    pop.prototype.remind = function(title, msg, duration) {
+    pop.prototype.remind = function (title, msg, duration) {
         var _this = this;
         var modal = this.genModal('remind');
         if (!modal) {
@@ -527,21 +528,21 @@
         modal.node.runAction(
             cc.sequence([
                 cc.fadeIn(0.25),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     modal.onPresent(opts);
                 }),
                 cc.delayTime(duration),
                 cc.fadeOut(0.25),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     _this.delete('remind');
                     _this.current = null;
                     _this.next();
-                })
+                }),
             ])
         );
         return modal;
     };
-    pop.prototype.present = function(prefeb, opts) {
+    pop.prototype.present = function (prefeb, opts) {
         var _this = this;
         var modal = this.genModal(prefeb);
         if (!modal) {
@@ -562,11 +563,11 @@
                     cc.scaleTo(0, 0, 0),
                     cc.fadeIn(0),
                     cc.scaleTo(0.3, 1, 1).easing(cc.easeElasticInOut(0.6)),
-                    cc.callFunc(function() {
+                    cc.callFunc(function () {
                         modal.onPresent(opts);
                         _this.current = null;
                         _this.next();
-                    })
+                    }),
                 ])
             );
         } else {
@@ -577,17 +578,17 @@
             modal.node.runAction(
                 cc.sequence([
                     cc.fadeIn(0.25),
-                    cc.callFunc(function() {
+                    cc.callFunc(function () {
                         modal.onPresent(opts);
                         _this.current = null;
                         _this.next();
-                    })
+                    }),
                 ])
             );
         }
         return modal;
     };
-    pop.prototype.dismiss = function(name, finish) {
+    pop.prototype.dismiss = function (name, finish) {
         var _this = this;
         var modal = name && this.showed[name];
         if (!modal) {
@@ -600,17 +601,17 @@
         modal.node.runAction(
             cc.sequence([
                 cc.fadeOut(0.25),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     ns.call(finish);
                     modal.onDismiss();
                     modal.node.destroy();
                     _this.current = null;
                     _this.next();
-                })
+                }),
             ])
         );
     };
-    pop.prototype.clear = function(finish) {
+    pop.prototype.clear = function (finish) {
         var _this = this;
         var showed = this.showed;
         if (!showed) {
@@ -623,7 +624,7 @@
         this.node.runAction(
             cc.sequence([
                 cc.fadeOut(0.25),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     _this.node.opacity = 255;
                     ns.call(finish);
                     for (var key in showed) {
@@ -633,11 +634,11 @@
                     }
                     _this.current = null;
                     _this.next();
-                })
+                }),
             ])
         );
     };
-    pop.prototype.wait = function(msg) {
+    pop.prototype.wait = function (msg) {
         var modal = this.genModal('wait');
         if (modal) {
             modal.onCreate({ msg: msg });
@@ -646,12 +647,12 @@
         this.next();
         return modal;
     };
-    pop.prototype.idle = function() {
+    pop.prototype.idle = function () {
         this.delete('wait');
         this.current = null;
         this.next();
     };
-    pop.prototype.delete = function(name) {
+    pop.prototype.delete = function (name) {
         var modal = this.showed[name];
         if (modal) {
             delete this.showed[name];
@@ -659,7 +660,7 @@
             modal.node.destroy();
         }
     };
-    pop.prototype.genBackground = function(modal) {
+    pop.prototype.genBackground = function (modal) {
         var background = new cc.Node();
         var sprite = background.addComponent(cc.Sprite);
         sprite.type = cc.Sprite.Type.SLICED;
@@ -672,7 +673,7 @@
         modal.background = background;
         return background;
     };
-    pop.prototype.genModal = function(prefeb) {
+    pop.prototype.genModal = function (prefeb) {
         prefeb = prefeb instanceof cc.Prefab ? prefeb : this.prefebs[prefeb];
         if (!prefeb) {
             ns.warn('prefeb not found:', prefeb);
@@ -689,16 +690,16 @@
         node.zIndex = modal.priority;
         node.addComponent(cc.BlockInputEvents);
         node.addComponent(cc.Button);
-        node.on('click', function() {
+        node.on('click', function () {
             ns.call(modal.onblur);
         });
         if (modal.blurquit) {
-            modal.onblur = function() {
+            modal.onblur = function () {
                 pop.dismiss(name);
             };
         }
-        modal.closeres.forEach(function(closer) {
-            closer.onclick = function() {
+        modal.closeres.forEach(function (closer) {
+            closer.onclick = function () {
                 pop.dismiss(name);
             };
         });
@@ -712,39 +713,39 @@
         properties: {
             opacity: {
                 default: -1,
-                tooltip: '设置变暗背景透明度，若为小于0则使用pop设置的透明度'
+                tooltip: '设置变暗背景透明度，若为小于0则使用pop设置的透明度',
             },
             blurquit: {
                 default: false,
-                tooltip: '打开时，点击变暗蒙层可以关闭弹窗,此时this.blur.onclick被设置为dismiss方法'
+                tooltip: '打开时，点击变暗蒙层可以关闭弹窗,此时this.blur.onclick被设置为dismiss方法',
             },
             priority: {
                 default: 0,
-                tooltip: '设置模态弹窗的优先级，较高优先级的显示在上层'
+                tooltip: '设置模态弹窗的优先级，较高优先级的显示在上层',
             },
             animator: {
                 default: null,
                 type: cc.Node,
-                tooltip: '指定一个节点作为弹出动画，如果为空则执行淡入动画。'
+                tooltip: '指定一个节点作为弹出动画，如果为空则执行淡入动画。',
             },
             closeres: {
                 default: [],
                 type: [ns.Button],
-                tooltip: '指定一组按钮作为关闭器，这些按钮会自动关联关闭事件'
-            }
+                tooltip: '指定一组按钮作为关闭器，这些按钮会自动关联关闭事件',
+            },
         },
         editor: {
-            menu: 'CMKit/Modal'
-        }
+            menu: 'CMKit/Modal',
+        },
     }));
-    Modal.prototype.onCreate = function(opts) {
+    Modal.prototype.onCreate = function (opts) {
         this.onhide = opts && opts.onhide;
     };
-    Modal.prototype.onPresent = function(opts) {};
-    Modal.prototype.onDismiss = function() {
+    Modal.prototype.onPresent = function (opts) {};
+    Modal.prototype.onDismiss = function () {
         ns.call(this.onhide);
     };
-    Modal.prototype.dismiss = function(finish) {
+    Modal.prototype.dismiss = function (finish) {
         pop.dismiss(this.node.name, finish);
     };
     var Alert = (ns.Alert = cc.Class({
@@ -753,31 +754,31 @@
         properties: {
             priority: {
                 default: 1000,
-                override: true
+                override: true,
             },
             title: cc.Label,
             message: cc.Label,
             cancel: ns.Button,
             confirm: ns.Button,
             cancelText: cc.Label,
-            confirmText: cc.Label
+            confirmText: cc.Label,
         },
         editor: {
-            menu: 'CMKit/Alert'
-        }
+            menu: 'CMKit/Alert',
+        },
     }));
-    Alert.prototype.onLoad = function() {
+    Alert.prototype.onLoad = function () {
         var _this = this;
-        this.confirm.onclick = function() {
+        this.confirm.onclick = function () {
             return _this.dismiss(_this.confirmBlock);
         };
         if (this.cancel) {
-            this.cancel.onclick = function() {
+            this.cancel.onclick = function () {
                 return _this.dismiss(_this.cancelBlock);
             };
         }
     };
-    Alert.prototype.onCreate = function(opts) {
+    Alert.prototype.onCreate = function (opts) {
         var title = opts.title,
             msg = opts.msg,
             confirm = opts.confirm,
@@ -814,16 +815,16 @@
         properties: {
             priority: {
                 default: 1001,
-                override: true
+                override: true,
             },
             title: cc.Label,
-            message: cc.Label
+            message: cc.Label,
         },
         editor: {
-            menu: 'CMKit/Remind'
-        }
+            menu: 'CMKit/Remind',
+        },
     }));
-    Remind.prototype.onCreate = function(opts) {
+    Remind.prototype.onCreate = function (opts) {
         var title = opts.title,
             msg = opts.msg;
         this.message && (this.message.string = msg || '');
@@ -833,50 +834,50 @@
     var Stack = (ns.Stack = cc.Class({
         extends: cc.Component,
         name: 'cm.Stack',
-        ctor: function() {
+        ctor: function () {
             this.prefebs = {};
             this.pageStack = [];
         },
         properties: {
-            pages: [cc.Prefab]
+            pages: [cc.Prefab],
         },
         editor: CC_EDITOR && {
-            menu: 'CMKit/Stack'
-        }
+            menu: 'CMKit/Stack',
+        },
     }));
     Object.defineProperty(Stack, 'current', {
-        get: function() {
+        get: function () {
             var node = cc.find('Canvas');
             return node && node.getComponent(ns.Stack);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Stack.prototype, 'root', {
-        get: function() {
+        get: function () {
             return this._root;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Stack.prototype, 'top', {
-        get: function() {
+        get: function () {
             return this.pageStack.last || this._root;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Stack.prototype, 'count', {
-        get: function() {
+        get: function () {
             return this.pageStack.length;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Stack.prototype.onLoad = function() {
+    Stack.prototype.onLoad = function () {
         if (this.pages && this.pages.length > 0) {
             var _this = this;
-            this.pages.forEach(function(ele) {
+            this.pages.forEach(function (ele) {
                 return (_this.prefebs[ele.name] = ele);
             });
             this._root = this.genPage(this.pages[0].name);
@@ -885,7 +886,7 @@
             this._root.didShow();
         }
     };
-    Stack.prototype.push = function(name, props, finish) {
+    Stack.prototype.push = function (name, props, finish) {
         var top = this.top;
         var page = this.genPage(name);
         var width = this.node.width;
@@ -898,9 +899,9 @@
         top.node.runAction(
             cc.sequence([
                 cc.moveTo(0.25, cc.v2(-width / 3, 0)).easing(cc.easeInOut(5)),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     top.didHide();
-                })
+                }),
             ])
         );
 
@@ -908,14 +909,14 @@
         page.node.runAction(
             cc.sequence([
                 cc.moveTo(0.25, cc.v2(0, 0)).easing(cc.easeInOut(5)),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     page.didShow();
                     ns.call(finish);
-                })
+                }),
             ])
         );
     };
-    Stack.prototype.pop = function() {
+    Stack.prototype.pop = function () {
         var length = this.pageStack.length;
         if (length <= 0) return;
         var delta = arguments[0];
@@ -945,29 +946,29 @@
         ani.node.runAction(
             cc.sequence([
                 cc.moveTo(0.25, cc.v2(width, 0)).easing(cc.easeInOut(5)),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     ani.didHide();
                     ani.node.destroy();
                     ns.call(finish);
-                })
+                }),
             ])
         );
         top.willShow();
         top.node.runAction(
             cc.sequence([
                 cc.moveTo(0.25, cc.v2(0, 0)).easing(cc.easeInOut(5)),
-                cc.callFunc(function() {
+                cc.callFunc(function () {
                     top.didShow();
-                })
+                }),
             ])
         );
     };
-    Stack.prototype.remove = function(page) {
+    Stack.prototype.remove = function (page) {
         if (this.pageStack.delete(page) >= 0) {
             page.node.destroy();
         }
     };
-    Stack.prototype.genPage = function(name) {
+    Stack.prototype.genPage = function (name) {
         var prefeb = this.prefebs[name];
         if (!prefeb) throw new Error('页面不存在');
         var node = cc.instantiate(prefeb);
@@ -979,24 +980,24 @@
         return page;
     };
     var SKPage = (ns.SKPage = cc.Class({
-        extends: cc.Component
+        extends: cc.Component,
     }));
-    SKPage.prototype.willShow = function() {};
-    SKPage.prototype.didShow = function() {};
-    SKPage.prototype.willHide = function() {};
-    SKPage.prototype.didHide = function() {};
+    SKPage.prototype.willShow = function () {};
+    SKPage.prototype.didShow = function () {};
+    SKPage.prototype.willHide = function () {};
+    SKPage.prototype.didHide = function () {};
 
     var Padding = cc.Class({
         name: 'cm.Padding',
         properties: {
             head: 0,
-            tail: 0
-        }
+            tail: 0,
+        },
     });
     var ListView = (ns.ListView = cc.Class({
         extends: cc.Component,
         name: 'cm.ListView',
-        ctor: function() {
+        ctor: function () {
             this.lastOffsetY = 0;
             this.datas = [];
             this.items = [];
@@ -1005,47 +1006,47 @@
         properties: {
             spacing: {
                 default: 0,
-                tooltip: '列表行间距'
+                tooltip: '列表行间距',
             },
             padding: {
                 default: null,
                 type: Padding,
-                tooltip: '列表的内边距'
+                tooltip: '列表的内边距',
             },
             itemPrefeb: {
                 default: null,
                 type: cc.Prefab,
-                tooltip: '列表item预制文件'
+                tooltip: '列表item预制文件',
             },
             itemHeight: {
                 default: 132,
-                tooltip: '列表item高度'
+                tooltip: '列表item高度',
             },
             cacheCount: {
                 default: 2,
                 type: cc.Integer,
                 slide: true,
                 range: [1, 4, 1],
-                tooltip: '列表上下两侧各预加载的item个数(必须为整数)'
+                tooltip: '列表上下两侧各预加载的item个数(必须为整数)',
             },
             frameCount: {
                 default: 3,
                 type: cc.Integer,
                 slide: true,
                 range: [1, 8, 1],
-                tooltip: '列表每一帧最多加载的item个数(必须为整数)，优化加载速度。'
-            }
+                tooltip: '列表每一帧最多加载的item个数(必须为整数)，优化加载速度。',
+            },
         },
         editor: CC_EDITOR && {
             menu: 'CMKit/ListView',
-            requireComponent: cc.ScrollView
-        }
+            requireComponent: cc.ScrollView,
+        },
     }));
-    ListView.prototype.onDestroy = function() {
+    ListView.prototype.onDestroy = function () {
         this.datas = [];
         this.items = [];
     };
-    ListView.prototype.onLoad = function() {
+    ListView.prototype.onLoad = function () {
         this.scrollView = this.node.getComponent(cc.ScrollView);
         this.scrollView.node.on('scrolling', this.onScrolling, this);
         this.scrollView.node.on('scroll-to-top', this.onScrollTop, this);
@@ -1055,7 +1056,7 @@
         this.maxTop = this.cacheCount * this.itemHeight;
         this.maxBottom = -(this.maxItemCount - this.cacheCount) * this.itemHeight;
     };
-    ListView.prototype.appendData = function(datas) {
+    ListView.prototype.appendData = function (datas) {
         if (this.scrollView && Array.isArray(datas) && datas.length > 0) {
             this.datas.append(datas);
             this.setHeight();
@@ -1065,7 +1066,7 @@
             }
         }
     };
-    ListView.prototype.reloadData = function(datas) {
+    ListView.prototype.reloadData = function (datas) {
         if (this.scrollView && Array.isArray(datas)) {
             this.datas = datas;
             this.items = [];
@@ -1076,48 +1077,48 @@
             this.next(this.genItems(0, itemCount), this.frameCount);
         }
     };
-    ListView.prototype.reloadIndex = function(index, data) {
+    ListView.prototype.reloadIndex = function (index, data) {
         if (ns.okint(index) && data && index >= 0 && index < this.datas.length) {
             this.datas[index] = data;
-            this.items.forEach(function(ele) {
+            this.items.forEach(function (ele) {
                 if (ele.index === index) {
                     ele.setData(data, this.bind);
                 }
             });
         }
     };
-    ListView.prototype.addNode = function(node) {
+    ListView.prototype.addNode = function (node) {
         this.scrollView.content.addChild(node);
     };
-    ListView.prototype.insertNode = function(node, index) {
+    ListView.prototype.insertNode = function (node, index) {
         this.scrollView.content.insertChild(node, index);
     };
-    ListView.prototype.scrollToHead = function(time, attenuated) {
+    ListView.prototype.scrollToHead = function (time, attenuated) {
         if (this.scrollView.vertical) {
             this.scrollView.scrollToTop(time, attenuated);
         } else if (this.scrollView.horizontal) {
             this.scrollView.scrollToLeft(time, attenuated);
         }
     };
-    ListView.prototype.scrollToTail = function(time, attenuated) {
+    ListView.prototype.scrollToTail = function (time, attenuated) {
         if (this.scrollView.vertical) {
             this.scrollView.scrollToBottom(time, attenuated);
         } else if (this.scrollView.horizontal) {
             this.scrollView.scrollToRight(time, attenuated);
         }
     };
-    ListView.prototype.scrollToIndex = function(index, time, attenuated) {
+    ListView.prototype.scrollToIndex = function (index, time, attenuated) {
         var offset = (this.itemHeight + this.spacing) * index;
         this.scrollToOffset(offset, time, attenuated);
     };
-    ListView.prototype.scrollToOffset = function(offset, time, attenuated) {
+    ListView.prototype.scrollToOffset = function (offset, time, attenuated) {
         if (this.scrollView.vertical) {
             this.scrollView.scrollToOffset(cc.v2(0, offset), time, attenuated);
         } else if (this.scrollView.horizontal) {
             this.scrollView.scrollToOffset(cc.v2(offset, 0), time, attenuated);
         }
     };
-    ListView.prototype.next = function(g, size) {
+    ListView.prototype.next = function (g, size) {
         for (var index = 0; index < size; index++) {
             if (g.next().done) {
                 if (this.delegate && this.delegate.itemsDidLoad) {
@@ -1127,13 +1128,13 @@
             }
         }
         var _this = this;
-        this.scheduleOnce(function() {
+        this.scheduleOnce(function () {
             _this.next(g, size);
         });
     };
-    ListView.prototype.genItems = function(from, to) {
+    ListView.prototype.genItems = function (from, to) {
         var index, node, item;
-        return __generator(this, function(_a) {
+        return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     index = from;
@@ -1158,22 +1159,22 @@
             }
         });
     };
-    ListView.prototype.onScrollTop = function() {
+    ListView.prototype.onScrollTop = function () {
         if (this.delegate && this.delegate.didReachHead) {
             this.delegate.didReachHead(this);
         }
     };
-    ListView.prototype.onScrollBottom = function() {
+    ListView.prototype.onScrollBottom = function () {
         if (this.delegate && this.delegate.didReachTail) {
             this.delegate.didReachTail(this);
         }
     };
-    ListView.prototype.setHeight = function() {
+    ListView.prototype.setHeight = function () {
         var height = (this.itemHeight + this.spacing) * this.datas.length - this.spacing;
         height = height + this.padding.head + this.padding.tail;
         this.scrollView.content.height = Math.max(height, this.maskHeight);
     };
-    ListView.prototype.onScrolling = function() {
+    ListView.prototype.onScrolling = function () {
         if (this.items.length < this.maxItemCount) {
             return;
         }
@@ -1204,15 +1205,15 @@
     };
     var ListItem = (ns.ListItem = cc.Class({
         extends: cc.Component,
-        ctor: function() {
+        ctor: function () {
             this.__index = 0;
-        }
+        },
     }));
     Object.defineProperty(ListItem.prototype, 'index', {
-        get: function() {
+        get: function () {
             return this.__index;
         },
-        set: function(val) {
+        set: function (val) {
             this.__index = val;
             if (this.list) {
                 this.node.y = -0.5 * this.list.itemHeight - (this.list.spacing + this.list.itemHeight) * val - this.list.padding.head;
@@ -1220,15 +1221,15 @@
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    ListItem.prototype.emit = function(event) {
+    ListItem.prototype.emit = function (event) {
         if (this.list && this.list.delegate && this.list.delegate.itemDidOccur) {
             this.list.delegate.itemDidOccur(event, this.list.datas[this.index], this, this.list);
         }
     };
-    ListItem.prototype.setData = function() {};
-    ListItem.prototype.init = function(list) {
+    ListItem.prototype.setData = function () {};
+    ListItem.prototype.init = function (list) {
         this.list = list;
     };
 
@@ -1236,38 +1237,38 @@
         name: 'cm.Counter',
         extends: cc.Component,
         editor: {
-            menu: 'CMKit/Counter'
+            menu: 'CMKit/Counter',
         },
         properties: {
             quiet: {
                 default: false,
-                tooltip: '是否开启静音模式'
+                tooltip: '是否开启静音模式',
             },
             label: {
                 type: cc.Label,
                 default: null,
-                tooltip: '需要滚动效果的label'
+                tooltip: '需要滚动效果的label',
             },
             sound: {
                 default: null,
                 type: cc.AudioClip,
-                tooltip: '滚动时候伴随的音效，若不需要音效则无需设置'
-            }
+                tooltip: '滚动时候伴随的音效，若不需要音效则无需设置',
+            },
         },
-        ctor: function() {
+        ctor: function () {
             this._value = 0;
             this._step = 0;
             this._goal = 0;
             this._stack = [];
             this._rate = cc.game.getFrameRate();
-        }
+        },
     }));
     Counter.quiet = false;
     Object.defineProperty(Counter.prototype, 'digit', {
-        get: function() {
+        get: function () {
             return this._goal;
         },
-        set: function(val) {
+        set: function (val) {
             if (typeof val === 'number') {
                 this._stack.push(val);
                 this.next();
@@ -1276,18 +1277,18 @@
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Counter.prototype.formater = function(value) {
+    Counter.prototype.formater = function (value) {
         return value.round().comma();
     };
-    Counter.prototype.steper = function(delta) {
+    Counter.prototype.steper = function (delta) {
         if (delta < this._rate) {
             return 1;
         }
         return Math.floor(delta / this._rate);
     };
-    Counter.prototype.next = function() {
+    Counter.prototype.next = function () {
         if (this._step) return;
         if (this._stack.length === 0) return;
         var goal = this._stack.shift();
@@ -1309,18 +1310,18 @@
                 dur = 0.3;
             }
             var sid = cc.audioEngine.play(this.sound, true, 1);
-            setTimeout(function() {
+            setTimeout(function () {
                 cc.audioEngine.stop(sid);
             }, dur * 1000);
         }
     };
-    Counter.prototype.setText = function(val) {
+    Counter.prototype.setText = function (val) {
         if (this._value !== val) {
             this._value = val;
             this.label.string = this.formater(val);
         }
     };
-    Counter.prototype.update = function(dt) {
+    Counter.prototype.update = function (dt) {
         if (this._step > 0 && this._goal > this._value) {
             var value = this._value + this._step;
             if (value > this._goal) {
@@ -1338,25 +1339,25 @@
         name: 'cm.Shadow',
         extends: cc.Component,
         editor: {
-            menu: 'CMKit/Shadow'
+            menu: 'CMKit/Shadow',
         },
         properties: {
             color: {
                 default: cc.Color.WHITE,
-                tooltip: '阴影的颜色'
+                tooltip: '阴影的颜色',
             },
             offset: {
                 default: cc.v2(2, -2),
-                tooltip: '阴影的偏移量'
+                tooltip: '阴影的偏移量',
             },
             target: {
                 type: cc.Label,
                 default: null,
-                tooltip: '需要添加阴影的Label，默认查询当前节点上的cc.Label'
-            }
-        }
+                tooltip: '需要添加阴影的Label，默认查询当前节点上的cc.Label',
+            },
+        },
     }));
-    Shadow.prototype.onLoad = function() {
+    Shadow.prototype.onLoad = function () {
         var target = this.target || this.node.getComponent(cc.Label);
         if (!target) {
             ns.warn('Shadow target must be  a cc.Label Node or mount on a cc.Label!!');
@@ -1365,7 +1366,7 @@
         this.label.string = target.string;
     };
     Object.defineProperty(Shadow.prototype, 'label', {
-        get: function() {
+        get: function () {
             if (this._label) return this._label;
             var target = this.target || this.node.getComponent(cc.Label);
             if (!target) {
@@ -1393,13 +1394,13 @@
             return label;
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Shadow.prototype, 'string', {
-        get: function() {
+        get: function () {
             return this.label && this.label.string;
         },
-        set: function(val) {
+        set: function (val) {
             var target = this.target || this.node.getComponent(cc.Label);
             if (target) {
                 this.label.string = val;
@@ -1407,34 +1408,34 @@
             }
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     var Corner = (ns.Corner = cc.Class({
         name: 'cm.Corner',
         extends: cc.Component,
         editor: {
             menu: 'CMKit/Corner',
-            requireComponent: cc.Mask
+            requireComponent: cc.Mask,
         },
         properties: {
             _radius: 0,
             radius: {
-                get: function() {
+                get: function () {
                     return this._radius;
                 },
-                set: function(value) {
+                set: function (value) {
                     this._radius = Math.min(this.node.width / 2, this.node.height / 2, Math.max(0, value));
                     var mask = this.node.getComponent(cc.Mask);
                     if (mask) {
                         mask._updateGraphics();
                     }
                 },
-                tooltip: '圆角半径'
-            }
-        }
+                tooltip: '圆角半径',
+            },
+        },
     }));
     var _updateGraphics = cc.Mask.prototype._updateGraphics;
-    cc.Mask.prototype._updateGraphics = function() {
+    cc.Mask.prototype._updateGraphics = function () {
         var corner = this.node.getComponent(Corner);
         if (corner && corner.radius) {
             var node = this.node;
@@ -1459,34 +1460,34 @@
         name: 'cm.Wrapper',
         extends: cc.Component,
         editor: {
-            menu: 'CMKit/Wrapper'
+            menu: 'CMKit/Wrapper',
         },
         properties: {
             label: cc.Label,
-            sprite: cc.Sprite
-        }
+            sprite: cc.Sprite,
+        },
     }));
     Object.defineProperty(Wrapper.prototype, 'text', {
-        get: function() {
+        get: function () {
             return this.label && this.label.string;
         },
-        set: function(val) {
+        set: function (val) {
             this.label && (this.label.string = val);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
     Object.defineProperty(Wrapper.prototype, 'image', {
-        get: function() {
+        get: function () {
             return this.sprite && this.sprite.spriteFrame;
         },
-        set: function(val) {
+        set: function (val) {
             this.sprite && (this.sprite.spriteFrame = val);
         },
         enumerable: true,
-        configurable: true
+        configurable: true,
     });
-    Wrapper.prototype.setImage = function(url, placeholder, progress) {
+    Wrapper.prototype.setImage = function (url, placeholder, progress) {
         if (this.sprite) {
             this.sprite.setImage(url, placeholder, progress);
         }
