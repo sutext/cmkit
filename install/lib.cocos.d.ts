@@ -72,9 +72,8 @@ declare namespace cm {
     /**
      * @description 加载远程图片资源
      * @param url 完整url地址
-     * @param progress 加载进度
      */
-    const loadtxe: (url: string, progress?: IProgress) => Promise<cc.Texture2D>;
+    const loadtxe: (url: string) => Promise<cc.Texture2D>;
     /**
      * @description 加载并缓存 一个dragonBones骨骼动画
      * @param dir 资源目录 相对于resources

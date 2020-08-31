@@ -76,12 +76,14 @@
 (function (ns, cc, dragonBones) {
     'use strict';
     var __Audio = cc.Audio || cc._Audio;
-    var __play = __Audio.prototype.play;
-    __Audio.prototype.play = function () {
-        if (!ns.quiet) {
-            __play.call(this);
-        }
-    };
+    if (__Audio) {
+        var __play = __Audio.prototype.play;
+        __Audio.prototype.play = function () {
+            if (!ns.quiet) {
+                __play.call(this);
+            }
+        };
+    }
     ///----------cc.Node----------
     cc.Node.prototype.setBone = function (dir, name) {
         var _this = this;
@@ -148,7 +150,7 @@
         ctx.drawImage(this.getHtmlElementObj(), 0, 0);
         return canvas.toDataURL('image/png');
     };
-    cc.Sprite.prototype.setImage = function (url, placeholder, progress) {
+    cc.Sprite.prototype.setImage = function (url, placeholder) {
         if (typeof url !== 'string') {
             if (typeof placeholder === 'string') {
                 return this.setImage(placeholder);
@@ -159,7 +161,7 @@
         var _this = this;
         if (url.startsWith('http')) {
             return ns
-                .loadtxe(url, progress)
+                .loadtxe(url)
                 .then(function (txe) {
                     if (_this.node) {
                         _this.spriteFrame = new cc.SpriteFrame(txe);
@@ -253,7 +255,7 @@
     'use strict';
     ns.loadres = function (type, url, progress) {
         return new Promise(function (resolve, reject) {
-            cc.loader.loadRes(url, type, progress, function (err, asset) {
+            cc.resources.load(url, type, progress, function (err, asset) {
                 if (err) {
                     reject(err);
                 } else {
@@ -264,7 +266,7 @@
     };
     ns.loadress = function (type, urls, progress) {
         return new Promise(function (resolve, reject) {
-            cc.loader.loadResArray(urls, type, progress, function (err, asset) {
+            cc.resources.loadArray(urls, type, progress, function (err, asset) {
                 if (err) {
                     reject(err);
                 } else {
@@ -279,7 +281,7 @@
                 reject(new Error('dir can not be empty'));
                 return;
             }
-            cc.loader.loadResDir(dir, type, progress, function (err, assets, urls) {
+            cc.resources.loadDir(dir, type, progress, function (err, assets, urls) {
                 if (err) {
                     reject(err);
                 } else {
@@ -302,9 +304,9 @@
                 .catch(reject);
         });
     };
-    ns.loadtxe = function (url, progress) {
+    ns.loadtxe = function (url) {
         return new Promise(function (resolve, reject) {
-            cc.loader.load({ url: url, type: 'jpg' }, progress, function (err, txe) {
+            cc.assetManager.loadRemote(url, function (err, txe) {
                 if (err) {
                     reject(err);
                 } else {
@@ -390,7 +392,7 @@
             if (_this.sound) {
                 cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (ns.okstr(Button.sound)) {
-                cc.loader.loadRes(Button.sound, cc.AudioClip, function (err, asset) {
+                cc.resources.load(Button.sound, cc.AudioClip, function (err, asset) {
                     if (!err) cc.audioEngine.play(asset, false, _this.volume);
                 });
             }
