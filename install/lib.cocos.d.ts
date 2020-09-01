@@ -2,39 +2,14 @@
 /// <reference path="lib.web.d.ts" />
 
 declare namespace cm {
-    /** @description 游戏全局代理类，用于处理全局消息 */
-    abstract class Game {
-        /**
-         * @description 游戏启动成功时候调用 cc.game.onStart 执行完之后执行此方法
-         * @notice 此时游戏场景尚未启动
-         * @param scene  默认启动场景
-         */
-        protected abstract onInit(scene: string): void;
-        /** @description 游戏页面出现时候调用 通常是host app 进入前台时调用 */
-        protected abstract onShow(): void;
-        /** @description 游戏隐藏时候调用 通常是host app 进入后台台时调用 */
-        protected abstract onHide(): void;
-        /** @description 退出游戏 需提供具体实现*/
-        public abstract exit(): void;
-    }
-    /**
-     * @description Mark a Game Entry class. There can only be one game entry
-     * @param apihost api主机
-     * @param debug 是否开启debug 模式 @default false
-     */
-    const entry: (apihost: string, debug?: boolean) => <T extends Game>(target: new () => T) => void;
     /** @description 以16进制字符串生成颜色 */
     const color: (hex: string) => cc.Color;
-    /** @description 全局游戏代理实例 */
-    const game: Game;
     /** 是否开启静音模式 如果开启,则立即关闭所有声音 并且禁止播之后的声音 @default false */
     let quiet: boolean;
-
     /**@description loader progress description */
     interface IProgress {
         (completedCount: number, totalCount: number, item: any): void;
     }
-
     /**@description cc.Asset meta class description */
     interface IMetaAsset<T extends cc.Asset> {
         new (): T;

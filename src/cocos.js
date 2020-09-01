@@ -27,27 +27,6 @@
             console.warn.apply(console, args);
         }
     };
-    ns.Game = (function () {
-        function Game() {
-            var _this = this;
-            cc.game.on(cc.game.EVENT_SHOW, _this.onShow, _this);
-            cc.game.on(cc.game.EVENT_HIDE, _this.onHide, _this);
-            this.start = function (scene) {
-                _this.onInit(scene);
-            };
-        }
-        return Game;
-    })();
-    ns.entry = function (apihost, debug) {
-        if (ns.game) {
-            throw new Error('There can only be one Game');
-        }
-        ns.apihost = apihost;
-        ns.debug = !!debug;
-        return function (target) {
-            ns.game = new target();
-        };
-    };
     ns.color = function (hex) {
         return cc.Color.WHITE.fromHEX(hex);
     };
