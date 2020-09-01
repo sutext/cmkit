@@ -156,7 +156,7 @@
                 });
         } else {
             return ns
-                .loadres(cc.SpriteFrame, url, progress)
+                .loadres(cc.SpriteFrame, url)
                 .then(function (frame) {
                     if (_this.node) {
                         _this.spriteFrame = frame;
@@ -1468,9 +1468,9 @@
         enumerable: true,
         configurable: true,
     });
-    Wrapper.prototype.setImage = function (url, placeholder, progress) {
+    Wrapper.prototype.setImage = function (url, placeholder) {
         if (this.sprite) {
-            this.sprite.setImage(url, placeholder, progress);
+            this.sprite.setImage(url, placeholder);
         }
     };
 })(window.cm || (window.cm = {}));

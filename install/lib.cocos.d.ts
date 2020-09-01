@@ -114,7 +114,7 @@ declare namespace cc {
          * @param url the image url
          * @param placeholder the placeholder url ,you must ensure the placeholder is exist
          */
-        readonly setImage: (url: string, placeholder?: string, progress?: cm.IProgress) => Promise<cc.Sprite>;
+        readonly setImage: (url: string, placeholder?: string) => Promise<cc.Sprite>;
         /**
          * @description 用于加载图集的一张图片
          * @param atlas 图集url 相对于resourses 的目录
