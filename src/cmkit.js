@@ -658,8 +658,7 @@ var __extends =
                                         ns.warn('the mapkey:', mapkey, 'not exist in object:', obj);
                                     }
                                 });
-                            }
-                            if (typeof value === 'object') {
+                            } else if (typeof value === 'object') {
                                 for (var key in value) {
                                     var obj = new meta(value[key]);
                                     var keyvalue = obj[mapkey];
