@@ -372,7 +372,10 @@
                 cc.audioEngine.play(_this.sound, false, _this.volume);
             } else if (ns.okstr(Button.sound)) {
                 cc.resources.load(Button.sound, cc.AudioClip, function (err, asset) {
-                    if (!err) cc.audioEngine.play(asset, false, _this.volume);
+                    if (!err) {
+                        _this.sound = asset;
+                        cc.audioEngine.play(asset, false, _this.volume);
+                    }
                 });
             }
         });
