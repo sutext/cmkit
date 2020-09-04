@@ -268,7 +268,7 @@ declare namespace cm {
          */
         protected readonly offall: () => void;
     }
-    class NoticeCenter extends Emitter<string> {
+    class NoticeCenter<T extends string = string> extends Emitter<T> {
         /**
          * @description dispatch event to all the rigsted handler
          * @param event the event
