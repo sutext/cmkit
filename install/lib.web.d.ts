@@ -274,7 +274,7 @@ declare namespace cm {
          * @param event the event
          * @param args the arguments of callback function
          */
-        public readonly emit: (event: string, ...args: any[]) => void;
+        public readonly emit: (event: T, ...args: any[]) => void;
         /** @description remove all handler */
         public readonly offall: () => void;
     }
@@ -288,24 +288,24 @@ declare namespace cm {
          * @description define the key of maptask and mapreq
          * @default 'id'
          */
-        protected readonly mapkey?: 'id' | string;
+        protected get mapkey(): 'id' | string;
         /**
          * @description auto show loading or not
          * @notice You must provide your loading UI in before or after hock. otherwith it does't work!
          * @see Network.before @see Network.after.
          * @default false
          */
-        protected readonly loading?: boolean;
+        protected get loading(): boolean;
         /**
          * @description wait time out settings
          * @default 0 wait forever
          */
-        protected readonly timeout?: number;
+        protected get timeout(): number;
         /**
          * @description the response type for xhr.responseType
          * @default 'json'
          */
-        protected readonly restype?: 'json' | 'text';
+        protected get restype(): 'json' | 'text';
         /**
          * @description the global http request method
          * @override you shoud override this property and provide you custom headers
@@ -315,7 +315,7 @@ declare namespace cm {
          *     return 'POST'
          * }
          */
-        protected readonly method: Network.Method;
+        protected get method(): Network.Method;
         /**
          * @description the global http headers. every request will include this headers
          * @override you shoud overwrite this property and provide you custom headers
@@ -327,7 +327,7 @@ declare namespace cm {
          *     }
          * }
          */
-        protected readonly headers: Record<string, string>;
+        protected get headers(): Record<string, string>;
 
         /**
          * @description the global request body data reslover
@@ -530,7 +530,7 @@ declare namespace cm {
             /** the realy websocket handler */
             protected readonly socket: Socket;
             /** Tell me your login status if not no retry */
-            protected abstract readonly isLogin: boolean;
+            protected abstract get isLogin(): boolean;
             /** @overwrite this method to provide url for web socket */
             protected abstract buildurl(): string;
             /** call when get some message @override point  @notice the msg has been parsed using JSON.parse.*/
