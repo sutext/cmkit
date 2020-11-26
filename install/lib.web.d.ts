@@ -459,6 +459,13 @@ declare namespace cm {
          * console.log(Network.encodeQuery(param)) // ?a=1&b=2&c=4&c=5&c=haa&d=true
          */
         const encodeQuery: (params: object) => string;
+        /**
+         * @description replace your custome network implementation
+         * @param impl You must provide your custome network implementation
+         */
+        const replaceImpl: (impl: {
+            request: (url: string, data: any, opts: Options) => [Promise<any>, { abort: () => void; onprogress: (evt: ProgressEvent) => void }];
+        }) => void;
     }
     /** @description Wrapped on WebSocket and has implement retry mechanis */
     class Socket {

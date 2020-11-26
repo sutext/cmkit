@@ -765,9 +765,7 @@ var __extends =
                     return _this.promiss.catch(onrejected);
                 };
                 this.abort = function () {
-                    if (this.handler.readyState < 4) {
-                        _this.handler.abort();
-                    }
+                    _this.handler.abort();
                 };
                 this.onProgress = function (func) {
                     _this.handler.onprogress = func;
@@ -789,6 +787,9 @@ var __extends =
         })(DataTask);
         Network.UploadTask = UploadTask;
         Network.http = function (url, data, opts) {
+            if (Network.impl) {
+                return Network.impl.request(url, data, opts);
+            }
             return (opts && opts.method) === 'GET' ? Network.get(url, data, opts) : Network.post(url, data, opts);
         };
         function isPlanValue(value) {
@@ -828,6 +829,15 @@ var __extends =
             return '?' + url.substring(1);
         }
         Network.encodeQuery = encodeParams;
+        Network.replaceImpl = function (impl) {
+            if (typeof impl !== 'object') {
+                throw new Error('invalid Network implementation');
+            }
+            if (typeof impl.get !== 'function' || typeof impl.post !== 'function') {
+                throw new Error('invalid Network implementation');
+            }
+            Network.impl = impl;
+        };
         Network.get = function (url, data, opts) {
             var handler;
             var promiss = new Promise(function (resolve, reject) {
