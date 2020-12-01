@@ -1263,7 +1263,7 @@ var __extends =
             var idxkey = getIdxkey(model.constructor);
             var objkey = getObjkey(clskey, model[idxkey]);
             var keys = getItem(clskey) || {};
-            keys[objkey] = '';
+            keys[objkey] = true;
             setItem(clskey, keys);
             setItem(objkey, model);
         };
