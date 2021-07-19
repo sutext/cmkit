@@ -546,7 +546,7 @@
                     cc.delayTime(0.05),
                     cc.scaleTo(0, 0, 0),
                     cc.fadeIn(0),
-                    cc.scaleTo(0.3, 1, 1).easing(cc.easeElasticInOut(0.6)),
+                    cc.scaleTo(0.3, 1, 1).easing(cc.easeBackOut(0.3)),
                     cc.callFunc(function () {
                         modal.onPresent(opts);
                         _this.current = null;
@@ -558,17 +558,9 @@
             if (opacity > 0) {
                 _this.genBackground(modal).opacity = opacity;
             }
-            modal.node.opacity = 0;
-            modal.node.runAction(
-                cc.sequence([
-                    cc.fadeIn(0.25),
-                    cc.callFunc(function () {
-                        modal.onPresent(opts);
-                        _this.current = null;
-                        _this.next();
-                    }),
-                ])
-            );
+            modal.onPresent(opts);
+            _this.current = null;
+            _this.next();
         }
         return modal;
     };
